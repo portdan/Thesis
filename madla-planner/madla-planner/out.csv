@@ -13,3 +13,4 @@ domain,problem,agents,heuristic,recursionLevel,totalTime,initHeuristic,initHeuri
 benchmarks/logistics00,benchmarks/logistics00/probLOGISTICS-4-0.pddl,3,PPsaFF-glcl,-1,272,{tru1=9 tru2=4 apn1=4},{tru1=22 tru2=13 apn1=15},0,309,41,268,70,147,148,365,12652,0,0,0,0,0,,,,,,,29,0,true,true
 mapddl-benchmarks/logistics00,mapddl-benchmarks/logistics00/probLOGISTICS-4-0.pddl,3,PPsaFF-glcl,-1,1723,{tru1=9 tru2=4 apn1=4},{tru1=20 tru2=13 apn1=15},0,298,13,285,77,57,57,191,6436,0,0,0,0,0,,,,,,,32,0,true,true
 mapddl-benchmarks/logistics00,mapddl-benchmarks/logistics00/probLOGISTICS-4-0.pddl,3,PPsaFF-glcl,-1,1559,{},0,{tru1=9 tru2=4 apn1=4},{tru1=20 tru2=13 apn1=15},0,352,7,345,111,41,39,191,6336,0,0,0,0,0,,,,,,,20,0,true,true
+mapddl-benchmarks/logistics00,mapddl-benchmarks/logistics00/probLOGISTICS-4-0.pddl,3,saFF-glcl,-1,956,{},0,{tru1=7 tru2=3 apn1=2},{tru1=10 tru2=14 apn1=8},0,265,7,258,83,19,18,120,3940,0,0,0,0,0,,,,,,,8,0,true,true

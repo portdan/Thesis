@@ -5,18 +5,21 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
 
+import cz.agents.alite.creator.CreatorFactory;
 import problemGenerator.fileGenerator.ADDLGenerator;
 import problemGenerator.fileGenerator.PDDLGenerator;
 
 public class Main 
 {
 	private static String timeStamp;
-	
+
 	private static ADDLGenerator addl;
 	private static PDDLGenerator pddl;
 
 	public static void main( String[] args )
 	{
+		CreatorFactory.createCreator(args).create();
+		
 		/*
 		DefineProblemName();
 		DefineDomain();
@@ -25,18 +28,19 @@ public class Main
 		DefineGoal();
 		 */
 
+		/*
 		printArgs(args);
 
 		checkArgs(args);
-		
+
 		setTimeStamp();
-		
+
 		initGenerators();
 
 		createProblemFile();
-		
-		createAgentFile();
 
+		createAgentFile();
+		 */
 		/*
         String[] a = {
         		"cz.agents.madla.creator.MAPDDLCreator",
@@ -86,5 +90,5 @@ public class Main
 		pddl.generateFile(timeStamp);
 	}
 
-	
+
 }
