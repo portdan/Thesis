@@ -46,7 +46,7 @@ public class RandomPlanner {
 	
 	
 	public static void RandomWalk(State current, State endState,  int numOfExpands, List<DIMAPWorldInterface> worlds) {
-		Random rand = new Random(1);
+		Random rand = new Random();
 		LOGGER.info("start random walk:");
 
 		// Random walk TODO: MAKE IT WORK DANIEL!
@@ -121,6 +121,61 @@ public class RandomPlanner {
 		endState = current;
 	}
 
+	public static State RandomWalk(State startState, int numOfExpands, List<DIMAPWorldInterface> worlds) {
+		
+		//Random rand = new Random(1); // fixed seed
+		Random rand = new Random(); // no seed
+
+		LOGGER.info("start random walk:");
+
+		// Random walk TODO: MAKE IT WORK DANIEL!
+		int randomActionIndex;
+		int randomAgent;
+		Action randomAction;
+		State current = new State(startState);
+		
+		List<Action> applicableActions = new ArrayList<Action>();
+		
+		for(int i=0; i<numOfExpands; i++) {
+			
+			randomAgent = rand.nextInt(worlds.size());
+			DIMAPWorldInterface world = worlds.get(randomAgent);
+			
+			applicableActions.clear();
+
+			for(Action action : world.getProblem().getMyActions()) {
+				if(action.isApplicableIn(current)) {
+					applicableActions.add(action);	
+				}
+			}
+			
+			// If reached a dead-end, stop the random walk
+			if(applicableActions.isEmpty()) {		
+				LOGGER.info(world.getAgentName() +  " - no more applicable actions!");
+				return current;
+			}
+			
+			randomActionIndex = rand.nextInt(applicableActions.size());
+			randomAction = applicableActions.get(randomActionIndex);
+			
+			
+			
+			LOGGER.info(world.getAgentName() +  " applied action " + randomAction.getLabel());
+			LOGGER.info("Previous state " + current);
+			
+			randomAction.transform(current);
+			
+			LOGGER.info("Reached state " + current);
+			
+			LOGGER.info("End of iteration");
+		}
+
+		LOGGER.info("end random walk:");
+		
+		return current;
+
+		// TODO: PRINT OUT THE NEW STATE, AND CREATE FROM IT A PDDL
+	}
 
 	public void RandomWalk () {
 

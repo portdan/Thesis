@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 
@@ -26,6 +28,8 @@ import cz.agents.dimaptools.input.addl.ADDLObject;
 import cz.agents.dimaptools.input.addl.ADDLParser;
 import cz.agents.dimaptools.input.sas.SASParser;
 import cz.agents.dimaptools.input.sas.SASPreprocessor;
+import cz.agents.dimaptools.model.Domain;
+import cz.agents.dimaptools.model.State;
 import problemGenerator.RandomPlanner.RandomPlanner;
 import problemGenerator.fileGenerator.FileGenerator;
 
@@ -37,6 +41,7 @@ public class MAPDDLProblemGenerator implements Creator {
 	private static final String PREPROCESSOR = "./preprocess-runner";
 	private static final String CONVERTOR = "./Misc/convert/ma-pddl/ma-to-pddl.py";
 	private static final String TEMP = "./Output/temp";
+	private static final String GEN = "./Output/gen";
 	private static final String OUTPUT = "./Output";
 	private static final String ROOT = "./";
 
@@ -54,15 +59,16 @@ public class MAPDDLProblemGenerator implements Creator {
 
 	private int timeLimitSec;
 
+	private ADDLObject addlParser;
+
 	private SASParser sasParser;    
 	private SASPreprocessor preprocessor;
-
 
 	private final Set<RandomPlanner> agentSet = new LinkedHashSet<RandomPlanner>();
 	private final ReceiverTable receiverTable = new DefaultReceiverTable();
 	private final ExecutorService executorService = Executors.newFixedThreadPool(1);
 
-	private final Set<Thread> threadSet = new LinkedHashSet<Thread>();
+	private final List<DIMAPWorldInterface> worlds = new ArrayList<DIMAPWorldInterface>();
 
 	@Override
 	public void init(String[] args) {
@@ -72,13 +78,13 @@ public class MAPDDLProblemGenerator implements Creator {
 		sasFilePath = "output.sas";
 		preprocessSASFilePath = "output";
 
-		if (args.length != 5 ) {
+		if (args.length != 5) {
 			LOGGER.fatal("provided args: " + Arrays.toString(args));
 			LOGGER.fatal("Usage (from PDDL): <domain>.pddl <problem>.pddl <number of expands> <time limit (sec)>");
 			System.exit(1);
 		}
 
-		if (args.length == 5){
+		if (args.length == 5) {
 			domainFilePath = args[1];
 			problemFilePath = args[2];
 			numOfExpands = Integer.parseInt(args[3]);
@@ -99,82 +105,126 @@ public class MAPDDLProblemGenerator implements Creator {
 		convertToPDDL();
 
 		LOGGER.info("parse agent file");
-		ADDLObject addlParser = new ADDLParser().parse(agentFile);
+		addlParser = new ADDLParser().parse(agentFile);
 
-		translateToSAS();	
+		translateToSAS();
 
 		preprocessSAS();
 
 		LOGGER.info("parse preprocessed sas file");
 
-		sasParser = new SASParser(preprocesSASFile);	
-		preprocessor = new SASPreprocessor(sasParser.getDomain(), addlParser);	
+		sasParser = new SASParser(preprocesSASFile);
+		preprocessor = new SASPreprocessor(sasParser.getDomain(), addlParser);
 
 		createEntities(addlParser);
 
-		//runEntities();
+		runEntities();
 
 		LOGGER.info("create end");
 	}
 
+	/*
+	 * private void createEntities(ADDLObject addlParser) {
+	 * LOGGER.info("create entities:");
+	 * 
+	 * for (String agentName: addlParser.getAgentList()) {
+	 * 
+	 * DIMAPWorldInterface world = initWorld(agentName,addlParser.getAgentCount());
+	 * 
+	 * agentSet.add(new RandomPlanner(world, numOfExpands,
+	 * (long)timeLimitSec*1000L)); } }
+	 */
+
 	private void createEntities(ADDLObject addlParser) {
 		LOGGER.info("create entities:");
 
-
-		
-		List<DIMAPWorldInterface> worlds = new ArrayList<DIMAPWorldInterface>();
-		for (String agentName: addlParser.getAgentList()) {
-			worlds.add(initWorld(agentName,addlParser.getAgentCount()));
-			
-//			
-//			
-//			DIMAPWorldInterface world = initWorld(agentName,addlParser.getAgentCount());
-//
-//			
-//			
-//			
-//			
-//			agentSet.add(new RandomPlanner(world, numOfExpands, (long)timeLimitSec*1000L));
+		for (String agentName : addlParser.getAgentList()) {
+			worlds.add(initWorld(agentName, addlParser.getAgentCount()));
 		}
-		RandomPlanner.RandomWalk(preprocessor.getGlobalInit(),null,100, worlds);	
-		
 	}
+
+	/*
+	 * private void runEntities() { LOGGER.info("run entities:");
+	 * 
+	 * FileGenerator fg = new FileGenerator(); if(fg.generateFile(ROOT, "walks",
+	 * ".txt")){
+	 * 
+	 * 
+	 * for (final RandomPlanner agent : agentSet) { agent.RandomWalk();
+	 * 
+	 * fg.WriteToFile(agent.getName() +" init:");
+	 * fg.WriteToFile(agent.initialState.toString());
+	 * 
+	 * fg.WriteToFile(agent.getName() +" end:");
+	 * fg.WriteToFile(agent.endState.toString());
+	 * 
+	 * } } }
+	 */
 
 	private void runEntities() {
 		LOGGER.info("run entities:");
 
+		//LOGGER.info(preprocessor.getGlobalInit().getDomain().humanize(preprocessor.getGlobalInit().getValues()));
+
+		State endState = RandomPlanner.RandomWalk(preprocessor.getGlobalInit(),numOfExpands, worlds);
+
+		//LOGGER.info(endState.getDomain().humanize(endState.getValues()));
+
+		String newGoal = createRandomGoal(endState);
+
+		String problemName = problemFilePath.substring(problemFilePath.lastIndexOf("/")+1, problemFilePath.length());
+
+		generateRandomProblem(problemName,newGoal);
+
+	}
+
+	private void generateRandomProblem(String problemName, String newGoal) {
+
 		FileGenerator fg = new FileGenerator();
-		if(fg.generateFile(ROOT, "walks", ".txt")){
+		if(fg.generateFile(GEN, problemName, "")){
 
+			for (int i = 0; i < worlds.size(); i++) {
 
-			for (final RandomPlanner agent : agentSet) {
-				agent.RandomWalk();
-
-				fg.WriteToFile(agent.getName() +" init:");
-				fg.WriteToFile(agent.initialState.toString());
-
-				fg.WriteToFile(agent.getName() +" end:");
-				fg.WriteToFile(agent.endState.toString());
+				String agentName = worlds.get(i).getAgentName();
+				//String s = preprocessor.getDomainForAgent(agentName).humanize(endState.getValues()); 
+				fg.WriteToFile(newGoal);
 
 			}
-
 		}
-
 	}
 
+	private String createRandomGoal(State endState) {
+		
+		String res = "(:goal\n"+"\t(and\n";
 
-	private DIMAPWorldInterface initWorld(String agentName, int totalAgents){
+		String humenized = endState.getDomain().humanize(endState.getValues());
 
-		return new DefaultDIMAPWorld(
-				agentName,
-				initQueuedCommunicator(agentName),
-				new DefaultEncoder(),
-				preprocessor.getProblemForAgent(agentName),
-				totalAgents
-				);
+		Pattern ptn = Pattern.compile("[a-z][a-z0-9_]*[a-z][a-z0-9_]*\\([a-z][a-z]*[0-9]+[a-z0-9]*,.[a-z][a-z]*[0-9]+[a-z0-9]*\\)");
+		Matcher mtch = ptn.matcher(humenized);
+
+		while(mtch.find()) {
+			
+			String var =  mtch.group();
+			
+			var = var.replace("(", " ");
+			var = var.replace(",", "");
+			var = var.replace(")", "");
+			
+			res +="\t\t("+ var + ")\n";
+		}
+		
+		res += "\t)\n"+")";
+
+		return res;
 	}
 
-	private PerformerCommunicator initQueuedCommunicator(String address){
+	private DIMAPWorldInterface initWorld(String agentName, int totalAgents) {
+
+		return new DefaultDIMAPWorld(agentName, initQueuedCommunicator(agentName), new DefaultEncoder(),
+				preprocessor.getProblemForAgent(agentName), totalAgents);
+	}
+
+	private PerformerCommunicator initQueuedCommunicator(String address) {
 		QueuedCommunicator communicator = new QueuedCommunicator(address);
 		try {
 
@@ -189,25 +239,22 @@ public class MAPDDLProblemGenerator implements Creator {
 		return communicator;
 	}
 
-
-
-	private void convertToPDDL(){
+	private void convertToPDDL() {
 
 		LOGGER.info("convert ma-pddl to pddl (ma-to-pddl.py)");
 
 		String path = domainFilePath.substring(0, domainFilePath.lastIndexOf("/"));
-		String domain = domainFilePath.substring(domainFilePath.lastIndexOf("/")+1, domainFilePath.indexOf("."));
-		String problem = problemFilePath.substring(problemFilePath.lastIndexOf("/")+1, problemFilePath.indexOf("."));
+		String domain = domainFilePath.substring(domainFilePath.lastIndexOf("/") + 1, domainFilePath.indexOf("."));
+		String problem = problemFilePath.substring(problemFilePath.lastIndexOf("/") + 1, problemFilePath.indexOf("."));
 
 		try {
-			String cmd = CONVERTOR + " " + ROOT	+ path + " " + domain + " " + problem + " " + TEMP;
+			String cmd = CONVERTOR + " " + ROOT + path + " " + domain + " " + problem + " " + TEMP;
 			LOGGER.info("RUN: " + cmd);
 			Process pr = Runtime.getRuntime().exec(cmd);
 
 			pr.waitFor();
-		} 
-		catch (Exception e) {
-			LOGGER.fatal(e,e);
+		} catch (Exception e) {
+			LOGGER.fatal(e, e);
 			System.exit(1);
 		}
 
@@ -215,7 +262,7 @@ public class MAPDDLProblemGenerator implements Creator {
 
 		domainFilePath = TEMP + "/" + domain + ".pddl";
 		problemFilePath = TEMP + "/" + problem + ".pddl";
-		agentFilePath =	TEMP + "/" + problem + ".addl";
+		agentFilePath = TEMP + "/" + problem + ".addl";
 
 		LOGGER.info("check the created agent file (.addl)");
 
@@ -226,7 +273,7 @@ public class MAPDDLProblemGenerator implements Creator {
 		}
 	}
 
-	private void translateToSAS(){
+	private void translateToSAS() {
 
 		LOGGER.info("translate pddl to .sas file (translate.py)");
 
@@ -236,9 +283,8 @@ public class MAPDDLProblemGenerator implements Creator {
 			Process pr = Runtime.getRuntime().exec(cmd);
 
 			pr.waitFor();
-		} 
-		catch (Exception e) {
-			LOGGER.fatal(e,e);
+		} catch (Exception e) {
+			LOGGER.fatal(e, e);
 			System.exit(1);
 		}
 
@@ -252,7 +298,7 @@ public class MAPDDLProblemGenerator implements Creator {
 		}
 	}
 
-	private void preprocessSAS(){
+	private void preprocessSAS() {
 
 		LOGGER.info("preprocess the .sas file (preprocess.exe < output.sas)");
 
@@ -261,11 +307,10 @@ public class MAPDDLProblemGenerator implements Creator {
 			LOGGER.info("RUN: " + cmd);
 			Process pr = Runtime.getRuntime().exec(cmd);
 			pr.waitFor();
-		}
-		catch (Exception e) {
-			LOGGER.fatal(e,e);
+		} catch (Exception e) {
+			LOGGER.fatal(e, e);
 			System.exit(1);
-		}			
+		}
 
 		LOGGER.info("check the preprocessed .sas file");
 

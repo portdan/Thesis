@@ -13,7 +13,7 @@ public class FileGenerator {
 
 	public boolean generateFile(String folderPath, String fileName, String fileType) {
 
-		outFile = new File(folderPath+fileName+fileType);
+		outFile = new File(folderPath+"/"+fileName+"."+fileType);
 
 		if (!outFile.exists()) {
 			try {
@@ -26,7 +26,7 @@ public class FileGenerator {
 			}
 		}
 		else {
-			
+
 			ClearFile();
 		}
 
@@ -39,7 +39,7 @@ public class FileGenerator {
 
 			try {
 				writer = new PrintWriter(new BufferedWriter(new FileWriter(outFile,true)));
-				writer.write(str + "\n");
+				writer.write(str);
 				writer.flush();
 				writer.close();
 			} 
