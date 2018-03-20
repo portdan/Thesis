@@ -25,6 +25,10 @@ public class FileGenerator {
 				return false;
 			}
 		}
+		else {
+			
+			ClearFile();
+		}
 
 		return true;
 	}
@@ -51,4 +55,28 @@ public class FileGenerator {
 		}
 		return false;
 	}
+
+	public boolean ClearFile() {
+
+		if(outFile!=null) {
+
+			try {
+				writer = new PrintWriter(new BufferedWriter(new FileWriter(outFile,false)));
+				writer.write("");
+				writer.flush();
+				writer.close();
+			} 
+			catch (IOException ex){
+				ex.printStackTrace();
+
+				if(writer!=null) {
+					writer.close();
+					return false;
+				} 
+			}
+			return true;
+		}
+		return false;
+	}
+
 }

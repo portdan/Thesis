@@ -1,8 +1,10 @@
 package problemGenerator;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -24,8 +26,8 @@ import cz.agents.dimaptools.input.addl.ADDLObject;
 import cz.agents.dimaptools.input.addl.ADDLParser;
 import cz.agents.dimaptools.input.sas.SASParser;
 import cz.agents.dimaptools.input.sas.SASPreprocessor;
-import cz.agents.madla.executor.IPCOutputExecutor;
-import cz.agents.madla.planner.Planner;
+import problemGenerator.RandomPlanner.RandomPlanner;
+import problemGenerator.fileGenerator.FileGenerator;
 
 public class MAPDDLProblemGenerator implements Creator {
 
@@ -50,15 +52,17 @@ public class MAPDDLProblemGenerator implements Creator {
 
 	private int numOfExpands;
 
-    private int timeLimitSec;
+	private int timeLimitSec;
 
 	private SASParser sasParser;    
 	private SASPreprocessor preprocessor;
 
 
-	private final Set<Planner> agentSet = new LinkedHashSet<Planner>();
+	private final Set<RandomPlanner> agentSet = new LinkedHashSet<RandomPlanner>();
 	private final ReceiverTable receiverTable = new DefaultReceiverTable();
 	private final ExecutorService executorService = Executors.newFixedThreadPool(1);
+
+	private final Set<Thread> threadSet = new LinkedHashSet<Thread>();
 
 	@Override
 	public void init(String[] args) {
@@ -106,29 +110,60 @@ public class MAPDDLProblemGenerator implements Creator {
 		sasParser = new SASParser(preprocesSASFile);	
 		preprocessor = new SASPreprocessor(sasParser.getDomain(), addlParser);	
 
-		createEntities(addlParser, preprocessor);
+		createEntities(addlParser);
+
+		//runEntities();
 
 		LOGGER.info("create end");
 	}
 
-	private void createEntities(ADDLObject addlParser, SASPreprocessor preprocessor) {
+	private void createEntities(ADDLObject addlParser) {
 		LOGGER.info("create entities:");
 
-		IPCOutputExecutor executor = new IPCOutputExecutor();
 
+		
+		List<DIMAPWorldInterface> worlds = new ArrayList<DIMAPWorldInterface>();
 		for (String agentName: addlParser.getAgentList()) {
-
-			DIMAPWorldInterface world = initWorld(agentName,addlParser.getAgentCount());
-
-			agentSet.add(new Planner(heuristic,recursionLevel,world,executor,(long)timeLimitSec*1000L));
-
-			executor.addProblem(world.getProblem());
+			worlds.add(initWorld(agentName,addlParser.getAgentCount()));
+			
+//			
+//			
+//			DIMAPWorldInterface world = initWorld(agentName,addlParser.getAgentCount());
+//
+//			
+//			
+//			
+//			
+//			agentSet.add(new RandomPlanner(world, numOfExpands, (long)timeLimitSec*1000L));
 		}
-
-		executor.setInitAndGoal(preprocessor.getGlobalInit(), preprocessor.getGlobalGoal());
+		RandomPlanner.RandomWalk(preprocessor.getGlobalInit(),null,100, worlds);	
+		
 	}
 
-	public DIMAPWorldInterface initWorld(String agentName, int totalAgents){
+	private void runEntities() {
+		LOGGER.info("run entities:");
+
+		FileGenerator fg = new FileGenerator();
+		if(fg.generateFile(ROOT, "walks", ".txt")){
+
+
+			for (final RandomPlanner agent : agentSet) {
+				agent.RandomWalk();
+
+				fg.WriteToFile(agent.getName() +" init:");
+				fg.WriteToFile(agent.initialState.toString());
+
+				fg.WriteToFile(agent.getName() +" end:");
+				fg.WriteToFile(agent.endState.toString());
+
+			}
+
+		}
+
+	}
+
+
+	private DIMAPWorldInterface initWorld(String agentName, int totalAgents){
 
 		return new DefaultDIMAPWorld(
 				agentName,
@@ -139,7 +174,7 @@ public class MAPDDLProblemGenerator implements Creator {
 				);
 	}
 
-	public PerformerCommunicator initQueuedCommunicator(String address){
+	private PerformerCommunicator initQueuedCommunicator(String address){
 		QueuedCommunicator communicator = new QueuedCommunicator(address);
 		try {
 
