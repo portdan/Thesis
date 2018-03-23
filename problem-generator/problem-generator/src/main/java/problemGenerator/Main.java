@@ -6,8 +6,8 @@ import java.util.Arrays;
 import java.util.Calendar;
 
 import cz.agents.alite.creator.CreatorFactory;
-import problemGenerator.fileGenerator.ADDLGenerator;
-import problemGenerator.fileGenerator.PDDLGenerator;
+import problemGenerator.FileGenerator.ADDLGenerator;
+import problemGenerator.FileGenerator.PDDLGenerator;
 
 public class Main 
 {
@@ -81,14 +81,4 @@ public class Main
 			System.out.println(args[i]);
 		}
 	}
-
-	private static void createAgentFile() {
-		addl.generateADDLFile(timeStamp);
-	}
-
-	private static void createProblemFile() {
-		pddl.generateFile(timeStamp);
-	}
-
-
 }

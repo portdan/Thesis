@@ -1,4 +1,4 @@
-package problemGenerator.fileGenerator;
+package problemGenerator.FileGenerator;
 
 public class ADDLGenerator{
 

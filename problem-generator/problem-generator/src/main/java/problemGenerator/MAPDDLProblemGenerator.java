@@ -1,15 +1,14 @@
 package problemGenerator;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 
@@ -28,10 +27,9 @@ import cz.agents.dimaptools.input.addl.ADDLObject;
 import cz.agents.dimaptools.input.addl.ADDLParser;
 import cz.agents.dimaptools.input.sas.SASParser;
 import cz.agents.dimaptools.input.sas.SASPreprocessor;
-import cz.agents.dimaptools.model.Domain;
 import cz.agents.dimaptools.model.State;
-import problemGenerator.RandomPlanner.RandomPlanner;
-import problemGenerator.fileGenerator.FileGenerator;
+import problemGenerator.FileGenerator.PDDLGenerator;
+import problemGenerator.RandomWalker.RandomWalker;
 
 public class MAPDDLProblemGenerator implements Creator {
 
@@ -47,9 +45,14 @@ public class MAPDDLProblemGenerator implements Creator {
 
 	private String domainFilePath;
 	private String problemFilePath;
+	private String oldDomainFilePath;
+	private String oldProblemFilePath;
 	private String agentFilePath;
 	private String sasFilePath;
 	private String preprocessSASFilePath;
+
+	private String domainFileName;
+	private String problemFileName;
 
 	private File agentFile;
 	private File sasFile;
@@ -61,10 +64,9 @@ public class MAPDDLProblemGenerator implements Creator {
 
 	private ADDLObject addlParser;
 
-	private SASParser sasParser;    
+	private SASParser sasParser;
 	private SASPreprocessor preprocessor;
 
-	private final Set<RandomPlanner> agentSet = new LinkedHashSet<RandomPlanner>();
 	private final ReceiverTable receiverTable = new DefaultReceiverTable();
 	private final ExecutorService executorService = Executors.newFixedThreadPool(1);
 
@@ -86,7 +88,9 @@ public class MAPDDLProblemGenerator implements Creator {
 
 		if (args.length == 5) {
 			domainFilePath = args[1];
+			oldDomainFilePath=args[1];
 			problemFilePath = args[2];
+			oldProblemFilePath=args[2];
 			numOfExpands = Integer.parseInt(args[3]);
 			timeLimitSec = Integer.parseInt(args[4]);
 		}
@@ -164,58 +168,28 @@ public class MAPDDLProblemGenerator implements Creator {
 	private void runEntities() {
 		LOGGER.info("run entities:");
 
-		//LOGGER.info(preprocessor.getGlobalInit().getDomain().humanize(preprocessor.getGlobalInit().getValues()));
+		// LOGGER.info(preprocessor.getGlobalInit().getDomain().humanize(preprocessor.getGlobalInit().getValues()));
 
-		State endState = RandomPlanner.RandomWalk(preprocessor.getGlobalInit(),numOfExpands, worlds);
+		State endState = RandomWalker.RandomWalk(preprocessor.getGlobalInit(), numOfExpands, worlds);
 
-		//LOGGER.info(endState.getDomain().humanize(endState.getValues()));
+		// LOGGER.info(endState.getDomain().humanize(endState.getValues()));
 
-		String newGoal = createRandomGoal(endState);
+		PDDLGenerator pddlGenerator = new PDDLGenerator();
 
-		String problemName = problemFilePath.substring(problemFilePath.lastIndexOf("/")+1, problemFilePath.length());
-
-		generateRandomProblem(problemName,newGoal);
-
-	}
-
-	private void generateRandomProblem(String problemName, String newGoal) {
-
-		FileGenerator fg = new FileGenerator();
-		if(fg.generateFile(GEN, problemName, "")){
-
-			for (int i = 0; i < worlds.size(); i++) {
-
-				String agentName = worlds.get(i).getAgentName();
-				//String s = preprocessor.getDomainForAgent(agentName).humanize(endState.getValues()); 
-				fg.WriteToFile(newGoal);
-
+		if (pddlGenerator.generateFile(GEN, problemFileName)) {
+			
+			String problemText = null;
+			try {
+				problemText = new String(Files.readAllBytes(Paths.get(oldProblemFilePath)));
+			} catch (IOException e) {
+				LOGGER.fatal(e, e);
+				System.exit(1);
 			}
+			
+			String humenized = endState.getDomain().humanize(endState.getValues());
+			
+			pddlGenerator.generateRandomProblem(problemText, humenized);
 		}
-	}
-
-	private String createRandomGoal(State endState) {
-		
-		String res = "(:goal\n"+"\t(and\n";
-
-		String humenized = endState.getDomain().humanize(endState.getValues());
-
-		Pattern ptn = Pattern.compile("[a-z][a-z0-9_]*[a-z][a-z0-9_]*\\([a-z][a-z]*[0-9]+[a-z0-9]*,.[a-z][a-z]*[0-9]+[a-z0-9]*\\)");
-		Matcher mtch = ptn.matcher(humenized);
-
-		while(mtch.find()) {
-			
-			String var =  mtch.group();
-			
-			var = var.replace("(", " ");
-			var = var.replace(",", "");
-			var = var.replace(")", "");
-			
-			res +="\t\t("+ var + ")\n";
-		}
-		
-		res += "\t)\n"+")";
-
-		return res;
 	}
 
 	private DIMAPWorldInterface initWorld(String agentName, int totalAgents) {
@@ -244,11 +218,11 @@ public class MAPDDLProblemGenerator implements Creator {
 		LOGGER.info("convert ma-pddl to pddl (ma-to-pddl.py)");
 
 		String path = domainFilePath.substring(0, domainFilePath.lastIndexOf("/"));
-		String domain = domainFilePath.substring(domainFilePath.lastIndexOf("/") + 1, domainFilePath.indexOf("."));
-		String problem = problemFilePath.substring(problemFilePath.lastIndexOf("/") + 1, problemFilePath.indexOf("."));
+		domainFileName = domainFilePath.substring(domainFilePath.lastIndexOf("/") + 1, domainFilePath.indexOf("."));
+		problemFileName = problemFilePath.substring(problemFilePath.lastIndexOf("/") + 1, problemFilePath.indexOf("."));
 
 		try {
-			String cmd = CONVERTOR + " " + ROOT + path + " " + domain + " " + problem + " " + TEMP;
+			String cmd = CONVERTOR + " " + ROOT + path + " " + domainFileName + " " + problemFileName + " " + TEMP;
 			LOGGER.info("RUN: " + cmd);
 			Process pr = Runtime.getRuntime().exec(cmd);
 
@@ -260,9 +234,9 @@ public class MAPDDLProblemGenerator implements Creator {
 
 		LOGGER.info("set converted domain, problem and agent file paths");
 
-		domainFilePath = TEMP + "/" + domain + ".pddl";
-		problemFilePath = TEMP + "/" + problem + ".pddl";
-		agentFilePath = TEMP + "/" + problem + ".addl";
+		domainFilePath = TEMP + "/" + domainFileName + ".pddl";
+		problemFilePath = TEMP + "/" + problemFileName + ".pddl";
+		agentFilePath = TEMP + "/" + problemFileName + ".addl";
 
 		LOGGER.info("check the created agent file (.addl)");
 
