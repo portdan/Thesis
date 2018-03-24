@@ -25,13 +25,13 @@ public class FileGenerator {
 			}
 		} else {
 
-			ClearFile();
+			clearFile();
 		}
 
 		return true;
 	}
 
-	public boolean WriteToFile(String str) {
+	public boolean writeToFile(String str) {
 
 		if (outFile != null) {
 
@@ -53,7 +53,7 @@ public class FileGenerator {
 		return false;
 	}
 
-	public boolean ClearFile() {
+	public boolean clearFile() {
 
 		if (outFile != null) {
 

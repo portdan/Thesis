@@ -18,7 +18,7 @@ public class PDDLGenerator {
 		String newProblemText = createProblemString(problemText);
 		String newProblemGoal = createGoalString(humanizedState);
 
-		fg.WriteToFile(newProblemText+newProblemGoal);
+		fg.writeToFile(newProblemText+newProblemGoal);
 	}
 
 	

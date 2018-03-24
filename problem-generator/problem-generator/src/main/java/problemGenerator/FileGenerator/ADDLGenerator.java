@@ -20,7 +20,7 @@ public class ADDLGenerator{
 	}
 
 	private boolean defineDomain() {
-		return fg.WriteToFile("(define (problem "+fileName+")");
+		return fg.writeToFile("(define (problem "+fileName+")");
 	}
 
 	private boolean generateFile(String fileName) {

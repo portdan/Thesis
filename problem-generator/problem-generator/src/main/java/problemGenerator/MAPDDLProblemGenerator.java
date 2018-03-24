@@ -38,6 +38,8 @@ public class MAPDDLProblemGenerator implements Creator {
 	private static final String TRANSLATOR = "./Misc/translate/translate.py";
 	private static final String PREPROCESSOR = "./preprocess-runner";
 	private static final String CONVERTOR = "./Misc/convert/ma-pddl/ma-to-pddl.py";
+	private static final String REMOVEDUPLICATOR = "./Misc/removeDuplicates/rmDup.py";
+
 	private static final String TEMP = "./Output/temp";
 	private static final String GEN = "./Output/gen";
 	private static final String OUTPUT = "./Output";
@@ -58,9 +60,8 @@ public class MAPDDLProblemGenerator implements Creator {
 	private File sasFile;
 	private File preprocesSASFile;
 
-	private int numOfExpands;
-
-	private int timeLimitSec;
+	private int maxNumOfExpands;
+	private int numOfProblemsToGenerate;
 
 	private ADDLObject addlParser;
 
@@ -88,11 +89,11 @@ public class MAPDDLProblemGenerator implements Creator {
 
 		if (args.length == 5) {
 			domainFilePath = args[1];
-			oldDomainFilePath=args[1];
+			oldDomainFilePath = args[1];
 			problemFilePath = args[2];
-			oldProblemFilePath=args[2];
-			numOfExpands = Integer.parseInt(args[3]);
-			timeLimitSec = Integer.parseInt(args[4]);
+			oldProblemFilePath = args[2];
+			maxNumOfExpands = Integer.parseInt(args[3]);
+			numOfProblemsToGenerate = Integer.parseInt(args[4]);
 		}
 
 		Trace.setFileStream("Log/trace.log");
@@ -168,28 +169,34 @@ public class MAPDDLProblemGenerator implements Creator {
 	private void runEntities() {
 		LOGGER.info("run entities:");
 
-		// LOGGER.info(preprocessor.getGlobalInit().getDomain().humanize(preprocessor.getGlobalInit().getValues()));
+		// generate problems
+		for (int i = 0; i < numOfProblemsToGenerate; i++) {
 
-		State endState = RandomWalker.RandomWalk(preprocessor.getGlobalInit(), numOfExpands, worlds);
+			// perform random walk
+			State endState = RandomWalker.RandomWalk(preprocessor.getGlobalInit(), maxNumOfExpands, worlds);
 
-		// LOGGER.info(endState.getDomain().humanize(endState.getValues()));
+			PDDLGenerator pddlGenerator = new PDDLGenerator();
 
-		PDDLGenerator pddlGenerator = new PDDLGenerator();
+			// if problem file created
+			if (pddlGenerator.generateFile(GEN, problemFileName + "_" + i)) {
 
-		if (pddlGenerator.generateFile(GEN, problemFileName)) {
-			
-			String problemText = null;
-			try {
-				problemText = new String(Files.readAllBytes(Paths.get(oldProblemFilePath)));
-			} catch (IOException e) {
-				LOGGER.fatal(e, e);
-				System.exit(1);
+				// get old problem text
+				String problemText = null;
+				try {
+					problemText = new String(Files.readAllBytes(Paths.get(oldProblemFilePath)));
+				} catch (IOException e) {
+					LOGGER.fatal(e, e);
+					System.exit(1);
+				}
+
+				String humenized = endState.getDomain().humanize(endState.getValues());
+
+				// generate new problem
+				pddlGenerator.generateRandomProblem(problemText, humenized);
 			}
-			
-			String humenized = endState.getDomain().humanize(endState.getValues());
-			
-			pddlGenerator.generateRandomProblem(problemText, humenized);
 		}
+
+		removeDupliacteProblems();
 	}
 
 	private DIMAPWorldInterface initWorld(String agentName, int totalAgents) {
@@ -303,5 +310,21 @@ public class MAPDDLProblemGenerator implements Creator {
 		preprocessSASFilePath = OUTPUT + "/" + preprocessSASFilePath + "-preprocess.sas";
 		preprocesSASFile.renameTo(new File(preprocessSASFilePath));
 		preprocesSASFile = new File(preprocessSASFilePath);
+	}
+
+	private void removeDupliacteProblems() {
+
+		LOGGER.info("remove duplicate .pddl files (rmDup.py)");
+
+		try {
+			String cmd = REMOVEDUPLICATOR + " " + GEN + "/";
+			LOGGER.info("RUN: " + cmd);
+			Process pr = Runtime.getRuntime().exec(cmd);
+
+			pr.waitFor();
+		} catch (Exception e) {
+			LOGGER.fatal(e, e);
+			System.exit(1);
+		}
 	}
 }
