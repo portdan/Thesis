@@ -317,7 +317,7 @@ public class MAPDDLProblemGenerator implements Creator {
 		LOGGER.info("remove duplicate .pddl files (rmDup.py)");
 
 		try {
-			String cmd = REMOVEDUPLICATOR + " " + GEN + "/";
+			String cmd = "python "+ REMOVEDUPLICATOR + " " + GEN ;
 			LOGGER.info("RUN: " + cmd);
 			Process pr = Runtime.getRuntime().exec(cmd);
 
