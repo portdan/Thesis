@@ -19,3 +19,62 @@ mapddl-benchmarks/logistics00,mapddl-benchmarks/logistics00/probLOGISTICS-4-0.pd
 mapddl-benchmarks/logistics00,mapddl-benchmarks/logistics00/probLOGISTICS-4-0.pddl,3,saFF-glcl,-1,1168,{},0,{tru1=9 tru2=4 apn1=4},{tru1=24 tru2=19 apn1=19},0,381,14,367,132,73,72,277,9356,0,0,0,0,0,,,,,,,22,0,true,true
 mapddl-benchmarks/logistics00,mapddl-benchmarks/logistics00/probLOGISTICS-4-0.pddl,3,saFF-glcl,-1,1167,{},0,{tru1=9 tru2=4 apn1=4},{tru1=24 tru2=19 apn1=19},0,436,13,423,137,67,67,271,9104,0,0,0,0,0,,,,,,,28,0,true,true
 mapddl-benchmarks/logistics00,mapddl-benchmarks/logistics00/probLOGISTICS-4-0.pddl,3,saFF-glcl,-1,1124,{},0,{tru1=9 tru2=4 apn1=4},{tru1=24 tru2=19 apn1=19},0,645,14,631,190,72,71,333,11116,0,0,0,0,0,,,,,,,28,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_12.pddl,3,saFF-glcl,-1,1173,{},0,{tru1=9 tru2=4 apn1=4},{tru1=24 tru2=19 apn1=19},0,484,14,471,132,68,67,267,9004,0,0,0,0,0,,,,,,,24,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/domain.pddl,3,saFF-glcl,-1,220,{tru1=9 tru2=4 apn1=4},{tru1=24 tru2=19 apn1=19},0,716,19,703,222,89,89,400,13384,0,0,0,0,0,,,,,,,36,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_12.pddl,3,saFF-glcl,-1,197,{tru1=9 tru2=4 apn1=4},{tru1=24 tru2=19 apn1=19},0,547,13,534,183,67,65,315,10420,0,0,0,0,0,,,,,,,22,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_30.pddl,3,saFF-glcl,-1,227,{tru1=9 tru2=4 apn1=4},{tru1=24 tru2=19 apn1=19},0,257,15,243,56,64,66,186,6360,0,0,0,0,0,,,,,,,27,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_60.pddl,3,saFF-glcl,-1,223,{tru1=9 tru2=4 apn1=4},{tru1=24 tru2=19 apn1=19},0,719,18,701,183,80,79,342,11504,0,0,0,0,0,,,,,,,24,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_62.pddl,3,saFF-glcl,-1,185,{tru1=9 tru2=4 apn1=4},{tru1=24 tru2=19 apn1=19},0,536,8,528,156,37,37,230,7580,0,0,0,0,0,,,,,,,28,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_63.pddl,3,saFF-glcl,-1,185,{tru1=9 tru2=4 apn1=4},{tru1=24 tru2=19 apn1=19},0,259,24,235,50,96,96,242,8296,0,0,0,0,0,,,,,,,27,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_87.pddl,3,saFF-glcl,-1,188,{tru1=9 tru2=4 apn1=4},{tru1=24 tru2=19 apn1=19},0,456,11,445,132,49,49,230,7780,0,0,0,0,0,,,,,,,24,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_89.pddl,3,saFF-glcl,-1,266,{tru1=9 tru2=4 apn1=4},{tru1=24 tru2=19 apn1=19},0,691,11,680,187,49,50,286,9488,0,0,0,0,0,,,,,,,24,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/domain.pddl,3,saFF-glcl,-1,198,{tru1=9 tru2=4 apn1=4},{tru1=24 tru2=19 apn1=19},0,836,24,813,203,109,106,418,13900,0,0,0,0,0,,,,,,,30,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_12.pddl,3,saFF-glcl,-1,184,{tru1=9 tru2=4 apn1=4},{tru1=24 tru2=19 apn1=19},0,490,21,470,163,97,96,356,11928,0,0,0,0,0,,,,,,,26,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_30.pddl,3,saFF-glcl,-1,273,{tru1=9 tru2=4 apn1=4},{tru1=24 tru2=19 apn1=19},0,1864,22,1843,545,103,101,749,24644,0,0,0,0,0,,,,,,,44,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_60.pddl,3,saFF-glcl,-1,194,{tru1=9 tru2=4 apn1=4},{tru1=24 tru2=19 apn1=19},0,244,16,228,76,74,73,223,7580,0,0,0,0,0,,,,,,,26,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_62.pddl,3,saFF-glcl,-1,183,{tru1=9 tru2=4 apn1=4},{tru1=24 tru2=19 apn1=19},0,515,19,496,161,89,89,339,11452,0,0,0,0,0,,,,,,,30,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_63.pddl,3,saFF-glcl,-1,226,{tru1=9 tru2=4 apn1=4},{tru1=24 tru2=19 apn1=19},0,482,10,471,149,46,47,242,8060,0,0,0,0,0,,,,,,,22,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_87.pddl,3,saFF-glcl,-1,226,{tru1=9 tru2=4 apn1=4},{tru1=24 tru2=19 apn1=19},0,1031,57,975,218,216,214,648,21816,0,0,0,0,0,,,,,,,25,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_89.pddl,3,saFF-glcl,-1,160,{tru1=9 tru2=4 apn1=4},{tru1=24 tru2=19 apn1=19},0,241,10,231,71,44,45,160,5400,0,0,0,0,0,,,,,,,25,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/domain.pddl,3,saFF-glcl,-1,197,{tru1=9 tru2=4 apn1=4},{tru1=24 tru2=19 apn1=19},0,392,14,378,102,66,65,233,7880,0,0,0,0,0,,,,,,,31,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_12.pddl,3,saFF-glcl,-1,168,{tru1=9 tru2=4 apn1=4},{tru1=24 tru2=19 apn1=19},0,298,12,286,101,56,56,213,7196,0,0,0,0,0,,,,,,,28,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_30.pddl,3,saFF-glcl,-1,177,{tru1=9 tru2=4 apn1=4},{tru1=24 tru2=19 apn1=19},0,345,38,308,93,166,165,424,14472,0,0,0,0,0,,,,,,,28,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_60.pddl,3,saFF-glcl,-1,175,{tru1=9 tru2=4 apn1=4},{tru1=24 tru2=19 apn1=19},0,180,16,165,52,74,75,201,6904,0,0,0,0,0,,,,,,,30,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_62.pddl,3,saFF-glcl,-1,198,{tru1=9 tru2=4 apn1=4},{tru1=24 tru2=19 apn1=19},0,541,10,531,175,47,48,270,8840,0,0,0,0,0,,,,,,,28,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_63.pddl,3,saFF-glcl,-1,166,{tru1=9 tru2=4 apn1=4},{tru1=24 tru2=19 apn1=19},0,210,17,193,69,80,81,230,7788,0,0,0,0,0,,,,,,,32,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_87.pddl,3,saFF-glcl,-1,197,{tru1=9 tru2=4 apn1=4},{tru1=24 tru2=19 apn1=19},0,577,16,562,168,73,74,315,10492,0,0,0,0,0,,,,,,,26,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_89.pddl,3,saFF-glcl,-1,207,{tru1=9 tru2=4 apn1=4},{tru1=24 tru2=19 apn1=19},0,260,8,253,78,34,36,148,4992,0,0,0,0,0,,,,,,,26,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/domain.pddl,3,saFF-glcl,-1,208,{tru1=9 tru2=4 apn1=4},{tru1=24 tru2=19 apn1=19},0,280,15,265,99,68,68,235,8028,0,0,0,0,0,,,,,,,24,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_12.pddl,3,saFF-glcl,-1,173,{tru1=1 apn1=1},{tru1=2 tru2=1},0,17,2,15,12,2,1,15,480,0,0,0,0,0,,,,,,,1,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_30.pddl,3,saFF-glcl,-1,182,{tru1=1 apn1=1},{tru2=1 apn1=2},0,80,3,78,63,4,2,69,2172,0,0,0,0,0,,,,,,,1,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_60.pddl,3,saFF-glcl,-1,168,{tru2=1 apn1=2},{tru1=1},0,9,1,9,7,2,0,9,264,0,0,0,0,0,,,,,,,1,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_62.pddl,3,saFF-glcl,-1,167,{tru2=1 apn1=1},{tru1=1},0,15,1,14,11,3,1,15,496,0,0,0,0,0,,,,,,,1,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_63.pddl,3,saFF-glcl,-1,172,{tru1=1 apn1=1},{tru2=1},0,30,3,27,17,2,1,20,596,0,0,0,0,0,,,,,,,1,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_87.pddl,3,saFF-glcl,-1,164,{tru1=2 tru2=2 apn1=1},{tru1=1 tru2=2},0,24,2,23,16,3,3,22,688,0,0,0,0,0,,,,,,,1,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_89.pddl,3,saFF-glcl,-1,166,{tru1=1 tru2=1},{tru1=1 apn1=1},0,90,2,88,74,3,1,78,2500,0,0,0,0,0,,,,,,,1,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/domain.pddl,3,saFF-glcl,-1,159,{tru2=1},{apn1=1},0,17,1,16,15,2,0,17,560,0,0,0,0,0,,,,,,,1,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_12.pddl,3,saFF-glcl,-1,161,{tru1=1 apn1=1},{tru2=1},0,23,1,22,14,1,0,15,488,0,0,0,0,0,,,,,,,1,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_30.pddl,3,saFF-glcl,-1,172,{tru1=1 apn1=1},{tru1=2 tru2=1},0,24,3,22,16,3,1,20,612,0,0,0,0,0,,,,,,,1,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_60.pddl,3,saFF-glcl,-1,185,{tru2=1 apn1=2},{tru1=1 apn1=1},0,42,2,40,29,3,1,33,1060,0,0,0,0,0,,,,,,,1,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_62.pddl,3,saFF-glcl,-1,165,{tru2=2 apn1=1},{tru1=1},0,12,1,12,10,3,1,14,464,0,0,0,0,0,,,,,,,1,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_63.pddl,3,saFF-glcl,-1,171,{tru1=1 apn1=1},{tru2=1 apn1=1},0,16,4,12,9,3,1,13,424,0,0,0,0,0,,,,,,,1,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_87.pddl,3,saFF-glcl,-1,169,{tru1=2 tru2=2 apn1=1},{tru1=1 tru2=2 apn1=2},0,46,3,44,32,4,3,39,1240,0,0,0,0,0,,,,,,,1,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_89.pddl,3,saFF-glcl,-1,166,{tru1=1 tru2=1},{apn1=1},0,23,1,22,19,1,0,20,648,0,0,0,0,0,,,,,,,1,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/domain.pddl,3,saFF-glcl,-1,144,{tru1=1 tru2=1},{apn1=1},0,37,1,36,32,1,1,34,1076,0,0,0,0,0,,,,,,,1,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_12.pddl,3,saFF-glcl,-1,180,{tru1=1 apn1=1},{tru2=1},0,20,1,19,17,2,0,19,624,0,0,0,0,0,,,,,,,1,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_30.pddl,3,saFF-glcl,-1,181,{tru1=1 apn1=1},{tru1=2 tru2=1 apn1=2},0,124,4,120,77,3,2,82,2572,0,0,0,0,0,,,,,,,1,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_60.pddl,3,saFF-glcl,-1,159,{tru2=1 apn1=1},{tru1=1},0,14,1,13,7,2,0,9,304,0,0,0,0,0,,,,,,,1,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_62.pddl,3,saFF-glcl,-1,167,{tru2=1 apn1=1},{tru1=1},0,4,1,3,1,3,1,5,176,0,0,0,0,0,,,,,,,1,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_63.pddl,3,saFF-glcl,-1,169,{tru1=1 apn1=1},{tru1=1 tru2=1 apn1=1},0,25,5,20,15,5,3,23,716,0,0,0,0,0,,,,,,,1,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_87.pddl,3,saFF-glcl,-1,168,{tru1=2 tru2=1 apn1=1},{tru1=1},0,22,1,21,18,2,0,20,656,0,0,0,0,0,,,,,,,1,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_89.pddl,3,saFF-glcl,-1,167,{tru1=1 tru2=1},{apn1=1},0,22,1,21,19,1,0,21,680,0,0,0,0,0,,,,,,,1,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/domain.pddl,3,saFF-glcl,-1,147,{tru1=1 tru2=1},{apn1=1},0,12,1,11,9,2,0,11,368,0,0,0,0,0,,,,,,,1,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_12.pddl,3,saFF-glcl,-1,215,{tru1=1 apn1=1},{tru2=1},0,19,1,18,17,2,0,19,624,0,0,0,0,0,,,,,,,1,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_30.pddl,3,saFF-glcl,-1,190,{tru1=1 apn1=1},{tru1=2 tru2=1 apn1=2},0,58,4,54,47,5,3,55,1752,0,0,0,0,0,,,,,,,1,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_60.pddl,3,saFF-glcl,-1,170,{tru2=1 apn1=1},{tru1=1},0,8,1,7,4,2,0,6,208,0,0,0,0,0,,,,,,,1,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_62.pddl,3,saFF-glcl,-1,182,{tru2=1 apn1=2},{tru1=1 tru2=2},0,31,2,29,25,4,2,31,944,0,0,0,0,0,,,,,,,1,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_63.pddl,3,saFF-glcl,-1,170,{tru1=1 apn1=1},{tru1=1 tru2=1 apn1=1},0,13,5,8,6,3,2,11,336,0,0,0,0,0,,,,,,,1,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_87.pddl,3,saFF-glcl,-1,173,{tru1=2 tru2=1 apn1=1},{tru1=1 tru2=2 apn1=2},0,29,3,26,20,6,3,29,900,0,0,0,0,0,,,,,,,1,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_89.pddl,3,saFF-glcl,-1,170,{tru1=2 tru2=1},{apn1=1},0,27,1,26,24,2,1,27,860,0,0,0,0,0,,,,,,,1,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/domain.pddl,3,saFF-glcl,-1,157,{tru1=1 tru2=1},{apn1=1},0,18,1,17,12,2,0,14,464,0,0,0,0,0,,,,,,,1,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_12.pddl,3,saFF-glcl,-1,166,{tru1=1 apn1=1},{tru2=1 apn1=2},0,27,2,25,19,3,1,23,744,0,0,0,0,0,,,,,,,1,0,true,true

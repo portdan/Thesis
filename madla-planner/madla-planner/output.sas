@@ -186,11 +186,14 @@ begin_state
 1
 end_state
 begin_goal
-4
-1 0
-3 0
-4 2
-6 2
+7
+0 1
+1 2
+3 2
+4 6
+6 3
+7 1
+8 1
 end_goal
 78
 begin_operator
