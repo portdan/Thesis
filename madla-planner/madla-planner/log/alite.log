@@ -5232,3 +5232,101 @@ requestedGoal={}(-637295477)]
 2018-03-26 06:54:27 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch - tru1 receive PLANNING_FINISHED!
 2018-03-26 06:54:28 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch -  by me (tru2) - 162
 2018-03-26 06:54:28 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch - tru1 receive PLANNING_FINISHED!
+2018-03-26 11:11:07 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch -  by me (tru2) - 1942
+2018-03-26 11:11:08 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch - apn1 receive PLANNING_FINISHED!
+2018-03-26 11:11:08 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch - tru1 receive PLANNING_FINISHED!
+2018-03-26 11:15:13 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch -  by me (tru2) - 371
+2018-03-26 11:15:13 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch - tru1 receive PLANNING_FINISHED!
+2018-03-26 11:19:57 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch -  by me (tru2) - 1539
+2018-03-26 11:19:57 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch - tru1 receive PLANNING_FINISHED!
+2018-03-26 11:19:59 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch -  by me (tru2) - 455
+2018-03-26 11:19:59 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch - apn1 receive PLANNING_FINISHED!
+2018-03-26 11:20:00 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch -  by me (tru1) - 429
+2018-03-26 11:20:00 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch - apn1 receive PLANNING_FINISHED!
+2018-03-26 11:20:01 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch -  by me (tru1) - 435
+2018-03-26 11:20:01 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch - apn1 receive PLANNING_FINISHED!
+2018-03-26 11:20:02 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch -  by me (tru2) - 454
+2018-03-26 11:20:02 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch - tru1 receive PLANNING_FINISHED!
+2018-03-26 11:20:04 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch -  by me (tru1) - 429
+2018-03-26 11:20:04 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch - apn1 receive PLANNING_FINISHED!
+2018-03-26 11:20:05 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch -  by me (apn1) - 404
+2018-03-26 11:25:19 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch -  by me (apn1) - 528
+2018-03-26 11:25:19 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch -  by me (tru1) - 532
+2018-03-26 11:25:20 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch -  by me (apn1) - 439
+2018-03-26 11:25:20 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch -  by me (tru2) - 446
+2018-03-26 11:25:20 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch -  by me (tru1) - 442
+2018-03-26 11:25:20 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch - apn1 receive PLANNING_FINISHED!
+2018-03-26 11:25:21 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch -  by me (tru1) - 422
+2018-03-26 11:25:23 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch -  by me (tru1) - 427
+2018-03-26 11:25:23 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch -  by me (tru2) - 434
+2018-03-26 11:25:23 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch -  by me (apn1) - 428
+2018-03-26 11:25:23 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch - apn1 receive PLANNING_FINISHED!
+2018-03-26 11:25:24 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch -  by me (tru2) - 424
+2018-03-26 11:25:24 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch - tru1 receive PLANNING_FINISHED!
+2018-03-26 11:25:25 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch -  by me (tru2) - 403
+2018-03-26 11:25:25 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch - tru1 receive PLANNING_FINISHED!
+2018-03-26 11:25:26 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch -  by me (tru1) - 426
+2018-03-26 11:25:26 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch -  by me (tru2) - 432
+2018-03-26 11:25:27 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch -  by me (apn1) - 433
+2018-03-26 11:25:27 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch - tru2 receive PLANNING_FINISHED!
+2018-03-26 11:25:28 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch -  by me (tru1) - 411
+2018-03-26 11:25:30 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch -  by me (tru1) - 402
+2018-03-26 11:25:30 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch -  by me (tru2) - 418
+2018-03-26 11:25:31 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch -  by me (tru1) - 403
+2018-03-26 11:25:31 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch -  by me (tru2) - 410
+2018-03-26 11:25:32 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch -  by me (apn1) - 393
+2018-03-26 11:25:32 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch -  by me (tru2) - 403
+2018-03-26 11:25:32 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch -  by me (tru1) - 397
+2018-03-26 11:25:32 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch - tru1 receive PLANNING_FINISHED!
+2018-03-26 11:25:33 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch -  by me (tru2) - 409
+2018-03-26 11:25:33 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch -  by me (apn1) - 432
+2018-03-26 11:25:34 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch -  by me (tru2) - 419
+2018-03-26 11:25:34 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch -  by me (tru1) - 423
+2018-03-26 11:25:35 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch -  by me (tru2) - 426
+2018-03-26 11:25:35 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch - apn1 receive PLANNING_FINISHED!
+2018-03-26 11:25:36 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch -  by me (tru2) - 381
+2018-03-26 11:25:38 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch -  by me (tru2) - 401
+2018-03-26 11:25:38 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch -  by me (tru1) - 408
+2018-03-26 11:25:39 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch -  by me (apn1) - 420
+2018-03-26 11:25:39 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch -  by me (tru2) - 440
+2018-03-26 11:25:40 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch -  by me (tru2) - 465
+2018-03-26 11:25:40 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch -  by me (apn1) - 472
+2018-03-26 11:25:41 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch -  by me (tru1) - 417
+2018-03-26 11:25:41 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch -  by me (tru2) - 414
+2018-03-26 11:25:42 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch -  by me (tru1) - 382
+2018-03-26 11:25:42 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch -  by me (tru2) - 397
+2018-03-26 11:25:44 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch -  by me (tru1) - 391
+2018-03-26 11:25:44 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch -  by me (apn1) - 404
+2018-03-26 11:25:44 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch -  by me (tru2) - 404
+2018-03-26 11:25:44 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch - apn1 receive PLANNING_FINISHED!
+2018-03-26 11:25:45 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch -  by me (tru2) - 405
+2018-03-26 11:25:45 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch - apn1 receive PLANNING_FINISHED!
+2018-03-26 11:25:46 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch -  by me (tru1) - 443
+2018-03-26 11:25:46 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch -  by me (apn1) - 442
+2018-03-26 11:25:47 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch -  by me (apn1) - 444
+2018-03-26 11:25:47 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch -  by me (tru1) - 455
+2018-03-26 11:25:47 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch -  by me (tru2) - 460
+2018-03-26 11:25:47 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch - apn1 receive PLANNING_FINISHED!
+2018-03-26 11:25:48 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch -  by me (tru2) - 441
+2018-03-26 11:25:48 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch -  by me (apn1) - 446
+2018-03-26 11:25:48 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch -  by me (tru1) - 442
+2018-03-26 11:25:49 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch -  by me (tru2) - 414
+2018-03-26 11:25:49 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch -  by me (tru1) - 426
+2018-03-26 11:25:50 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch -  by me (apn1) - 476
+2018-03-26 11:25:50 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch - tru1 receive PLANNING_FINISHED!
+2018-03-26 11:25:51 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch -  by me (tru1) - 428
+2018-03-26 11:25:51 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch -  by me (tru2) - 451
+2018-03-26 11:25:52 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch -  by me (tru1) - 403
+2018-03-26 11:25:52 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch -  by me (apn1) - 400
+2018-03-26 11:25:53 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch -  by me (tru2) - 369
+2018-03-26 11:25:53 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch - tru1 receive PLANNING_FINISHED!
+2018-03-26 11:25:54 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch -  by me (apn1) - 368
+2018-03-26 11:25:54 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch - tru2 receive PLANNING_FINISHED!
+2018-03-26 11:25:55 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch -  by me (tru1) - 437
+2018-03-26 11:25:55 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch - apn1 receive PLANNING_FINISHED!
+2018-03-26 11:25:56 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch -  by me (tru1) - 426
+2018-03-26 11:25:56 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch -  by me (tru2) - 433
+2018-03-26 11:25:56 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch -  by me (apn1) - 432
+2018-03-26 11:25:56 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch - apn1 receive PLANNING_FINISHED!
+2018-03-26 11:25:58 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch -  by me (tru2) - 418
+2018-03-26 11:25:58 [WARN ]: cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch -  by me (apn1) - 420

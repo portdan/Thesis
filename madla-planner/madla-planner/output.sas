@@ -187,11 +187,11 @@ begin_state
 end_state
 begin_goal
 7
-0 1
+0 0
 1 2
 3 2
 4 6
-6 3
+6 6
 7 1
 8 1
 end_goal

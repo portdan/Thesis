@@ -1,26 +1,47 @@
 #!/bin/bash
 
+#./PlanForAll.sh <domain type> <domain file name> <.pddl problems path> <.plan plans path> <heuristic> <recursion> <timeout (min)>
+
 JAVA="/usr/bin/java"
-JAR="madla-planner.jar"
+MADLA_JAR="madla-planner.jar"
 #JAR="cz.agents.madla.creator.MAPDDLCreator"
 
+MADLAcreator="cz.agents.madla.creator.MAPDDLCreator"
 
-problems="$PWD/mapddl-problems/$1/*.pddl"
-plans="$PWD/mapddl-plans/$1"
+domainType=$1
+domainFileName=$2
+problemsPath=$3
+plansPath=$4
 
+heuristic=$5
+recursion=$6
+timeout=$7
 
-for pddl in $problems; do
+problemsAbsPath="$PWD/$3/$1/*.pddl"
+plansAbsPath="$PWD/$4/$1"
+
+for f in $problemsAbsPath; do
 	
-	pddlFile=${pddl##*/} 
+	pddlFile=${f##*/} 
+	pddFfileName="${pddlFile%.*}"	
+	
 	problem="mapddl-problems/$1/$pddlFile"
 	
-			
-	#echo /usr/bin/timeout -s SIGSEGV $(($4+1))m $JAVA -Xmx8G -jar $JAR cz.agents.madla.creator.MAPDDLCreator "mapddl-benchmarks/$1/domain.pddl" $problem "temp/$2.addl" $3 $4 $5
+	if [[ "${pddFfileName}" != "${domainFileName}" ]] ; then
+    	
+    	#echo $pddFfileName
+    	
+    	#echo /usr/bin/timeout -s SIGSEGV $(($4+1))m $JAVA -Xmx8G -jar $MADLA_JAR $MADLAcreator "$problemsPath/$domainType/$domainFileName.pddl" "$problemsPath/$domainType/$pddlFile" "temp/$pddFfileName.addl" $5 $6 $7
 	
-	 /usr/bin/timeout -s SIGSEGV $(($4+1))m $JAVA -Xmx8G -jar $JAR cz.agents.madla.creator.MAPDDLCreator "mapddl-problems/$1/domain.pddl" $problem "temp/$2.addl" $3 $4 $5
-
-	cp $pddl $plans
-	#cp out.plan mapddl-problems-plans
+		/usr/bin/timeout -s SIGSEGV $(($recursion+1))m $JAVA -Xmx8G -jar $MADLA_JAR $MADLAcreator "$problemsPath/$domainType/$domainFileName.pddl" "$problemsPath/$domainType/$pddlFile" "temp/$pddFfileName.addl" $heuristic $recursion $timeout
+	
+		mv "out.plan" "$pddFfileName.plan"
+		
+		cp "$pddFfileName.plan" "$plansPath/$domainType"	
+		
+		rm "$pddFfileName.plan"
+	fi
+	
 done
 
 

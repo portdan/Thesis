@@ -78,3 +78,46 @@ mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_87.pdd
 mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_89.pddl,3,saFF-glcl,-1,170,{tru1=2 tru2=1},{apn1=1},0,27,1,26,24,2,1,27,860,0,0,0,0,0,,,,,,,1,0,true,true
 mapddl-problems/logistics00,mapddl-problems/logistics00/domain.pddl,3,saFF-glcl,-1,157,{tru1=1 tru2=1},{apn1=1},0,18,1,17,12,2,0,14,464,0,0,0,0,0,,,,,,,1,0,true,true
 mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_12.pddl,3,saFF-glcl,-1,166,{tru1=1 apn1=1},{tru2=1 apn1=2},0,27,2,25,19,3,1,23,744,0,0,0,0,0,,,,,,,1,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_12.pddl,3,saFF-glcl,-1,1991,{tru1=1 apn1=1},{tru2=1},0,65,1,64,49,2,0,51,1648,0,0,0,0,0,,,,,,,1,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_12.pddl,3,saFF-glcl,-1,406,{tru1=1 apn1=1},{tru2=1},0,18,1,17,13,2,0,15,496,0,0,0,0,0,,,,,,,1,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_12.pddl,3,saFF-glcl,-1,1558,{tru1=1 apn1=1},{tru2=1},0,41,1,40,35,2,0,37,1200,0,0,0,0,0,,,,,,,1,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_30.pddl,3,saFF-glcl,-1,467,{tru1=1 apn1=1},{tru2=1},0,29,2,27,23,2,0,25,816,0,0,0,0,0,,,,,,,1,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_60.pddl,3,saFF-glcl,-1,443,{tru2=1 apn1=1},{tru1=1},0,26,1,25,17,2,0,19,624,0,0,0,0,0,,,,,,,1,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_62.pddl,3,saFF-glcl,-1,453,{tru2=1 apn1=1},{tru1=1},0,41,1,40,32,3,1,36,1168,0,0,0,0,0,,,,,,,1,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_63.pddl,3,saFF-glcl,-1,467,{tru1=1 apn1=1},{tru1=1 tru2=1 apn1=1},0,36,5,31,25,6,2,33,1064,0,0,0,0,0,,,,,,,1,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_87.pddl,3,saFF-glcl,-1,468,{tru1=2 tru2=1 apn1=1},{tru1=1},0,49,1,48,35,3,1,39,1264,0,0,0,0,0,,,,,,,1,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_89.pddl,3,saFF-glcl,-1,424,{tru1=1 tru2=1},{apn1=1},0,30,1,29,22,2,0,24,784,0,0,0,0,0,,,,,,,1,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_10.pddl,3,saFF-glcl,-1,592,{tru1=3 tru2=3 apn1=3},{tru1=3 tru2=3 apn1=3},0,105,3,102,81,8,8,97,3020,0,0,0,0,0,,,,,,,3,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_16.pddl,3,saFF-glcl,-1,500,{tru1=3 tru2=3 apn1=3},{tru1=3 tru2=4 apn1=4},0,86,4,82,60,10,10,80,2456,0,0,0,0,0,,,,,,,3,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_18.pddl,3,saFF-glcl,-1,441,{tru1=2 tru2=1 apn1=1},{tru1=1},0,62,1,61,48,3,1,52,1680,0,0,0,0,0,,,,,,,1,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_19.pddl,3,saFF-glcl,-1,445,{tru1=3 tru2=3 apn1=3},{tru1=4 tru2=4 apn1=5},0,43,6,37,29,13,13,55,1648,0,0,0,0,0,,,,,,,3,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_21.pddl,3,saFF-glcl,-1,439,{tru1=3 tru2=1 apn1=3},{tru1=3 tru2=3 apn1=3},0,42,4,38,29,6,4,39,1256,0,0,0,0,0,,,,,,,3,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_23.pddl,3,saFF-glcl,-1,482,{tru1=3 tru2=3 apn1=3},{tru1=4 tru2=4 apn1=5},0,71,5,66,45,12,11,68,2084,0,0,0,0,0,,,,,,,3,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_28.pddl,3,saFF-glcl,-1,443,{tru1=3 tru2=3 apn1=3},{tru2=3 apn1=4},0,62,3,59,42,6,5,53,1668,0,0,0,0,0,,,,,,,3,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_2.pddl,3,saFF-glcl,-1,462,{tru1=4 tru2=4 apn1=4},{tru1=8 tru2=7 apn1=6},0,103,3,100,70,13,12,95,2980,0,0,0,0,0,,,,,,,5,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_35.pddl,3,saFF-glcl,-1,423,{tru2=1 apn1=1},{tru1=1},0,22,1,21,18,3,0,21,696,0,0,0,0,0,,,,,,,1,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_39.pddl,3,saFF-glcl,-1,432,{tru1=3 tru2=3 apn1=3},{tru1=4 tru2=3 apn1=4},0,53,3,50,36,9,6,51,1636,0,0,0,0,0,,,,,,,3,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_42.pddl,3,saFF-glcl,-1,421,{tru1=3 tru2=3 apn1=3},{tru2=3 apn1=3},0,68,2,66,43,7,6,56,1760,0,0,0,0,0,,,,,,,3,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_45.pddl,3,saFF-glcl,-1,426,{tru1=3 tru2=3 apn1=3},{tru1=4 tru2=3 apn1=4},0,49,3,46,32,6,6,44,1344,0,0,0,0,0,,,,,,,3,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_46.pddl,3,saFF-glcl,-1,473,{tru1=3 tru2=3 apn1=3},{tru1=4 tru2=4 apn1=5},0,64,3,61,43,10,9,62,1912,0,0,0,0,0,,,,,,,3,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_48.pddl,3,saFF-glcl,-1,441,{tru1=3 tru2=3 apn1=3},{tru1=3 apn1=3},0,71,2,69,50,6,5,61,1908,0,0,0,0,0,,,,,,,3,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_49.pddl,3,saFF-glcl,-1,447,{tru1=1 apn1=1},{tru1=2 tru2=1},0,54,3,51,42,3,1,46,1484,0,0,0,0,0,,,,,,,1,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_51.pddl,3,saFF-glcl,-1,400,{tru1=1 apn1=1},{tru2=1},0,51,1,50,37,2,0,39,1264,0,0,0,0,0,,,,,,,1,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_57.pddl,3,saFF-glcl,-1,446,{tru1=3 tru2=3 apn1=3},{tru1=4 tru2=4 apn1=5},0,94,5,89,64,10,8,82,2600,0,0,0,0,0,,,,,,,3,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_58.pddl,3,saFF-glcl,-1,448,{tru1=3 tru2=3 apn1=3},{tru1=3 tru2=3},0,88,2,86,65,7,5,77,2436,0,0,0,0,0,,,,,,,3,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_61.pddl,3,saFF-glcl,-1,520,{tru1=3 tru2=3 apn1=3},{tru1=3 tru2=3},0,91,2,89,76,5,5,86,2704,0,0,0,0,0,,,,,,,3,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_63.pddl,3,saFF-glcl,-1,478,{tru1=3 tru2=3 apn1=3},{tru1=3},0,90,1,89,65,4,3,72,2292,0,0,0,0,0,,,,,,,3,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_64.pddl,3,saFF-glcl,-1,402,{tru1=3 tru2=3 apn1=3},{tru1=4 tru2=4 apn1=5},0,69,4,65,47,8,8,63,1968,0,0,0,0,0,,,,,,,3,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_65.pddl,3,saFF-glcl,-1,415,{tru1=3 tru2=3 apn1=3},{tru1=4 tru2=4 apn1=5},0,61,3,58,40,10,8,58,1800,0,0,0,0,0,,,,,,,3,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_66.pddl,3,saFF-glcl,-1,433,{tru1=3 tru2=3 apn1=3},{tru1=4 apn1=5},0,79,2,77,54,7,5,66,2100,0,0,0,0,0,,,,,,,3,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_68.pddl,3,saFF-glcl,-1,454,{tru1=5 tru2=5 apn1=5},{tru1=5 tru2=5 apn1=5},0,80,4,76,57,10,10,77,2368,0,0,0,0,0,,,,,,,5,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_69.pddl,3,saFF-glcl,-1,478,{tru1=5 tru2=5 apn1=5},{tru1=5 tru2=6 apn1=6},0,81,3,78,57,12,10,79,2488,0,0,0,0,0,,,,,,,5,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_6.pddl,3,saFF-glcl,-1,478,{tru1=3 tru2=3 apn1=3},{tru1=3 tru2=4 apn1=4},0,91,3,88,65,8,8,81,2512,0,0,0,0,0,,,,,,,3,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_71.pddl,3,saFF-glcl,-1,492,{tru1=3 tru2=3 apn1=3},{tru1=4 tru2=3},0,61,2,59,43,8,7,58,1792,0,0,0,0,0,,,,,,,3,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_72.pddl,3,saFF-glcl,-1,454,{tru1=3 tru2=3 apn1=3},{tru1=4 tru2=3 apn1=4},0,72,3,69,49,7,4,60,1920,0,0,0,0,0,,,,,,,3,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_74.pddl,3,saFF-glcl,-1,418,{tru1=3 tru2=3 apn1=3},{tru1=3 tru2=4 apn1=4},0,61,3,58,42,6,5,53,1664,0,0,0,0,0,,,,,,,3,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_75.pddl,3,saFF-glcl,-1,379,{tru1=1 apn1=1},{tru2=1},0,42,3,39,28,2,0,30,976,0,0,0,0,0,,,,,,,1,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_83.pddl,3,saFF-glcl,-1,386,{tru1=1 tru2=1},{apn1=1},0,31,1,30,23,2,0,25,816,0,0,0,0,0,,,,,,,1,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_86.pddl,3,saFF-glcl,-1,452,{tru2=1 apn1=1},{tru1=1},0,31,1,30,22,2,0,24,784,0,0,0,0,0,,,,,,,1,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_88.pddl,3,saFF-glcl,-1,475,{tru1=3 tru2=3 apn1=3},{tru1=3 tru2=3 apn1=3},0,71,4,67,49,12,12,73,2200,0,0,0,0,0,,,,,,,3,0,true,true
+mapddl-problems/logistics00,mapddl-problems/logistics00/probLOGISTICS-4-0_90.pddl,3,saFF-glcl,-1,453,{tru1=3 tru2=3 apn1=3},{tru1=4 tru2=3 apn1=4},0,42,3,39,26,6,5,37,1152,0,0,0,0,0,,,,,,,3,0,true,true
