@@ -9,6 +9,8 @@ import hashlib
 import time
 import argparse
 
+globalChunkSize=256
+
 
 def main():
     
@@ -30,7 +32,7 @@ def main():
     
     print("Done! (time - %0.4f" %(end - start)+")")
     
-def chunk_reader(fobj, chunk_size=1024):
+def chunk_reader(fobj, chunk_size=globalChunkSize):
     """Generator that reads a file in chunks of bytes"""
     while True:
         chunk = fobj.read(chunk_size)
@@ -44,7 +46,7 @@ def get_hash(filename, first_chunk_only=False, hash=hashlib.sha1):
     file_object = open(filename, 'rb')
 
     if first_chunk_only:
-        hashobj.update(file_object.read(1024))
+        hashobj.update(file_object.read(globalChunkSize))
     else:
         for chunk in chunk_reader(file_object):
             hashobj.update(chunk)
@@ -78,7 +80,7 @@ def check_for_duplicates(folderPath, hash=hashlib.sha1):
                 hashes_by_size[file_size] = []  # create the list for this file size
                 hashes_by_size[file_size].append(full_path)
 
-    # For all files with the same file size, get their hash on the 1st 1024 bytes
+    # For all files with the same file size, get their hash on the 1st globalChunkSize bytes
     for __, files in hashes_by_size.items():
         if len(files) < 2:
             continue    # this file size is unique, no need to spend cpy cycles on it
@@ -93,7 +95,7 @@ def check_for_duplicates(folderPath, hash=hashlib.sha1):
                 hashes_on_1k[small_hash] = []          # create the list for this 1k hash
                 hashes_on_1k[small_hash].append(filename)
 
-    # For all files with the hash on the 1st 1024 bytes, get their hash on the full file - collisions will be duplicates
+    # For all files with the hash on the 1st globalChunkSize bytes, get their hash on the full file - collisions will be duplicates
     for __, files in hashes_on_1k.items():
         if len(files) < 2:
             continue    # this hash of fist 1k file bytes is unique, no need to spend cpy cycles on it

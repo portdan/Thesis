@@ -1,6 +1,7 @@
 #!/bin/bash
 
 #./PlanForAll.sh <domain type> <domain file name> <.pddl problems path> <.plan plans path> <heuristic> <recursion> <timeout (min)>
+#./PlanForAll.sh logistics00 domain mapddl-problems mapddl-plans saFF-glcl -1 10
 
 JAVA="/usr/bin/java"
 MADLA_JAR="madla-planner.jar"

@@ -1,3 +1,5 @@
-[:heuristic: 5001 4]
 [:heuristic: 4000 4]
-[:heuristic: 6002 3]
+[:heuristic: 5001 3]
+[:heuristic: 6002 4]
+[:heuristic: 9002 5]
+[:heuristic: 7000 5]

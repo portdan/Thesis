@@ -114,11 +114,20 @@ public class MAPDDLProblemGenerator implements Creator {
 
 		translateToSAS();
 
+		/* preprocessing the sas might remove some of the variables
 		preprocessSAS();
 
 		LOGGER.info("parse preprocessed sas file");
-
+			
 		sasParser = new SASParser(preprocesSASFile);
+		
+		preprocessor = new SASPreprocessor(sasParser.getDomain(), addlParser);
+		*/
+		
+		LOGGER.info("parse sas file");
+			
+		sasParser = new SASParser(sasFile);
+		
 		preprocessor = new SASPreprocessor(sasParser.getDomain(), addlParser);
 
 		createEntities(addlParser);
