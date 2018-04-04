@@ -1,0 +1,6 @@
+09:19:02 -  INFO [main] - domainLerner.MAPDDLDomainLerner.init - init start:
+09:19:02 -  INFO [main] - domainLerner.MAPDDLDomainLerner.init - init end
+09:19:02 -  INFO [main] - domainLerner.MAPDDLDomainLerner.create - create start:
+09:19:02 -  INFO [main] - domainLerner.MAPDDLDomainLerner.createEntities - create entities:
+09:19:02 -  INFO [main] - domainLerner.MAPDDLDomainLerner.runEntities - run entities:
+09:19:02 -  INFO [main] - domainLerner.MAPDDLDomainLerner.create - create end
