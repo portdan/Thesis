@@ -1,6 +1,18 @@
-09:19:02 -  INFO [main] - domainLerner.MAPDDLDomainLerner.init - init start:
-09:19:02 -  INFO [main] - domainLerner.MAPDDLDomainLerner.init - init end
-09:19:02 -  INFO [main] - domainLerner.MAPDDLDomainLerner.create - create start:
-09:19:02 -  INFO [main] - domainLerner.MAPDDLDomainLerner.createEntities - create entities:
-09:19:02 -  INFO [main] - domainLerner.MAPDDLDomainLerner.runEntities - run entities:
-09:19:02 -  INFO [main] - domainLerner.MAPDDLDomainLerner.create - create end
+11:48:33 -  INFO [main] - domainLerner.MAPDDLDomainLerner.init - init start:
+11:48:34 -  INFO [main] - domainLerner.MAPDDLDomainLerner.init - init end
+11:48:34 -  INFO [main] - domainLerner.MAPDDLDomainLerner.create - create start:
+11:48:34 -  INFO [main] - domainLerner.MAPDDLDomainLerner.createAgentsFile - convert to PDDL start:
+11:48:34 -  INFO [main] - domainLerner.MAPDDLDomainLerner.createAgentsFile - RUN: ./Misc/extractAgentFile/unfactoredMAPDDL-extract-agent-file.py ./mapddl-benchmarks/logistics00/ domain probLOGISTICS-4-0 ./Output/to-pddl
+11:48:34 -  INFO [main] - domainLerner.MAPDDLDomainLerner.createAgentsFile - convert to PDDL end
+11:48:34 -  INFO [main] - domainLerner.MAPDDLDomainLerner.pickRandomAgent - pick random agent start:
+11:48:34 -  INFO [main] - domainLerner.MAPDDLDomainLerner.pickRandomAgent - check the created agents file (.agents)
+11:48:34 -  INFO [main] - domainLerner.MAPDDLDomainLerner.pickRandomAgent - pick random line from .agents file:
+11:48:34 -  INFO [main] - domainLerner.MAPDDLDomainLerner.pickRandomAgent - choosen agent - tru1
+11:48:34 -  INFO [main] - domainLerner.MAPDDLDomainLerner.pickRandomAgent - choosen agent type - truck
+11:48:34 -  INFO [main] - domainLerner.MAPDDLDomainLerner.pickRandomAgent - pick random agent end
+11:48:34 -  INFO [main] - domainLerner.MAPDDLDomainLerner.removeAllOtherAgents - RUN: ./Misc/convert/unfactoredMAPDDL-to-PDDL.py ./mapddl-benchmarks/logistics00/ domain probLOGISTICS-4-0 ./Output/to-pddl
+11:48:34 -  INFO [main] - domainLerner.MAPDDLDomainLerner.createAgentDomain - create agent domain start:
+11:48:34 -  INFO [main] - domainLerner.MAPDDLDomainLerner.createAgentDomain - create agent domian end
+11:48:34 -  INFO [main] - domainLerner.MAPDDLDomainLerner.createAgentProblem - create agent problem:
+11:48:34 -  INFO [main] - domainLerner.MAPDDLDomainLerner.createAgentProblem - create agent problem end
+11:48:34 -  INFO [main] - domainLerner.MAPDDLDomainLerner.create - create end

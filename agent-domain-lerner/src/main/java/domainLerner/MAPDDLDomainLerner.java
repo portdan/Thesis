@@ -3,97 +3,56 @@ package domainLerner;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.Random;
 
 import org.apache.log4j.Logger;
 
-import cz.agents.alite.communication.PerformerCommunicator;
-import cz.agents.alite.communication.QueuedCommunicator;
-import cz.agents.alite.communication.channel.CommunicationChannelException;
-import cz.agents.alite.communication.channel.DirectCommunicationChannelAsync;
-import cz.agents.alite.communication.channel.DirectCommunicationChannel.DefaultReceiverTable;
-import cz.agents.alite.communication.channel.DirectCommunicationChannel.ReceiverTable;
 import cz.agents.alite.creator.Creator;
-import cz.agents.dimaptools.DIMAPWorldInterface;
-import cz.agents.dimaptools.DefaultDIMAPWorld;
-import cz.agents.dimaptools.communication.protocol.DefaultEncoder;
+
 import cz.agents.dimaptools.experiment.Trace;
-import cz.agents.dimaptools.input.addl.ADDLObject;
-import cz.agents.dimaptools.input.addl.ADDLParser;
-import cz.agents.dimaptools.input.sas.SASParser;
-import cz.agents.dimaptools.input.sas.SASPreprocessor;
-import cz.agents.dimaptools.model.State;
 
 public class MAPDDLDomainLerner implements Creator {
 
 	private final static Logger LOGGER = Logger.getLogger(MAPDDLDomainLerner.class);
 
-	private static final String TRANSLATOR = "./Misc/translate/translate.py";
-	private static final String PREPROCESSOR = "./preprocess-runner";
-	private static final String CONVERTOR = "./Misc/convert/ma-pddl/ma-to-pddl.py";
-	private static final String REMOVEDUPLICATOR = "./Misc/removeDuplicates/rmDup.py";
+	private static final String MA_TO_PDDL_CONVERTOR = "./Misc/converters/unfactoredMAPDDL-to-PDDL.py";
+	private static final String PDDL_TO_MA_CONVERTOR = "./Misc/converters/PDDL-to-unfactoredMAPDDL.py";
+	private static final String MA_TO_AGENT_FILE = "./Misc/extractAgentFile/unfactoredMAPDDL-extract-agent-file.py";
 
-	private static final String TEMP = "./Output/temp";
-	private static final String GEN = "./Output/gen";
-	private static final String OUTPUT = "./Output";
-	private static final String ROOT = "./";
+	private static final String MA_TO_PDDL_OUTPUT = "./Output/to-pddl";
+	private static final String PDDL_TO_MA_OUTPUT = "./Output/to-ma";
 
-	private String domainFilePath;
-	private String problemFilePath;
-	private String oldDomainFilePath;
-	private String oldProblemFilePath;
+	private String domainAndProblemDirectoryPath;
+
+	private String domainName;
+	private String problemName;
+
 	private String agentFilePath;
-	private String sasFilePath;
-	private String preprocessSASFilePath;
-
-	private String domainFileName;
-	private String problemFileName;
 
 	private File agentFile;
-	private File sasFile;
-	private File preprocesSASFile;
 
-	private int maxNumOfExpands;
-	private int numOfProblemsToGenerate;
-
-	private ADDLObject addlParser;
-
-	private SASParser sasParser;
-	private SASPreprocessor preprocessor;
-
-	private final ReceiverTable receiverTable = new DefaultReceiverTable();
-	private final ExecutorService executorService = Executors.newFixedThreadPool(1);
-
-	private final List<DIMAPWorldInterface> worlds = new ArrayList<DIMAPWorldInterface>();
+	private String PickedAagent;
+	private String PickedAagentType;
 
 	@Override
 	public void init(String[] args) {
 
 		LOGGER.info("init start:");
 
-		sasFilePath = "output.sas";
-		preprocessSASFilePath = "output";
-
-		
-		if (args.length != 3) {
+		if (args.length != 4) {
 			LOGGER.fatal("provided args: " + Arrays.toString(args));
-			LOGGER.fatal("Usage (from PDDL): <domain>.pddl <problem>.pddl");
-			//LOGGER.fatal("Usage (from PDDL): <domain>.pddl <problem>.pddl <number of expands> <time limit (sec)>");
+			LOGGER.fatal("Usage: <path to .pddl files> <domain name> <problem name>");
 			System.exit(1);
 		}
 
-		if (args.length == 3) {
-			domainFilePath = args[1];
-			oldDomainFilePath = args[1];
-			problemFilePath = args[2];
-			oldProblemFilePath = args[2];
-			//maxNumOfExpands = Integer.parseInt(args[3]);
-			//numOfProblemsToGenerate = Integer.parseInt(args[4]);
+		if (args.length == 4) {
+
+			domainAndProblemDirectoryPath = args[1];
+			domainName = args[2];
+			problemName = args[3];
+
 		}
 
 		Trace.setFileStream("Log/trace.log");
@@ -107,19 +66,110 @@ public class MAPDDLDomainLerner implements Creator {
 
 		LOGGER.info("create start:");
 
-		createEntities();
+		createAgentsFile();
 
-		runEntities();
+		pickRandomAgent();
+
+		removeAllOtherAgents();
+
+		createAgentDomain();
+
+		createAgentProblem();
 
 		LOGGER.info("create end");
 	}
 
-	private void createEntities() {
-		LOGGER.info("create entities:");
+	private void createAgentProblem() {
+		LOGGER.info("create agent problem:");
+
+		LOGGER.info("create agent problem end");
 	}
 
-	private void runEntities() {
-		LOGGER.info("run entities:");
+	private void createAgentDomain() {
+		LOGGER.info("create agent domain start:");
+
+		LOGGER.info("create agent domian end");
+	}
+
+	private void createAgentsFile() {
+
+		LOGGER.info("convert to PDDL start:");
+
+		try {
+
+			String cmd = MA_TO_AGENT_FILE + " " + domainAndProblemDirectoryPath + " " + domainName + " " + problemName
+					+ " " + MA_TO_PDDL_OUTPUT;
+
+			LOGGER.info("RUN: " + cmd);
+
+			Process pr = Runtime.getRuntime().exec(cmd);
+
+			pr.waitFor();
+
+		} catch (Exception e) {
+			LOGGER.fatal(e, e);
+			System.exit(1);
+		}
+
+		LOGGER.info("convert to PDDL end");
+	}
+
+	private void pickRandomAgent() {
+
+		LOGGER.info("pick random agent start:");
+
+		agentFilePath = MA_TO_PDDL_OUTPUT + "/" + problemName + ".agents";
+
+		LOGGER.info("check the created agents file (.agents)");
+
+		agentFile = new File(agentFilePath);
+		if (!agentFile.exists()) {
+			LOGGER.fatal("Agent file " + agentFilePath + " does not exist!");
+			System.exit(1);
+		}
+
+		Random rand = new Random(2); // fixed seed
+		// Random rand = new Random(); // no seed
+
+		List<String> lines = null;
+
+		try {
+			lines = Files.readAllLines(agentFile.toPath());
+		} catch (IOException e) {
+			LOGGER.fatal(e, e);
+			System.exit(1);
+		}
+
+		LOGGER.info("pick random line from .agents file:");
+
+		String randomLine = lines.get(rand.nextInt(lines.size()));
+
+		String[] tmp = randomLine.split("-");
+
+		PickedAagent = tmp[0].trim();
+		PickedAagentType = tmp[1].trim();
+
+		LOGGER.info("choosen agent - " + PickedAagent);
+		LOGGER.info("choosen agent type - " + PickedAagentType);
+
+		LOGGER.info("pick random agent end");
+	}
+
+	private void removeAllOtherAgents() {
+
+		try {
+			String cmd = MA_TO_PDDL_CONVERTOR + " " + domainAndProblemDirectoryPath + " " + domainName + " "
+					+ problemName + " " + PickedAagent + " " + PickedAagentType + " " + MA_TO_PDDL_OUTPUT;
+
+			LOGGER.info("RUN: " + cmd);
+
+			Process pr = Runtime.getRuntime().exec(cmd);
+
+			pr.waitFor();
+		} catch (Exception e) {
+			LOGGER.fatal(e, e);
+			System.exit(1);
+		}
 	}
 
 }
