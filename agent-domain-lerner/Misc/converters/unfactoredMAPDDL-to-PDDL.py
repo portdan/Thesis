@@ -152,7 +152,7 @@ class PlanningProblem(object):
     self.goal = [] #List of Predicates
     self.metric = False
     
-    # DANL 
+    # DANL my defines
     self.removeAgents = set()
     self.agent = agent
     self.type = type
@@ -305,7 +305,7 @@ class PlanningProblem(object):
       eff_list = self._parse_unground_propositions(act.get('effect'))
       new_act = Action(act_name, up_params, pre_list, eff_list)
       
-      # DANL
+      # DANL add to new actions an agent property
       new_act.agent_type = act.get('agent')[2]
       
       new_actions.append(new_act)
@@ -542,7 +542,7 @@ class PlanningProblem(object):
     for type_ in self.types:
       to_write += "\t"
       for key in self.types.get(type_):
-        # DANL 
+        # DANL remove all other types of agents
         if not key in self.removeAgents: 
             to_write += key + " " # 1.the type is not an agent 2. the type is the given agent type
       to_write += "- " + type_
@@ -570,9 +570,9 @@ class PlanningProblem(object):
       to_write += ")\n"
     #Actions
     for action in self.actions:
-        # DANL 
+        # DANL remove all other actions except our agents actions
         if not action.agent_type in self.removeAgents: 
-            to_write += "\n{}\n".format(action.pddl_rep())
+            to_write += "\n{}\n".format(action.pddl_rep()) # the action are of the given type 
     
     #Endmatter
     to_write += ")" #Close domain defn
@@ -586,17 +586,39 @@ class PlanningProblem(object):
     #Objects
     to_write += "(:objects\n"
     for obj in self.object_list:
-      to_write += "\t" + obj + " - " + self.get_type_of_object(obj) + "\n"
+        # DANL remove all objects that are agents and not our agent
+        if self.get_type_of_object(obj) in self.removeAgents:
+            continue # the object is agent from other type
+        if (self.get_type_of_object(obj) == self.type) and (not obj == self.agent):
+            continue # the object is agent same type but different name 
+        else:
+            to_write += "\t" + obj + " - " + self.get_type_of_object(obj) + "\n"
     to_write += ")\n"
     to_write += "(:init\n"
     for predicate in self.init:
-      to_write += "\t{}\n".format(predicate)
+        # DANLremove all unwanted inits predicate
+        predicateSet = set(predicate.args)
+        intersection = self.agents.intersection(predicateSet)
+        if len(intersection) > 1:
+            continue # the predicate contains more agents the out one
+        if len(intersection) == 1 and (not self.agent in intersection):
+            continue # the predicate contains one agent, but its not ours
+        else:
+            to_write += "\t{}\n".format(predicate)
     for function in self.ground_functions:
       to_write += "\t{}\n".format(function)
     to_write += ")\n"
     to_write += "(:goal\n\t(and\n"
     for goal in self.goal:
-      to_write += "\t\t{}\n".format(goal)
+        # DANL remove all unwanted goals predicate
+        goalSet = set(goal.args)
+        intersection = self.agents.intersection(goalSet)
+        if len(intersection) > 1:
+            continue # the predicate contains more agents the out one
+        if len(intersection) == 1 and (not self.agent in intersection):
+            continue # the predicate contains one agent, but its not ours
+        else:
+            to_write += "\t{}\n".format(goal)
     to_write += "\t)\n)\n"
     if self.metric:
       to_write += "(:metric minimize (total-cost))\n" 
@@ -611,8 +633,11 @@ class PlanningProblem(object):
     to_write += "(:domain " + self.domain + ")\n"
     #Objects
     to_write += "(:agents"
-    for obj in self.agents:
-      to_write += " " + obj 
+    # DANL
+    #for obj in self.agents:
+     #to_write += " " + obj 
+    to_write += " " + self.agent  # write out single agent
+    
     to_write += ")\n"
     to_write += ")"
     file_.write(to_write)

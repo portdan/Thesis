@@ -1136,9 +1136,10 @@ def main():
     pp = PlanningProblem(args.folder + "/" + args.domain + ".pddl", args.folder + "/" + args.problem + ".pddl", args.folder + "/" + args.problem + ".addl")
     pp.print_problem()
 
-    if not pp.goal_reachable:
-        print ("ERROR: GOAL IS NOT REACHABLE!")
-        sys.exit(-1)
+    #DANL
+    #if not pp.goal_reachable:
+        #print ("ERROR: GOAL IS NOT REACHABLE!")
+        #sys.exit(-1)
     
     if not os.path.exists(args.output):
         os.mkdir(args.output)

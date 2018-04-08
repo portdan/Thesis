@@ -170,6 +170,20 @@ public class MAPDDLDomainLerner implements Creator {
 			LOGGER.fatal(e, e);
 			System.exit(1);
 		}
+		
+		try {
+			String cmd = PDDL_TO_MA_CONVERTOR + " " + MA_TO_PDDL_OUTPUT + " " + domainName + " "
+					+ problemName + " " + PDDL_TO_MA_OUTPUT;
+
+			LOGGER.info("RUN: " + cmd);
+
+			Process pr = Runtime.getRuntime().exec(cmd);
+
+			pr.waitFor();
+		} catch (Exception e) {
+			LOGGER.fatal(e, e);
+			System.exit(1);
+		}
 	}
 
 }
