@@ -157,6 +157,9 @@ public class MAPDDLDomainLerner implements Creator {
 
 	private void removeAllOtherAgents() {
 
+		LOGGER.info("remove all other agents start:");
+		
+		LOGGER.info("convert to pddl with a single agent - " + PickedAagent + ", type - " + PickedAagentType); 
 		try {
 			String cmd = MA_TO_PDDL_CONVERTOR + " " + domainAndProblemDirectoryPath + " " + domainName + " "
 					+ problemName + " " + PickedAagent + " " + PickedAagentType + " " + MA_TO_PDDL_OUTPUT;
@@ -171,6 +174,8 @@ public class MAPDDLDomainLerner implements Creator {
 			System.exit(1);
 		}
 		
+		LOGGER.info("convert back to ma-pddl with newly created pddl"); 
+
 		try {
 			String cmd = PDDL_TO_MA_CONVERTOR + " " + MA_TO_PDDL_OUTPUT + " " + domainName + " "
 					+ problemName + " " + PDDL_TO_MA_OUTPUT;
@@ -184,6 +189,8 @@ public class MAPDDLDomainLerner implements Creator {
 			LOGGER.fatal(e, e);
 			System.exit(1);
 		}
+		
+		LOGGER.info("remove all other agents end");
 	}
 
 }

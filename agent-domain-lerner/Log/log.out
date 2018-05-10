@@ -1,19 +1,23 @@
-12:50:28 -  INFO [main] - domainLerner.MAPDDLDomainLerner.init - init start:
-12:50:28 -  INFO [main] - domainLerner.MAPDDLDomainLerner.init - init end
-12:50:28 -  INFO [main] - domainLerner.MAPDDLDomainLerner.create - create start:
-12:50:28 -  INFO [main] - domainLerner.MAPDDLDomainLerner.createAgentsFile - convert to PDDL start:
-12:50:28 -  INFO [main] - domainLerner.MAPDDLDomainLerner.createAgentsFile - RUN: ./Misc/extractAgentFile/unfactoredMAPDDL-extract-agent-file.py ./mapddl-benchmarks/logistics00/ domain probLOGISTICS-4-0 ./Output/to-pddl
-12:50:28 -  INFO [main] - domainLerner.MAPDDLDomainLerner.createAgentsFile - convert to PDDL end
-12:50:28 -  INFO [main] - domainLerner.MAPDDLDomainLerner.pickRandomAgent - pick random agent start:
-12:50:28 -  INFO [main] - domainLerner.MAPDDLDomainLerner.pickRandomAgent - check the created agents file (.agents)
-12:50:28 -  INFO [main] - domainLerner.MAPDDLDomainLerner.pickRandomAgent - pick random line from .agents file:
-12:50:28 -  INFO [main] - domainLerner.MAPDDLDomainLerner.pickRandomAgent - choosen agent - tru1
-12:50:28 -  INFO [main] - domainLerner.MAPDDLDomainLerner.pickRandomAgent - choosen agent type - truck
-12:50:28 -  INFO [main] - domainLerner.MAPDDLDomainLerner.pickRandomAgent - pick random agent end
-12:50:28 -  INFO [main] - domainLerner.MAPDDLDomainLerner.removeAllOtherAgents - RUN: ./Misc/converters/unfactoredMAPDDL-to-PDDL.py ./mapddl-benchmarks/logistics00/ domain probLOGISTICS-4-0 tru1 truck ./Output/to-pddl
-12:50:28 -  INFO [main] - domainLerner.MAPDDLDomainLerner.removeAllOtherAgents - RUN: ./Misc/converters/PDDL-to-unfactoredMAPDDL.py ./Output/to-pddl domain probLOGISTICS-4-0 ./Output/to-ma
-12:50:28 -  INFO [main] - domainLerner.MAPDDLDomainLerner.createAgentDomain - create agent domain start:
-12:50:28 -  INFO [main] - domainLerner.MAPDDLDomainLerner.createAgentDomain - create agent domian end
-12:50:28 -  INFO [main] - domainLerner.MAPDDLDomainLerner.createAgentProblem - create agent problem:
-12:50:28 -  INFO [main] - domainLerner.MAPDDLDomainLerner.createAgentProblem - create agent problem end
-12:50:28 -  INFO [main] - domainLerner.MAPDDLDomainLerner.create - create end
+09:16:12 -  INFO [main] - domainLerner.MAPDDLDomainLerner.init - init start:
+09:16:12 -  INFO [main] - domainLerner.MAPDDLDomainLerner.init - init end
+09:16:12 -  INFO [main] - domainLerner.MAPDDLDomainLerner.create - create start:
+09:16:12 -  INFO [main] - domainLerner.MAPDDLDomainLerner.createAgentsFile - convert to PDDL start:
+09:16:12 -  INFO [main] - domainLerner.MAPDDLDomainLerner.createAgentsFile - RUN: ./Misc/extractAgentFile/unfactoredMAPDDL-extract-agent-file.py ./mapddl-benchmarks/blocksworld/ domain probBLOCKS-4-0 ./Output/to-pddl
+09:16:12 -  INFO [main] - domainLerner.MAPDDLDomainLerner.createAgentsFile - convert to PDDL end
+09:16:12 -  INFO [main] - domainLerner.MAPDDLDomainLerner.pickRandomAgent - pick random agent start:
+09:16:12 -  INFO [main] - domainLerner.MAPDDLDomainLerner.pickRandomAgent - check the created agents file (.agents)
+09:16:12 -  INFO [main] - domainLerner.MAPDDLDomainLerner.pickRandomAgent - pick random line from .agents file:
+09:16:12 -  INFO [main] - domainLerner.MAPDDLDomainLerner.pickRandomAgent - choosen agent - a2
+09:16:12 -  INFO [main] - domainLerner.MAPDDLDomainLerner.pickRandomAgent - choosen agent type - agent
+09:16:12 -  INFO [main] - domainLerner.MAPDDLDomainLerner.pickRandomAgent - pick random agent end
+09:16:12 -  INFO [main] - domainLerner.MAPDDLDomainLerner.removeAllOtherAgents - remove all other agents start:
+09:16:12 -  INFO [main] - domainLerner.MAPDDLDomainLerner.removeAllOtherAgents - convert to pddl with a single agent - a2, type - agent
+09:16:12 -  INFO [main] - domainLerner.MAPDDLDomainLerner.removeAllOtherAgents - RUN: ./Misc/converters/unfactoredMAPDDL-to-PDDL.py ./mapddl-benchmarks/blocksworld/ domain probBLOCKS-4-0 a2 agent ./Output/to-pddl
+09:16:13 -  INFO [main] - domainLerner.MAPDDLDomainLerner.removeAllOtherAgents - convert back to ma-pddl with newly created pddl
+09:16:13 -  INFO [main] - domainLerner.MAPDDLDomainLerner.removeAllOtherAgents - RUN: ./Misc/converters/PDDL-to-unfactoredMAPDDL.py ./Output/to-pddl domain probBLOCKS-4-0 ./Output/to-ma
+09:16:13 -  INFO [main] - domainLerner.MAPDDLDomainLerner.removeAllOtherAgents - remove all other agents end
+09:16:13 -  INFO [main] - domainLerner.MAPDDLDomainLerner.createAgentDomain - create agent domain start:
+09:16:13 -  INFO [main] - domainLerner.MAPDDLDomainLerner.createAgentDomain - create agent domian end
+09:16:13 -  INFO [main] - domainLerner.MAPDDLDomainLerner.createAgentProblem - create agent problem:
+09:16:13 -  INFO [main] - domainLerner.MAPDDLDomainLerner.createAgentProblem - create agent problem end
+09:16:13 -  INFO [main] - domainLerner.MAPDDLDomainLerner.create - create end
