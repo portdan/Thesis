@@ -9,6 +9,14 @@ import java.util.Random;
 
 import org.apache.log4j.Logger;
 
+/*
+import org.gerryai.planning.model.domain.Domain;
+import org.gerryai.planning.model.problem.Problem;
+import org.gerryai.planning.parser.error.ParseException;
+import org.gerryai.planning.parser.pddl.PDDLParserService;
+import java.io.FileInputStream;
+*/
+
 import cz.agents.alite.creator.Creator;
 
 import cz.agents.dimaptools.experiment.Trace;
@@ -23,6 +31,12 @@ public class MAPDDLDomainLerner implements Creator {
 
 	private static final String MA_TO_PDDL_OUTPUT = "./Output/to-pddl";
 	private static final String PDDL_TO_MA_OUTPUT = "./Output/to-ma";
+
+	private static final String MA_TO_PDDL_CONVERTOR_OLD = "./Misc/convertersOld/unfactoredMAPDDL-to-PDDL.py";
+	private static final String PDDL_TO_MA_CONVERTOR_OLD = "./Misc/convertersOld/PDDL-to-unfactoredMAPDDL.py";
+
+	private static final String MA_TO_PDDL_CONVERTOR_ORIGINAL = "./Misc/convertersOriginal/unfactoredMAPDDL-to-PDDL.py";
+	private static final String PDDL_TO_MA_CONVERTOR_ORIGINAL = "./Misc/convertersOriginal/PDDL-to-unfactoredMAPDDL.py";
 
 	private String domainAndProblemDirectoryPath;
 
@@ -70,7 +84,11 @@ public class MAPDDLDomainLerner implements Creator {
 
 		pickRandomAgent();
 
+		//removeAllOtherAgentsOld();
+		//removeAllOtherAgentsOriginal();
 		removeAllOtherAgents();
+
+		//TEST();
 
 		createAgentDomain();
 
@@ -79,8 +97,32 @@ public class MAPDDLDomainLerner implements Creator {
 		LOGGER.info("create end");
 	}
 
+	/*	 
+	private void TEST() {
+		PDDLParserService parserService = new PDDLParserService();
+
+		Domain domain;
+		Problem problem;
+
+		String d = MA_TO_PDDL_OUTPUT+"/"+domainName+".pddl";
+		String p = MA_TO_PDDL_OUTPUT+"/"+problemName+".pddl";
+
+		try {
+			domain = parserService.parseDomain(new FileInputStream(d));
+			problem = parserService.parseProblem(new FileInputStream(p));
+		} catch (ParseException ex) {
+			throw new IllegalStateException("Could not parse PDDL file", ex);
+		} catch (IOException ex) {
+			throw new IllegalStateException("Could not read PDDL file for parsing", ex);
+		}
+
+		LOGGER.info(domain.getName());
+		LOGGER.info(problem.getGoal());
+	}
+	 */
+
 	private void createAgentProblem() {
-		LOGGER.info("create agent problem:");
+		LOGGER.info("create agent problem start:");
 
 		LOGGER.info("create agent problem end");
 	}
@@ -158,7 +200,7 @@ public class MAPDDLDomainLerner implements Creator {
 	private void removeAllOtherAgents() {
 
 		LOGGER.info("remove all other agents start:");
-		
+
 		LOGGER.info("convert to pddl with a single agent - " + PickedAagent + ", type - " + PickedAagentType); 
 		try {
 			String cmd = MA_TO_PDDL_CONVERTOR + " " + domainAndProblemDirectoryPath + " " + domainName + " "
@@ -173,7 +215,7 @@ public class MAPDDLDomainLerner implements Creator {
 			LOGGER.fatal(e, e);
 			System.exit(1);
 		}
-		
+
 		LOGGER.info("convert back to ma-pddl with newly created pddl"); 
 
 		try {
@@ -189,8 +231,86 @@ public class MAPDDLDomainLerner implements Creator {
 			LOGGER.fatal(e, e);
 			System.exit(1);
 		}
-		
+
 		LOGGER.info("remove all other agents end");
 	}
 
+	private void removeAllOtherAgentsOriginal() {
+
+		LOGGER.info("remove all other agents original start:");
+
+		LOGGER.info("convert to pddl with a single agent - " + PickedAagent + ", type - " + PickedAagentType); 
+		try {
+			String cmd = MA_TO_PDDL_CONVERTOR_ORIGINAL + " " + domainAndProblemDirectoryPath + " " + domainName + " "
+					+ problemName + " " + MA_TO_PDDL_OUTPUT;
+
+			LOGGER.info("RUN: " + cmd);
+
+			Process pr = Runtime.getRuntime().exec(cmd);
+
+			pr.waitFor();
+		} catch (Exception e) {
+			LOGGER.fatal(e, e);
+			System.exit(1);
+		}
+
+		LOGGER.info("convert back to ma-pddl with newly created pddl"); 
+
+		try {
+			String cmd = PDDL_TO_MA_CONVERTOR_ORIGINAL + " " + MA_TO_PDDL_OUTPUT + " " + domainName + " "
+					+ problemName + " " + PDDL_TO_MA_OUTPUT;
+
+			LOGGER.info("RUN: " + cmd);
+
+			Process pr = Runtime.getRuntime().exec(cmd);
+
+			pr.waitFor();
+		} catch (Exception e) {
+			LOGGER.fatal(e, e);
+			System.exit(1);
+		}
+
+		LOGGER.info("remove all other agents original end");
+	}
+
+	private void removeAllOtherAgentsOld() {
+
+		LOGGER.info("remove all other agents original start:");
+
+		LOGGER.info("convert to pddl with a single agent - " + PickedAagent + ", type - " + PickedAagentType); 
+		try {
+			String cmd = MA_TO_PDDL_CONVERTOR_OLD + " " + domainAndProblemDirectoryPath + " " + domainName + " "
+					+ problemName + " " + MA_TO_PDDL_OUTPUT;
+
+			LOGGER.info("RUN: " + cmd);
+
+			Process pr = Runtime.getRuntime().exec(cmd);
+
+			pr.waitFor();
+		} catch (Exception e) {
+			LOGGER.fatal(e, e);
+			System.exit(1);
+		}
+
+		LOGGER.info("convert back to ma-pddl with newly created pddl"); 
+
+		try {
+			String cmd = PDDL_TO_MA_CONVERTOR_OLD + " " + MA_TO_PDDL_OUTPUT + " " + domainName + " "
+					+ problemName + " " + PDDL_TO_MA_OUTPUT;
+
+			LOGGER.info("RUN: " + cmd);
+
+			Process pr = Runtime.getRuntime().exec(cmd);
+
+			pr.waitFor();
+		} catch (Exception e) {
+			LOGGER.fatal(e, e);
+			System.exit(1);
+		}
+
+		LOGGER.info("remove all other agents original end");
+	}
+
 }
+
+

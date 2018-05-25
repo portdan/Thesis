@@ -191,11 +191,11 @@ begin_goal
 1 2
 2 2
 3 5
-4 3
+4 6
 5 3
 6 3
 7 1
-8 0
+8 1
 end_goal
 78
 begin_operator

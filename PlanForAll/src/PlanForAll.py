@@ -10,6 +10,8 @@ import argparse
 import subprocess
 import shutil
 
+ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+
 def main():
     
     start = time.time()
@@ -30,14 +32,20 @@ def main():
                 
                 agent = str(agent +"/" + (os.path.splitext(filename))[0] +".addl")  
                 
-                subprocess.call(["./run_local.sh" 
+                processList = ["./run_local.sh" 
                                  , args.creator 
                                  , args.domain
                                  , os.path.join(args.problems, filename) 
                                  , agent
                                  , args.heuristic
                                  , str(args.recursion)
-                                 , str(args.timeout) ])
+                                 , str(args.timeout) ]
+                
+                print(', '.join(processList))
+                
+                subprocess.call(processList)
+                
+                
             
     end = time.time() 
     

@@ -1,3 +1,0 @@
-0: (load-truck tru1 obj13 pos1)
-1: (load-truck tru2 obj23 pos2)
-2: (drive-truck tru2 pos2 apt2 cit2)
