@@ -9,7 +9,7 @@
     <booleanAttribute key="org.eclipse.jdt.launching.ATTR_USE_START_ON_FIRST_THREAD" value="true"/>
     <stringAttribute key="org.eclipse.jdt.launching.CLASSPATH_PROVIDER" value="org.eclipse.m2e.launchconfig.classpathProvider"/>
     <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="StateActionStateSequencer.Main"/>
-    <stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="StateActionStateSequencer.StateActionStateSequencer"/>
+    <stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="StateActionStateSequencer.StateActionStateSequencer ./Domains/logistics00/domain.pddl ./Problems/logistics00/probLOGISTICS-4-0_1.pddl ./Traces/logistics00/probLOGISTICS-4-0_1.plan"/>
     <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="StateActionStateSequencer"/>
     <stringAttribute key="org.eclipse.jdt.launching.SOURCE_PATH_PROVIDER" value="org.eclipse.m2e.launchconfig.sourcepathProvider"/>
 </launchConfiguration>

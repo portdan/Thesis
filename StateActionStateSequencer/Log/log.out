@@ -1,2 +1,7 @@
-2018-11-09 17:29:46 -  INFO [main] - StateActionStateSequencer.StateActionStateSequencer.init - StateActionStateSequencer Start
-2018-11-09 17:29:46 -  INFO [main] - StateActionStateSequencer.StateActionStateSequencer.create - StateActionStateSequencer End
+2018-11-15 15:56:18 -  INFO [main] - StateActionStateSequencer.StateActionStateSequencer.init - StateActionStateSequencer Start
+2018-11-15 15:56:18 -  INFO [main] - StateActionStateSequencer.StateActionStateSequencer.ParseArgs - Args validity check
+2018-11-15 15:56:18 -  INFO [main] - StateActionStateSequencer.StateActionStateSequencer.ArgsLenghtValid - Args lenght check
+2018-11-15 15:56:18 -  INFO [main] - StateActionStateSequencer.StateActionStateSequencer.ArgsParsingValid - Args parse check
+2018-11-15 15:56:18 -  INFO [main] - StateActionStateSequencer.StateActionStateSequencer.CreateAgentsFile - Agents File creation
+2018-11-15 15:56:18 -  INFO [main] - StateActionStateSequencer.StateActionStateSequencer.CreateAgentsFile - Running: ./PythonScripts/unfactoredMAPDDL-extract-agent-file.py ./Domains/logistics00/domain.pddl ./Problems/logistics00/probLOGISTICS-4-0_1.pddl ./Output/Agents
+2018-11-15 15:56:18 - FATAL [main] - StateActionStateSequencer.StateActionStateSequencer.init - Trace file reading failure
