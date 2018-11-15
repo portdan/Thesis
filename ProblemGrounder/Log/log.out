@@ -1,0 +1,7 @@
+2018-11-15 22:09:42 -  INFO [main] - ProblemGrounder.ProblemGrounder.init - ProblemGrounder Start
+2018-11-15 22:09:42 -  INFO [main] - ProblemGrounder.ProblemGrounder.ParseArgs - Args validity check
+2018-11-15 22:09:42 -  INFO [main] - ProblemGrounder.ProblemGrounder.ArgsLenghtValid - Args lenght check
+2018-11-15 22:09:42 -  INFO [main] - ProblemGrounder.ProblemGrounder.ArgsParsingValid - Args parse check
+2018-11-15 22:09:42 -  INFO [main] - ProblemGrounder.ProblemGrounder.CreateAgentsFile - Agents File creation
+2018-11-15 22:09:42 -  INFO [main] - ProblemGrounder.ProblemGrounder.CreateAgentsFile - Running: ./PythonScripts/generate-agent-file.py ./Domains/logistics00/domain.pddl ./Problems/logistics00/probLOGISTICS-4-0_1.pddl ./Output/Agents
+2018-11-15 22:09:42 - FATAL [main] - ProblemGrounder.ProblemGrounder.init - Trace file reading failure

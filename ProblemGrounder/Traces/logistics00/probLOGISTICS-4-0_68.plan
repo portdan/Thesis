@@ -1,0 +1,3 @@
+0: (load-truck tru1 obj11 pos1)
+1: (fly-airplane apn1 apt2 apt1)
+2: (drive-truck tru2 pos2 apt2 cit2)
