@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <launchConfiguration type="org.python.pydev.debug.regularLaunchConfigurationType">
     <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
-        <listEntry value="/ProblemGrounder/PythonScripts/generate-agent-file.py"/>
+        <listEntry value="/problem-generator/Misc/convert/ma-pddl/ma-to-pddl.py"/>
     </listAttribute>
     <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
         <listEntry value="1"/>
     </listAttribute>
-    <stringAttribute key="org.eclipse.ui.externaltools.ATTR_LOCATION" value="${workspace_loc:ProblemGrounder/PythonScripts/generate-agent-file.py}"/>
+    <stringAttribute key="org.eclipse.ui.externaltools.ATTR_LOCATION" value="${workspace_loc:problem-generator/Misc/convert/ma-pddl/ma-to-pddl.py}"/>
     <stringAttribute key="org.eclipse.ui.externaltools.ATTR_OTHER_WORKING_DIRECTORY" value=""/>
-    <stringAttribute key="org.eclipse.ui.externaltools.ATTR_TOOL_ARGUMENTS" value="./Input/Domains/logistics00/domain.pddl ./Input/Problems/logistics00/probLOGISTICS-4-0.pddl ./Output/Agent"/>
+    <stringAttribute key="org.eclipse.ui.externaltools.ATTR_TOOL_ARGUMENTS" value="./Test domain probLOGISTICS-4-0 ./Output/temp"/>
     <stringAttribute key="org.python.pydev.debug.ATTR_INTERPRETER" value="__default"/>
-    <stringAttribute key="org.python.pydev.debug.ATTR_PROJECT" value="ProblemGrounder"/>
+    <stringAttribute key="org.python.pydev.debug.ATTR_PROJECT" value="problem-generator"/>
     <stringAttribute key="process_factory_id" value="org.python.pydev.debug.processfactory.PyProcessFactory"/>
 </launchConfiguration>
