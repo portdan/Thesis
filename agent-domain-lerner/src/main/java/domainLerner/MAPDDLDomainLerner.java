@@ -15,7 +15,7 @@ import org.gerryai.planning.model.problem.Problem;
 import org.gerryai.planning.parser.error.ParseException;
 import org.gerryai.planning.parser.pddl.PDDLParserService;
 import java.io.FileInputStream;
-*/
+ */
 
 import cz.agents.alite.creator.Creator;
 
@@ -87,13 +87,13 @@ public class MAPDDLDomainLerner implements Creator {
 		//removeAllOtherAgentsOld();
 		//removeAllOtherAgentsOriginal();
 		removeAllOtherAgents();
-
+		/*
 		//TEST();
 
 		createAgentDomain();
 
 		createAgentProblem();
-
+		 */
 		LOGGER.info("create end");
 	}
 
@@ -235,6 +235,7 @@ public class MAPDDLDomainLerner implements Creator {
 		LOGGER.info("remove all other agents end");
 	}
 
+	/*
 	private void removeAllOtherAgentsOriginal() {
 
 		LOGGER.info("remove all other agents original start:");
@@ -310,7 +311,7 @@ public class MAPDDLDomainLerner implements Creator {
 
 		LOGGER.info("remove all other agents original end");
 	}
-
+	 */
 }
 
 

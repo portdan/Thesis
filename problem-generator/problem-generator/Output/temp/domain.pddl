@@ -1,7 +1,9 @@
 (define (domain logistics)
 	(:requirements :typing)
 (:types
-	location vehicle package city - object
+	apn1 - airplane
+	airplane location vehicle package city truck - object
+	tru1 tru2 - truck
 	airport - location
 	truck airplane - vehicle
 )
@@ -11,8 +13,8 @@
 	(in-city ?loc - location ?city - city)
 )
 
-(:action load-airplane
-	:parameters (?airplane - airplane ?obj - package ?loc - airport)
+(:action load-airplane-apn1
+	:parameters (?airplane - apn1 ?obj - package ?loc - airport)
 	:precondition (and
 		(at ?obj ?loc)
 		(at ?airplane ?loc)
@@ -24,8 +26,8 @@
 )
 
 
-(:action unload-airplane
-	:parameters (?airplane - airplane ?obj - package ?loc - airport)
+(:action unload-airplane-apn1
+	:parameters (?airplane - apn1 ?obj - package ?loc - airport)
 	:precondition (and
 		(in ?obj ?airplane)
 		(at ?airplane ?loc)
@@ -37,8 +39,8 @@
 )
 
 
-(:action fly-airplane
-	:parameters (?airplane - airplane ?loc-from - airport ?loc-to - airport)
+(:action fly-airplane-apn1
+	:parameters (?airplane - apn1 ?loc-from - airport ?loc-to - airport)
 	:precondition 
 		(at ?airplane ?loc-from)
 	:effect (and
@@ -48,8 +50,8 @@
 )
 
 
-(:action load-truck
-	:parameters (?truck - truck ?obj - package ?loc - location)
+(:action load-truck-tru1
+	:parameters (?truck - tru1 ?obj - package ?loc - location)
 	:precondition (and
 		(at ?truck ?loc)
 		(at ?obj ?loc)
@@ -61,8 +63,8 @@
 )
 
 
-(:action unload-truck
-	:parameters (?truck - truck ?obj - package ?loc - location)
+(:action unload-truck-tru1
+	:parameters (?truck - tru1 ?obj - package ?loc - location)
 	:precondition (and
 		(at ?truck ?loc)
 		(in ?obj ?truck)
@@ -74,8 +76,48 @@
 )
 
 
-(:action drive-truck
-	:parameters (?truck - truck ?loc-from - location ?loc-to - location ?city - city)
+(:action drive-truck-tru1
+	:parameters (?truck - tru1 ?loc-from - location ?loc-to - location ?city - city)
+	:precondition (and
+		(at ?truck ?loc-from)
+		(in-city ?loc-from ?city)
+		(in-city ?loc-to ?city)
+	)
+	:effect (and
+		(not (at ?truck ?loc-from))
+		(at ?truck ?loc-to)
+	)
+)
+
+
+(:action load-truck-tru2
+	:parameters (?truck - tru2 ?obj - package ?loc - location)
+	:precondition (and
+		(at ?truck ?loc)
+		(at ?obj ?loc)
+	)
+	:effect (and
+		(not (at ?obj ?loc))
+		(in ?obj ?truck)
+	)
+)
+
+
+(:action unload-truck-tru2
+	:parameters (?truck - tru2 ?obj - package ?loc - location)
+	:precondition (and
+		(at ?truck ?loc)
+		(in ?obj ?truck)
+	)
+	:effect (and
+		(not (in ?obj ?truck))
+		(at ?obj ?loc)
+	)
+)
+
+
+(:action drive-truck-tru2
+	:parameters (?truck - tru2 ?loc-from - location ?loc-to - location ?city - city)
 	:precondition (and
 		(at ?truck ?loc-from)
 		(in-city ?loc-from ?city)

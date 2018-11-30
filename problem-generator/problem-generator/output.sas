@@ -194,49 +194,49 @@ begin_goal
 end_goal
 78
 begin_operator
-drive-truck tru1 apt1 pos1 cit1
+drive-truck-tru1 tru1 apt1 pos1 cit1
 0
 1
 0 7 0 1
 1
 end_operator
 begin_operator
-drive-truck tru1 pos1 apt1 cit1
+drive-truck-tru1 tru1 pos1 apt1 cit1
 0
 1
 0 7 1 0
 1
 end_operator
 begin_operator
-drive-truck tru2 apt2 pos2 cit2
+drive-truck-tru2 tru2 apt2 pos2 cit2
 0
 1
 0 8 0 1
 1
 end_operator
 begin_operator
-drive-truck tru2 pos2 apt2 cit2
+drive-truck-tru2 tru2 pos2 apt2 cit2
 0
 1
 0 8 1 0
 1
 end_operator
 begin_operator
-fly-airplane apn1 apt1 apt2
+fly-airplane-apn1 apn1 apt1 apt2
 0
 1
 0 0 0 1
 1
 end_operator
 begin_operator
-fly-airplane apn1 apt2 apt1
+fly-airplane-apn1 apn1 apt2 apt1
 0
 1
 0 0 1 0
 1
 end_operator
 begin_operator
-load-airplane apn1 obj11 apt1
+load-airplane-apn1 apn1 obj11 apt1
 1
 0 0
 1
@@ -244,7 +244,7 @@ load-airplane apn1 obj11 apt1
 1
 end_operator
 begin_operator
-load-airplane apn1 obj11 apt2
+load-airplane-apn1 apn1 obj11 apt2
 1
 0 1
 1
@@ -252,7 +252,7 @@ load-airplane apn1 obj11 apt2
 1
 end_operator
 begin_operator
-load-airplane apn1 obj12 apt1
+load-airplane-apn1 apn1 obj12 apt1
 1
 0 0
 1
@@ -260,7 +260,7 @@ load-airplane apn1 obj12 apt1
 1
 end_operator
 begin_operator
-load-airplane apn1 obj12 apt2
+load-airplane-apn1 apn1 obj12 apt2
 1
 0 1
 1
@@ -268,7 +268,7 @@ load-airplane apn1 obj12 apt2
 1
 end_operator
 begin_operator
-load-airplane apn1 obj13 apt1
+load-airplane-apn1 apn1 obj13 apt1
 1
 0 0
 1
@@ -276,7 +276,7 @@ load-airplane apn1 obj13 apt1
 1
 end_operator
 begin_operator
-load-airplane apn1 obj13 apt2
+load-airplane-apn1 apn1 obj13 apt2
 1
 0 1
 1
@@ -284,7 +284,7 @@ load-airplane apn1 obj13 apt2
 1
 end_operator
 begin_operator
-load-airplane apn1 obj21 apt1
+load-airplane-apn1 apn1 obj21 apt1
 1
 0 0
 1
@@ -292,7 +292,7 @@ load-airplane apn1 obj21 apt1
 1
 end_operator
 begin_operator
-load-airplane apn1 obj21 apt2
+load-airplane-apn1 apn1 obj21 apt2
 1
 0 1
 1
@@ -300,7 +300,7 @@ load-airplane apn1 obj21 apt2
 1
 end_operator
 begin_operator
-load-airplane apn1 obj22 apt1
+load-airplane-apn1 apn1 obj22 apt1
 1
 0 0
 1
@@ -308,7 +308,7 @@ load-airplane apn1 obj22 apt1
 1
 end_operator
 begin_operator
-load-airplane apn1 obj22 apt2
+load-airplane-apn1 apn1 obj22 apt2
 1
 0 1
 1
@@ -316,7 +316,7 @@ load-airplane apn1 obj22 apt2
 1
 end_operator
 begin_operator
-load-airplane apn1 obj23 apt1
+load-airplane-apn1 apn1 obj23 apt1
 1
 0 0
 1
@@ -324,7 +324,7 @@ load-airplane apn1 obj23 apt1
 1
 end_operator
 begin_operator
-load-airplane apn1 obj23 apt2
+load-airplane-apn1 apn1 obj23 apt2
 1
 0 1
 1
@@ -332,7 +332,7 @@ load-airplane apn1 obj23 apt2
 1
 end_operator
 begin_operator
-load-truck tru1 obj11 apt1
+load-truck-tru1 tru1 obj11 apt1
 1
 7 0
 1
@@ -340,7 +340,7 @@ load-truck tru1 obj11 apt1
 1
 end_operator
 begin_operator
-load-truck tru1 obj11 pos1
+load-truck-tru1 tru1 obj11 pos1
 1
 7 1
 1
@@ -348,7 +348,7 @@ load-truck tru1 obj11 pos1
 1
 end_operator
 begin_operator
-load-truck tru1 obj12 apt1
+load-truck-tru1 tru1 obj12 apt1
 1
 7 0
 1
@@ -356,7 +356,7 @@ load-truck tru1 obj12 apt1
 1
 end_operator
 begin_operator
-load-truck tru1 obj12 pos1
+load-truck-tru1 tru1 obj12 pos1
 1
 7 1
 1
@@ -364,7 +364,7 @@ load-truck tru1 obj12 pos1
 1
 end_operator
 begin_operator
-load-truck tru1 obj13 apt1
+load-truck-tru1 tru1 obj13 apt1
 1
 7 0
 1
@@ -372,7 +372,7 @@ load-truck tru1 obj13 apt1
 1
 end_operator
 begin_operator
-load-truck tru1 obj13 pos1
+load-truck-tru1 tru1 obj13 pos1
 1
 7 1
 1
@@ -380,7 +380,7 @@ load-truck tru1 obj13 pos1
 1
 end_operator
 begin_operator
-load-truck tru1 obj21 apt1
+load-truck-tru1 tru1 obj21 apt1
 1
 7 0
 1
@@ -388,7 +388,7 @@ load-truck tru1 obj21 apt1
 1
 end_operator
 begin_operator
-load-truck tru1 obj21 pos1
+load-truck-tru1 tru1 obj21 pos1
 1
 7 1
 1
@@ -396,7 +396,7 @@ load-truck tru1 obj21 pos1
 1
 end_operator
 begin_operator
-load-truck tru1 obj22 apt1
+load-truck-tru1 tru1 obj22 apt1
 1
 7 0
 1
@@ -404,7 +404,7 @@ load-truck tru1 obj22 apt1
 1
 end_operator
 begin_operator
-load-truck tru1 obj22 pos1
+load-truck-tru1 tru1 obj22 pos1
 1
 7 1
 1
@@ -412,7 +412,7 @@ load-truck tru1 obj22 pos1
 1
 end_operator
 begin_operator
-load-truck tru1 obj23 apt1
+load-truck-tru1 tru1 obj23 apt1
 1
 7 0
 1
@@ -420,7 +420,7 @@ load-truck tru1 obj23 apt1
 1
 end_operator
 begin_operator
-load-truck tru1 obj23 pos1
+load-truck-tru1 tru1 obj23 pos1
 1
 7 1
 1
@@ -428,7 +428,7 @@ load-truck tru1 obj23 pos1
 1
 end_operator
 begin_operator
-load-truck tru2 obj11 apt2
+load-truck-tru2 tru2 obj11 apt2
 1
 8 0
 1
@@ -436,7 +436,7 @@ load-truck tru2 obj11 apt2
 1
 end_operator
 begin_operator
-load-truck tru2 obj11 pos2
+load-truck-tru2 tru2 obj11 pos2
 1
 8 1
 1
@@ -444,7 +444,7 @@ load-truck tru2 obj11 pos2
 1
 end_operator
 begin_operator
-load-truck tru2 obj12 apt2
+load-truck-tru2 tru2 obj12 apt2
 1
 8 0
 1
@@ -452,7 +452,7 @@ load-truck tru2 obj12 apt2
 1
 end_operator
 begin_operator
-load-truck tru2 obj12 pos2
+load-truck-tru2 tru2 obj12 pos2
 1
 8 1
 1
@@ -460,7 +460,7 @@ load-truck tru2 obj12 pos2
 1
 end_operator
 begin_operator
-load-truck tru2 obj13 apt2
+load-truck-tru2 tru2 obj13 apt2
 1
 8 0
 1
@@ -468,7 +468,7 @@ load-truck tru2 obj13 apt2
 1
 end_operator
 begin_operator
-load-truck tru2 obj13 pos2
+load-truck-tru2 tru2 obj13 pos2
 1
 8 1
 1
@@ -476,7 +476,7 @@ load-truck tru2 obj13 pos2
 1
 end_operator
 begin_operator
-load-truck tru2 obj21 apt2
+load-truck-tru2 tru2 obj21 apt2
 1
 8 0
 1
@@ -484,7 +484,7 @@ load-truck tru2 obj21 apt2
 1
 end_operator
 begin_operator
-load-truck tru2 obj21 pos2
+load-truck-tru2 tru2 obj21 pos2
 1
 8 1
 1
@@ -492,7 +492,7 @@ load-truck tru2 obj21 pos2
 1
 end_operator
 begin_operator
-load-truck tru2 obj22 apt2
+load-truck-tru2 tru2 obj22 apt2
 1
 8 0
 1
@@ -500,7 +500,7 @@ load-truck tru2 obj22 apt2
 1
 end_operator
 begin_operator
-load-truck tru2 obj22 pos2
+load-truck-tru2 tru2 obj22 pos2
 1
 8 1
 1
@@ -508,7 +508,7 @@ load-truck tru2 obj22 pos2
 1
 end_operator
 begin_operator
-load-truck tru2 obj23 apt2
+load-truck-tru2 tru2 obj23 apt2
 1
 8 0
 1
@@ -516,7 +516,7 @@ load-truck tru2 obj23 apt2
 1
 end_operator
 begin_operator
-load-truck tru2 obj23 pos2
+load-truck-tru2 tru2 obj23 pos2
 1
 8 1
 1
@@ -524,7 +524,7 @@ load-truck tru2 obj23 pos2
 1
 end_operator
 begin_operator
-unload-airplane apn1 obj11 apt1
+unload-airplane-apn1 apn1 obj11 apt1
 1
 0 0
 1
@@ -532,7 +532,7 @@ unload-airplane apn1 obj11 apt1
 1
 end_operator
 begin_operator
-unload-airplane apn1 obj11 apt2
+unload-airplane-apn1 apn1 obj11 apt2
 1
 0 1
 1
@@ -540,7 +540,7 @@ unload-airplane apn1 obj11 apt2
 1
 end_operator
 begin_operator
-unload-airplane apn1 obj12 apt1
+unload-airplane-apn1 apn1 obj12 apt1
 1
 0 0
 1
@@ -548,7 +548,7 @@ unload-airplane apn1 obj12 apt1
 1
 end_operator
 begin_operator
-unload-airplane apn1 obj12 apt2
+unload-airplane-apn1 apn1 obj12 apt2
 1
 0 1
 1
@@ -556,7 +556,7 @@ unload-airplane apn1 obj12 apt2
 1
 end_operator
 begin_operator
-unload-airplane apn1 obj13 apt1
+unload-airplane-apn1 apn1 obj13 apt1
 1
 0 0
 1
@@ -564,7 +564,7 @@ unload-airplane apn1 obj13 apt1
 1
 end_operator
 begin_operator
-unload-airplane apn1 obj13 apt2
+unload-airplane-apn1 apn1 obj13 apt2
 1
 0 1
 1
@@ -572,7 +572,7 @@ unload-airplane apn1 obj13 apt2
 1
 end_operator
 begin_operator
-unload-airplane apn1 obj21 apt1
+unload-airplane-apn1 apn1 obj21 apt1
 1
 0 0
 1
@@ -580,7 +580,7 @@ unload-airplane apn1 obj21 apt1
 1
 end_operator
 begin_operator
-unload-airplane apn1 obj21 apt2
+unload-airplane-apn1 apn1 obj21 apt2
 1
 0 1
 1
@@ -588,7 +588,7 @@ unload-airplane apn1 obj21 apt2
 1
 end_operator
 begin_operator
-unload-airplane apn1 obj22 apt1
+unload-airplane-apn1 apn1 obj22 apt1
 1
 0 0
 1
@@ -596,7 +596,7 @@ unload-airplane apn1 obj22 apt1
 1
 end_operator
 begin_operator
-unload-airplane apn1 obj22 apt2
+unload-airplane-apn1 apn1 obj22 apt2
 1
 0 1
 1
@@ -604,7 +604,7 @@ unload-airplane apn1 obj22 apt2
 1
 end_operator
 begin_operator
-unload-airplane apn1 obj23 apt1
+unload-airplane-apn1 apn1 obj23 apt1
 1
 0 0
 1
@@ -612,7 +612,7 @@ unload-airplane apn1 obj23 apt1
 1
 end_operator
 begin_operator
-unload-airplane apn1 obj23 apt2
+unload-airplane-apn1 apn1 obj23 apt2
 1
 0 1
 1
@@ -620,7 +620,7 @@ unload-airplane apn1 obj23 apt2
 1
 end_operator
 begin_operator
-unload-truck tru1 obj11 apt1
+unload-truck-tru1 tru1 obj11 apt1
 1
 7 0
 1
@@ -628,7 +628,7 @@ unload-truck tru1 obj11 apt1
 1
 end_operator
 begin_operator
-unload-truck tru1 obj11 pos1
+unload-truck-tru1 tru1 obj11 pos1
 1
 7 1
 1
@@ -636,7 +636,7 @@ unload-truck tru1 obj11 pos1
 1
 end_operator
 begin_operator
-unload-truck tru1 obj12 apt1
+unload-truck-tru1 tru1 obj12 apt1
 1
 7 0
 1
@@ -644,7 +644,7 @@ unload-truck tru1 obj12 apt1
 1
 end_operator
 begin_operator
-unload-truck tru1 obj12 pos1
+unload-truck-tru1 tru1 obj12 pos1
 1
 7 1
 1
@@ -652,7 +652,7 @@ unload-truck tru1 obj12 pos1
 1
 end_operator
 begin_operator
-unload-truck tru1 obj13 apt1
+unload-truck-tru1 tru1 obj13 apt1
 1
 7 0
 1
@@ -660,7 +660,7 @@ unload-truck tru1 obj13 apt1
 1
 end_operator
 begin_operator
-unload-truck tru1 obj13 pos1
+unload-truck-tru1 tru1 obj13 pos1
 1
 7 1
 1
@@ -668,7 +668,7 @@ unload-truck tru1 obj13 pos1
 1
 end_operator
 begin_operator
-unload-truck tru1 obj21 apt1
+unload-truck-tru1 tru1 obj21 apt1
 1
 7 0
 1
@@ -676,7 +676,7 @@ unload-truck tru1 obj21 apt1
 1
 end_operator
 begin_operator
-unload-truck tru1 obj21 pos1
+unload-truck-tru1 tru1 obj21 pos1
 1
 7 1
 1
@@ -684,7 +684,7 @@ unload-truck tru1 obj21 pos1
 1
 end_operator
 begin_operator
-unload-truck tru1 obj22 apt1
+unload-truck-tru1 tru1 obj22 apt1
 1
 7 0
 1
@@ -692,7 +692,7 @@ unload-truck tru1 obj22 apt1
 1
 end_operator
 begin_operator
-unload-truck tru1 obj22 pos1
+unload-truck-tru1 tru1 obj22 pos1
 1
 7 1
 1
@@ -700,7 +700,7 @@ unload-truck tru1 obj22 pos1
 1
 end_operator
 begin_operator
-unload-truck tru1 obj23 apt1
+unload-truck-tru1 tru1 obj23 apt1
 1
 7 0
 1
@@ -708,7 +708,7 @@ unload-truck tru1 obj23 apt1
 1
 end_operator
 begin_operator
-unload-truck tru1 obj23 pos1
+unload-truck-tru1 tru1 obj23 pos1
 1
 7 1
 1
@@ -716,7 +716,7 @@ unload-truck tru1 obj23 pos1
 1
 end_operator
 begin_operator
-unload-truck tru2 obj11 apt2
+unload-truck-tru2 tru2 obj11 apt2
 1
 8 0
 1
@@ -724,7 +724,7 @@ unload-truck tru2 obj11 apt2
 1
 end_operator
 begin_operator
-unload-truck tru2 obj11 pos2
+unload-truck-tru2 tru2 obj11 pos2
 1
 8 1
 1
@@ -732,7 +732,7 @@ unload-truck tru2 obj11 pos2
 1
 end_operator
 begin_operator
-unload-truck tru2 obj12 apt2
+unload-truck-tru2 tru2 obj12 apt2
 1
 8 0
 1
@@ -740,7 +740,7 @@ unload-truck tru2 obj12 apt2
 1
 end_operator
 begin_operator
-unload-truck tru2 obj12 pos2
+unload-truck-tru2 tru2 obj12 pos2
 1
 8 1
 1
@@ -748,7 +748,7 @@ unload-truck tru2 obj12 pos2
 1
 end_operator
 begin_operator
-unload-truck tru2 obj13 apt2
+unload-truck-tru2 tru2 obj13 apt2
 1
 8 0
 1
@@ -756,7 +756,7 @@ unload-truck tru2 obj13 apt2
 1
 end_operator
 begin_operator
-unload-truck tru2 obj13 pos2
+unload-truck-tru2 tru2 obj13 pos2
 1
 8 1
 1
@@ -764,7 +764,7 @@ unload-truck tru2 obj13 pos2
 1
 end_operator
 begin_operator
-unload-truck tru2 obj21 apt2
+unload-truck-tru2 tru2 obj21 apt2
 1
 8 0
 1
@@ -772,7 +772,7 @@ unload-truck tru2 obj21 apt2
 1
 end_operator
 begin_operator
-unload-truck tru2 obj21 pos2
+unload-truck-tru2 tru2 obj21 pos2
 1
 8 1
 1
@@ -780,7 +780,7 @@ unload-truck tru2 obj21 pos2
 1
 end_operator
 begin_operator
-unload-truck tru2 obj22 apt2
+unload-truck-tru2 tru2 obj22 apt2
 1
 8 0
 1
@@ -788,7 +788,7 @@ unload-truck tru2 obj22 apt2
 1
 end_operator
 begin_operator
-unload-truck tru2 obj22 pos2
+unload-truck-tru2 tru2 obj22 pos2
 1
 8 1
 1
@@ -796,7 +796,7 @@ unload-truck tru2 obj22 pos2
 1
 end_operator
 begin_operator
-unload-truck tru2 obj23 apt2
+unload-truck-tru2 tru2 obj23 apt2
 1
 8 0
 1
@@ -804,7 +804,7 @@ unload-truck tru2 obj23 apt2
 1
 end_operator
 begin_operator
-unload-truck tru2 obj23 pos2
+unload-truck-tru2 tru2 obj23 pos2
 1
 8 1
 1
