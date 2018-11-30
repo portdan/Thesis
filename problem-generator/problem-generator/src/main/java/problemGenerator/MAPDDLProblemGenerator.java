@@ -9,6 +9,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 
@@ -118,16 +120,16 @@ public class MAPDDLProblemGenerator implements Creator {
 		preprocessSAS();
 
 		LOGGER.info("parse preprocessed sas file");
-			
+
 		sasParser = new SASParser(preprocesSASFile);
-		
+
 		preprocessor = new SASPreprocessor(sasParser.getDomain(), addlParser);
-		*/
-		
+		 */
+
 		LOGGER.info("parse sas file");
-			
+
 		sasParser = new SASParser(sasFile);
-		
+
 		preprocessor = new SASPreprocessor(sasParser.getDomain(), addlParser);
 
 		createEntities(addlParser);
@@ -186,8 +188,10 @@ public class MAPDDLProblemGenerator implements Creator {
 
 			PDDLGenerator pddlGenerator = new PDDLGenerator();
 
+			String newProblemFileName = problemFileName + "_" + i;
+
 			// if problem file created
-			if (pddlGenerator.generateFile(GEN, problemFileName + "_" + i)) {
+			if (pddlGenerator.generateFile(GEN,newProblemFileName)) {
 
 				// get old problem text
 				String problemText = null;
@@ -206,6 +210,8 @@ public class MAPDDLProblemGenerator implements Creator {
 		}
 
 		removeDupliacteProblems();
+
+		renameProblems();
 	}
 
 	private DIMAPWorldInterface initWorld(String agentName, int totalAgents) {
@@ -319,6 +325,59 @@ public class MAPDDLProblemGenerator implements Creator {
 		preprocessSASFilePath = OUTPUT + "/" + preprocessSASFilePath + "-preprocess.sas";
 		preprocesSASFile.renameTo(new File(preprocessSASFilePath));
 		preprocesSASFile = new File(preprocessSASFilePath);
+	}
+
+	private void renameProblems() {
+		// rename problems
+		File dir = new File(GEN);
+		File[] directoryListing = dir.listFiles();
+
+		if (directoryListing != null) 
+			for (File child : directoryListing) {
+
+				PDDLGenerator pddlGenerator = new PDDLGenerator();
+
+				String newProblemName = child.getName().substring(0, child.getName().lastIndexOf('.'));
+
+				String newProblemText = renameProblem(child,newProblemName);
+
+				// if problem file created
+				if (pddlGenerator.generateFile(GEN,newProblemName))
+					pddlGenerator.writeToFile(newProblemText);
+			}
+	}
+
+	private String renameProblem(File problemFile, String newProblemName) {
+
+		String problemText = "";
+
+		try {
+			problemText = new String(Files.readAllBytes(problemFile.toPath()));
+		} catch (IOException e) {
+			LOGGER.fatal(e, e);
+			System.exit(1);
+		}
+
+		// this part replaces problem name with new one
+		Pattern ptn = Pattern.compile("problem\\s");
+
+		Matcher mtch = ptn.matcher(problemText);
+
+		int sIndex=0;
+		int eIndex=0;
+
+		if (mtch.find())	
+			sIndex = mtch.end();
+
+		eIndex = sIndex + problemText.substring(sIndex).indexOf(')');
+
+		StringBuilder sb = new StringBuilder();
+
+		sb.append(problemText.substring( 0, sIndex));
+		sb.append(newProblemName);
+		sb.append(problemText.substring(eIndex));
+
+		return sb.toString();
 	}
 
 	private void removeDupliacteProblems() {
