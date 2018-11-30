@@ -2,6 +2,7 @@
 
 import sys
 import os
+import shutil
 import argparse
 import time
 # from sets import Set
@@ -427,28 +428,6 @@ class PlanningProblem(object):
       if t in self.constants:
         selected_objects = selected_objects | set(self.constants[t])
     return selected_objects
-
-  def print_domain(self):
-    """Prints out the planning problem in (semi-)readable format."""
-    print ('\n*****************')
-    print ('DOMAIN: ' + self.domain)
-    print ('REQUIREMENTS: ' + str(self.requirements))
-    print ('TYPES: ' + str(self.types))
-    print ('PREDICATES: ' + str(self.predicates))
-    print ('ACTIONS: ' + str(self.actions))
-    print ('FUNCTIONS: ' + str(self.functions))
-    print ('CONSTANTS: ' + str(self.constants))
-    print ('****************')
-
-  def print_problem(self):
-    """Prints out the planning problem in (semi-)readable format."""
-    print ('\n*****************')
-    print ('PROBLEM: ' + self.problem)
-    print ('OBJECTS: ' + str(self.objects))
-    print ('INIT: ' + str(self.init))
-    print ('GOAL: ' + str(self.goal))
-    print ('AGENTS: ' + str(self.agents))
-    print ('****************')
     
   # Get string of file with comments removed - comments are rest of line after ';'
   def _get_file_as_array(self, file_):
@@ -516,108 +495,30 @@ class PlanningProblem(object):
         prop = []
     # print array[:array.index(')') + 1]
     return prop_list
-
-  def write_pddl_domain(self, output_file):
-    """Writes an unfactored MA-PDDL domain file for this planning problem."""
-    file_ = open(output_file, 'w')
-    to_write = "(define (domain " + self.domain + ")\n"
-    # Requirements
-    to_write += "\t(:requirements"
-    for r in self.requirements:
-      to_write += " :" + r
-    to_write += ")\n"
-    # Types
-    to_write += "(:types\n"
-    for type_ in self.types:
-      to_write += "\t"
-      for key in self.types.get(type_):
-        to_write += key + " "
-      to_write += "- " + type_
-      to_write += "\n"
-    to_write += ")\n"
-    # Constants
-    if len(self.constants) > 0:
-      to_write += "(:constants\n"
-      for t in self.constants.keys():
-        to_write += "\t"
-        for c in self.constants[t]:
-          to_write += c + " "
-        to_write += " - " + t + "\n" 
-      to_write += ")\n"
-    # Public predicates
-    to_write += "(:predicates\n"
-    for predicate in self.predicates:
-      to_write += "\t{}\n".format(predicate.pddl_rep())
-    to_write += ")\n"
-    # Functions
-    if len(self.functions) > 0:
-      to_write += "(:functions\n"
-      for function in self.functions:
-        to_write += "\t{}\n".format(function.pddl_rep())
-      to_write += ")\n"
-    # Actions
-    for action in self.actions:
-      to_write += "\n{}\n".format(action.pddl_rep())
-    
-    # Endmatter
-    to_write += ")"  # Close domain defn
-    file_.write(to_write)
-    file_.close()
-
-  def write_pddl_problem(self, output_file):
-    file_ = open(output_file, 'w')
-    to_write = "(define (problem " + self.problem + ") "
-    to_write += "(:domain " + self.domain + ")\n"
-    # Objects
-    to_write += "(:objects\n"
-    for obj in self.object_list:
-      to_write += "\t" + obj + " - " + self.get_type_of_object(obj) + "\n"
-    to_write += ")\n"
-    to_write += "(:init\n"
-    for predicate in self.init:
-      to_write += "\t{}\n".format(predicate)
-    for function in self.ground_functions:
-      to_write += "\t{}\n".format(function)
-    to_write += ")\n"
-    to_write += "(:goal\n\t(and\n"
-    for goal in self.goal:
-      to_write += "\t\t{}\n".format(goal)
-    to_write += "\t)\n)\n"
-    if self.metric:
-      to_write += "(:metric minimize (total-cost))\n" 
-    # Endmatter
-    to_write += ")"
-    file_.write(to_write)
-    file_.close()
-
-  def write_addl(self, output_file):
-    file_ = open(output_file, 'w')
-    to_write = "(define (problem " + self.problem + ") "
-    to_write += "(:domain " + self.domain + ")\n"
-    # Objects
-    to_write += "(:agents"
-    for obj in self.agents:
-      to_write += " " + obj 
-    to_write += ")\n"
-    to_write += ")"
-    file_.write(to_write)
-    file_.close()
-
-  def write_agent_list(self, output_file):
-    file_ = open(output_file, 'w')
-    to_write = ""
-    for obj in self.agents:
-      to_write += obj + "\n"
-    file_.write(to_write)
-    file_.close()
     
   def write_agent_types(self, output_file):
+    '''
     file_ = open(output_file, 'w')
     to_write = ""
     
     for a in self.agents:
         to_write += a + " - " + self.get_type_of_object(a) + "\n"        
             
+    file_.write(to_write)
+    file_.close()
+    '''
+      
+    file_ = open(output_file, 'w')
+    to_write = "(define (problem " + self.problem + ") "
+    to_write += "(:domain " + self.domain + ")\n"
+    # Objects
+    to_write += "\t(:agents\n"
+    
+    for a in self.agents:
+        to_write += "\t\t" + a + " - " + self.get_type_of_object(a) + "\n" 
+    
+    to_write += "\t)\n"
+    to_write += ")"
     file_.write(to_write)
     file_.close()
 
@@ -629,13 +530,15 @@ def main():
     args = parse_args()
     
     pp = PlanningProblem(args.domain , args.problem)
-
-    if not os.path.exists(args.output):
-      os.mkdir(args.output)
-      
-    problem_name = os.path.basename(args.problem)
     
-    pp.write_agent_types(args.output + "/" + problem_name + ".agents")
+    # change filename 
+    pp.problem = os.path.splitext(os.path.basename(args.problem))[0]
+
+    if os.path.exists(args.output):
+        shutil.rmtree(args.output)  #removes all the subdirectories!
+    os.makedirs(args.output)    
+          
+    pp.write_agent_types(args.output + "/" + pp.problem + ".agents")
 
     end = time.time() 
     
