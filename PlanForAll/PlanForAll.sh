@@ -1,7 +1,7 @@
 #!/bin/bash
 
-#./PlanForAll.sh <domain type> <domain file name> <.pddl problems path> <.plan plans path> <heuristic> <recursion> <timeout (min)>
-#./PlanForAll.sh logistics00 domain mapddl-problems mapddl-plans saFF-glcl -1 10
+#./PlanForAll.sh <.pddl domain full path> <.pddl problems path> <.plan plans path> <heuristic> <recursion> <timeout (min)>
+#./PlanForAll.sh Input/logistics00/domain.pddl Input/logistics00 Traces/logistics00 saFF-glcl -1 10
 
 JAVA="/usr/bin/java"
 MADLA_JAR="madla-planner.jar"
@@ -9,24 +9,21 @@ MADLA_JAR="madla-planner.jar"
 
 MADLAcreator="cz.agents.madla.creator.MAPDDLCreator"
 
-domainType=$1
-domainFileName=$2
-problemsPath=$3
-plansPath=$4
+domainPath=$1
+problemsPath=$2
+plansPath=$3
 
-heuristic=$5
-recursion=$6
-timeout=$7
+heuristic=$4
+recursion=$5
+timeout=$6
 
-problemsAbsPath="$PWD/$3/$1/*.pddl"
-plansAbsPath="$PWD/$4/$1"
+problemsAbsPath="$PWD/$2/*.pddl"
+plansAbsPath="$PWD/$3"
 
 for f in $problemsAbsPath; do
 	
 	pddlFile=${f##*/} 
-	pddFfileName="${pddlFile%.*}"	
-	
-	problem="mapddl-problems/$1/$pddlFile"
+	pddFfileName="${pddlFile%.*}"
 	
 	if [[ "${pddFfileName}" != "${domainFileName}" ]] ; then
     	
@@ -34,7 +31,7 @@ for f in $problemsAbsPath; do
     	
     	#echo /usr/bin/timeout -s SIGSEGV $(($4+1))m $JAVA -Xmx8G -jar $MADLA_JAR $MADLAcreator "$problemsPath/$domainType/$domainFileName.pddl" "$problemsPath/$domainType/$pddlFile" "temp/$pddFfileName.addl" $5 $6 $7
 	
-		/usr/bin/timeout -s SIGSEGV $(($recursion+1))m $JAVA -Xmx8G -jar $MADLA_JAR $MADLAcreator "$problemsPath/$domainType/$domainFileName.pddl" "$problemsPath/$domainType/$pddlFile" "temp/$pddFfileName.addl" $heuristic $recursion $timeout
+		/usr/bin/timeout -s SIGSEGV $(($recursion+1))m $JAVA -Xmx8G -jar $MADLA_JAR $MADLAcreator "$domainPath" "$problemsPath/$pddlFile" "temp/$pddFfileName.addl" $heuristic $recursion $timeout
 	
 		mv "out.plan" "$pddFfileName.plan"
 		

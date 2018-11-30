@@ -17,36 +17,46 @@ def main():
     start = time.time()
 
     args = parse_args()
+
+    agents_folder = 'temp'
     
-    for dirpath, dirnames, filenames in os.walk(args.problems):
+    if os.path.exists(agents_folder):
+        shutil.rmtree(agents_folder)
+    else:
+        os.makedirs(agents_folder)
+
+    for dirpath, dirnames, filenames in os.walk(args.input):
         for filename in filenames:
-            if filename.endswith(".pddl") :
+            if filename.endswith(".pddl"):
                 #print(filename)
                 
-                agent = 'temp'
-
-                if os.path.exists(agent):
-                    shutil.rmtree(agent)
-                else:
-                    os.makedirs(agent)
+                problem_name = os.path.splitext(filename)[0]
                 
-                agent = str(agent +"/" + (os.path.splitext(filename))[0] +".addl")  
+                if(filename != args.domain_name):
                 
-                processList = ["./run_local.sh" 
+                    agents_path = str(agents_folder +"/" + problem_name +".addl")  
+                
+                    processList = ["./run_local.sh" 
                                  , args.creator 
-                                 , args.domain
-                                 , os.path.join(args.problems, filename) 
-                                 , agent
+                                 , args.input + "/" + args.domain_name
+                                 , os.path.join(args.input, filename) 
+                                 , agents_path
                                  , args.heuristic
                                  , str(args.recursion)
                                  , str(args.timeout) ]
                 
-                print(', '.join(processList))
+                    print(', '.join(processList))
                 
-                subprocess.call(processList)
-                
-                
-            
+                    subprocess.call(processList)
+                    
+                    os.remove("out.csv") 
+                    os.remove("output")
+                    os.remove("output.sas")
+                    
+                    shutil.move('out.plan', args.traces + "/" + problem_name + ".plan")
+    
+    shutil.rmtree(agents_folder)
+    
     end = time.time() 
     
     print("Done! (time - %0.4f" %(end - start)+")")
@@ -59,9 +69,11 @@ def parse_args():
     argparser.add_argument(
         "creator", help="creator class", type=str)
     argparser.add_argument(
-        "domain", help="path to domain file", type=str)
+        "input", help="path to input directory", type=str)
     argparser.add_argument(
-        "problems", help="path to problems folder", type=str)
+        "domain_name", help="domain file name", type=str)
+    argparser.add_argument(
+        "traces", help="path to traces folder", type=str)
     argparser.add_argument(
         "heuristic", help="heuristic", type=str)
     argparser.add_argument(
