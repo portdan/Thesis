@@ -1,8 +1,8 @@
 (define (domain logistics)
-	(:requirements :typing)
+	(:requirements :typing :multi-agent :unfactored-privacy)
 (:types
 	apn1 - airplane
-	airplane location vehicle package city truck - object
+	location vehicle package city - object
 	tru1 tru2 - truck
 	airport - location
 	truck airplane - vehicle
@@ -10,11 +10,15 @@
 (:predicates
 	(at ?obj - object ?loc - location)
 	(in ?obj1 - package ?veh - vehicle)
-	(in-city ?loc - location ?city - city)
+
+	(:private ?agent - truck
+		(in-city ?loc - location ?city - city)
+	)
 )
 
 (:action load-airplane-apn1
-	:parameters (?airplane - apn1 ?obj - package ?loc - airport)
+	:agent ?airplane - apn1
+	:parameters (?obj - package ?loc - airport)
 	:precondition (and
 		(at ?obj ?loc)
 		(at ?airplane ?loc)
@@ -27,7 +31,8 @@
 
 
 (:action unload-airplane-apn1
-	:parameters (?airplane - apn1 ?obj - package ?loc - airport)
+	:agent ?airplane - apn1
+	:parameters (?obj - package ?loc - airport)
 	:precondition (and
 		(in ?obj ?airplane)
 		(at ?airplane ?loc)
@@ -40,7 +45,8 @@
 
 
 (:action fly-airplane-apn1
-	:parameters (?airplane - apn1 ?loc-from - airport ?loc-to - airport)
+	:agent ?airplane - apn1
+	:parameters (?loc-from - airport ?loc-to - airport)
 	:precondition 
 		(at ?airplane ?loc-from)
 	:effect (and
@@ -51,7 +57,8 @@
 
 
 (:action load-truck-tru1
-	:parameters (?truck - tru1 ?obj - package ?loc - location)
+	:agent ?truck - tru1
+	:parameters (?obj - package ?loc - location)
 	:precondition (and
 		(at ?truck ?loc)
 		(at ?obj ?loc)
@@ -64,7 +71,8 @@
 
 
 (:action unload-truck-tru1
-	:parameters (?truck - tru1 ?obj - package ?loc - location)
+	:agent ?truck - tru1
+	:parameters (?obj - package ?loc - location)
 	:precondition (and
 		(at ?truck ?loc)
 		(in ?obj ?truck)
@@ -77,7 +85,8 @@
 
 
 (:action drive-truck-tru1
-	:parameters (?truck - tru1 ?loc-from - location ?loc-to - location ?city - city)
+	:agent ?truck - tru1
+	:parameters (?loc-from - location ?loc-to - location ?city - city)
 	:precondition (and
 		(at ?truck ?loc-from)
 		(in-city ?loc-from ?city)
@@ -91,7 +100,8 @@
 
 
 (:action load-truck-tru2
-	:parameters (?truck - tru2 ?obj - package ?loc - location)
+	:agent ?truck - tru2
+	:parameters (?obj - package ?loc - location)
 	:precondition (and
 		(at ?truck ?loc)
 		(at ?obj ?loc)
@@ -104,7 +114,8 @@
 
 
 (:action unload-truck-tru2
-	:parameters (?truck - tru2 ?obj - package ?loc - location)
+	:agent ?truck - tru2
+	:parameters (?obj - package ?loc - location)
 	:precondition (and
 		(at ?truck ?loc)
 		(in ?obj ?truck)
@@ -117,7 +128,8 @@
 
 
 (:action drive-truck-tru2
-	:parameters (?truck - tru2 ?loc-from - location ?loc-to - location ?city - city)
+	:agent ?truck - tru2
+	:parameters (?loc-from - location ?loc-to - location ?city - city)
 	:precondition (and
 		(at ?truck ?loc-from)
 		(in-city ?loc-from ?city)

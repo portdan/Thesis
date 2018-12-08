@@ -1,18 +1,18 @@
 (define (problem probLOGISTICS-4-0) (:domain logistics)
 (:objects
+	cit1 - city
+	cit2 - city
 	obj21 - package
 	obj22 - package
 	obj23 - package
+	obj11 - package
+	obj13 - package
+	obj12 - package
 	tru1 - tru1
-	cit1 - city
-	cit2 - city
 	tru2 - tru2
 	apn1 - apn1
 	apt2 - airport
 	apt1 - airport
-	obj11 - package
-	obj13 - package
-	obj12 - package
 	pos2 - location
 	pos1 - location
 )
