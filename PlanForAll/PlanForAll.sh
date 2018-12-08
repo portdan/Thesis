@@ -4,7 +4,8 @@
 #./PlanForAll.sh Input/logistics00/domain.pddl Input/logistics00 Traces/logistics00 saFF-glcl -1 10
 
 JAVA="/usr/bin/java"
-MADLA_JAR="madla-planner.jar"
+#MADLA_JAR="Planner/madla-planner.jar"
+MADLA_JAR="Planner/Planner.jar"
 #JAR="cz.agents.madla.creator.MAPDDLCreator"
 
 MADLAcreator="cz.agents.madla.creator.MAPDDLCreator"

@@ -1,7 +1,8 @@
 #!/bin/bash
 
 JAVA="java"
-MADLA_PLANNER_JAR="madla-planner.jar"
+#MADLA_PLANNER_JAR="Planner/madla-planner.jar"
+MADLA_PLANNER_JAR="Planner/Planner.jar"
 
 CREATOR=$1
 DOMAIN=$2

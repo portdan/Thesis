@@ -1,0 +1,6 @@
+11:49:50 0 [INFO ] (MAPDDLCreator.java:192) - RUN: ./misc/ma-pddl/ma-to-pddl.py ./Input/logistics00 domain probLOGISTICS-4-0_104 ./temp
+11:49:50 15 [INFO ] (MAPDDLCreator.java:118) - >>> CREATION
+11:49:50 15 [INFO ] (MAPDDLCreator.java:119) - >>>   sas: output
+11:49:50 15 [INFO ] (MAPDDLCreator.java:120) - >>>   agents: temp/probLOGISTICS-4-0_104.addl
+11:49:50 20 [INFO ] (MAPDDLCreator.java:213) - RUN: ./misc/fd/src/translate/translate.py ./temp/domain.pddl ./temp/probLOGISTICS-4-0_104.pddl
+11:49:50 45 [DEBUG] (MAPDDLCreator.java:235) - test: /home/daniel/Work/WorkSpace/Thesis/PlanForAll/output.sas

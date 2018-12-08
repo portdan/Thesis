@@ -5,7 +5,7 @@ SAS_FILE_VERSION = 3
 
 class SASTask:
     def __init__(self, variables, mutexes, init, goal,
-                 operators, axioms, metric):
+                 operators, axioms, metric,solvable = True):
         self.variables = variables
         self.mutexes = mutexes
         self.init = init
@@ -13,6 +13,7 @@ class SASTask:
         self.operators = sorted(operators, key=lambda op: (op.name, op.prevail, op.pre_post))
         self.axioms = sorted(axioms, key=lambda axiom: (axiom.condition, axiom.effect))
         self.metric = metric
+        self.solvable = solvable;
     def output(self, stream):
         print("begin_version", file=stream)
         print(SAS_FILE_VERSION, file=stream)

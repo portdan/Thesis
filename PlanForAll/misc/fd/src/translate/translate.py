@@ -490,7 +490,7 @@ def unsolvable_sas_task(msg):
     axioms = []
     metric = True
     return sas_tasks.SASTask(variables, mutexes, init, goal,
-                             operators, axioms, metric)
+                             operators, axioms, metric, False)
 
 
 def pddl_to_sas(task):
@@ -669,7 +669,10 @@ def main():
 
     with timers.timing("Writing output"):
         with open("output.sas", "w") as output_file:
-            sas_task.output(output_file)
+            if sas_task.solvable:
+                sas_task.output(output_file)
+            else:
+                print("unsolvable", file = output_file)
     print("Done! %s" % timer)
 
 

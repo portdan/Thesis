@@ -20,43 +20,57 @@ def main():
 
     agents_folder = 'temp'
     
+    domain_name = os.path.splitext(os.path.basename(args.domain))[0]
+
     if os.path.exists(agents_folder):
         shutil.rmtree(agents_folder)
-    else:
-        os.makedirs(agents_folder)
+    os.makedirs(agents_folder)
+        
+    if os.path.exists(args.traces):
+        shutil.rmtree(args.traces)
+    os.makedirs(args.traces)
+        
+    if os.path.exists("out.csv"):
+        os.remove("out.csv")
 
-    for dirpath, dirnames, filenames in os.walk(args.input):
+    for dirpath, dirnames, filenames in os.walk(args.problems):
         for filename in filenames:
             if filename.endswith(".pddl"):
                 #print(filename)
                 
-                problem_name = os.path.splitext(filename)[0]
-                
-                if(filename != args.domain_name):
-                
+                if(filename != domain_name):
+                    
+                    problem_name = os.path.splitext(filename)[0]
+                                    
                     agents_path = str(agents_folder +"/" + problem_name +".addl")  
-                
+                    
                     processList = ["./run_local.sh" 
-                                 , args.creator 
-                                 , args.input + "/" + args.domain_name
-                                 , os.path.join(args.input, filename) 
-                                 , agents_path
-                                 , args.heuristic
-                                 , str(args.recursion)
-                                 , str(args.timeout) ]
-                
+                                , args.creator 
+                                , args.domain 
+                                , os.path.join(args.problems, filename) 
+                                , agents_path
+                                , args.heuristic
+                                , str(args.recursion)
+                                , str(args.timeout) ]
+                    
                     print(', '.join(processList))
+                        
+                    
+                    process = subprocess.Popen(processList)
+                    process.wait()                
+                        
+                    #subprocess.call(processList)
+    
+                    if os.path.exists("out.plan"):
+                        print(args.traces + "/" + problem_name + ".plan")
+                        shutil.move('out.plan', args.traces + "/" + problem_name + ".plan")
+    
+    if os.path.exists("output"):
+        os.remove("output")
                 
-                    subprocess.call(processList)
-                    
-                    os.remove("out.csv") 
-                    os.remove("output")
-                    os.remove("output.sas")
-                    
-                    shutil.move('out.plan', args.traces + "/" + problem_name + ".plan")
-    
-    shutil.rmtree(agents_folder)
-    
+    if os.path.exists("output.sas"):
+        os.remove("output.sas")
+                                                
     end = time.time() 
     
     print("Done! (time - %0.4f" %(end - start)+")")
@@ -69,9 +83,9 @@ def parse_args():
     argparser.add_argument(
         "creator", help="creator class", type=str)
     argparser.add_argument(
-        "input", help="path to input directory", type=str)
+        "domain", help="path to domain file", type=str)
     argparser.add_argument(
-        "domain_name", help="domain file name", type=str)
+        "problems", help="path to problems directory", type=str)
     argparser.add_argument(
         "traces", help="path to traces folder", type=str)
     argparser.add_argument(
