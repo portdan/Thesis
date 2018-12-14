@@ -10,4 +10,5 @@
     <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="cz.agents.alite.Main"/>
     <stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="cz.agents.madla.creator.CostPartitioningEvaluatorCreator benchmarks/satellites/domain.pddl benchmarks/satellites/p03-pfile3.pddl benchmarks/satellites/p03-pfile3.addl approx-ocp"/>
     <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="madla-planner"/>
+    <stringAttribute key="org.eclipse.jdt.launching.SOURCE_PATH_PROVIDER" value="org.eclipse.m2e.launchconfig.sourcepathProvider"/>
 </launchConfiguration>
