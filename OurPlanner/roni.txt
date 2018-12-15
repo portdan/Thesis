@@ -1,0 +1,5 @@
+validate plan for each agent localview or whole problem?
+if validation fails - what action went wrong (for learning purposes...)
+verify plan by sending states?
+currently im verifing with whole problem and domain - for each agent...
+check if goal is reached for full plan or only reached?

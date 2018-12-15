@@ -1,0 +1,12 @@
+/__init__.pyc
+/actions.pyc
+/axioms.pyc
+/conditions.pyc
+/effects.pyc
+/f_expression.pyc
+/functions.pyc
+/parser.pyc
+/pddl_file.pyc
+/pddl_types.pyc
+/predicates.pyc
+/tasks.pyc
