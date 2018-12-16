@@ -12,6 +12,7 @@ import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
 import cz.agents.alite.communication.PerformerCommunicator;
@@ -212,6 +213,25 @@ public class MAPDDLProblemGenerator implements Creator {
 		removeDupliacteProblems();
 
 		renameProblems();
+		
+		delelteTemporaryFiles();
+	}
+	
+	private void delelteTemporaryFiles() {
+
+		LOGGER.info("Deleting temporary files");
+
+		File temp = new File(TEMP);		
+		if(temp.exists()) {
+			LOGGER.info("Deleting 'temp' folder");
+
+			try {
+				FileUtils.deleteDirectory(temp);
+			} catch (IOException e) {
+				LOGGER.fatal(e, e);
+				System.exit(1);
+			}
+		}
 	}
 
 	private DIMAPWorldInterface initWorld(String agentName, int totalAgents) {
