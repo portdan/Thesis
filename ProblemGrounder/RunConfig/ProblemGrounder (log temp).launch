@@ -9,7 +9,7 @@
     <booleanAttribute key="org.eclipse.jdt.launching.ATTR_USE_START_ON_FIRST_THREAD" value="true"/>
     <stringAttribute key="org.eclipse.jdt.launching.CLASSPATH_PROVIDER" value="org.eclipse.m2e.launchconfig.classpathProvider"/>
     <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="ProblemGrounder.Main"/>
-    <stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="ProblemGrounder.ProblemGrounder ./Input/Domains/rovers/domain.pddl ./Input/Problems/rovers/roverprob3726.pddl"/>
+    <stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="ProblemGrounder.ProblemGrounder ./Input/Domains/logistics00/domain.pddl ./Input/Problems/logistics00/probLOGISTICS-4-0_5.pddl"/>
     <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="ProblemGrounder"/>
     <stringAttribute key="org.eclipse.jdt.launching.SOURCE_PATH_PROVIDER" value="org.eclipse.m2e.launchconfig.sourcepathProvider"/>
 </launchConfiguration>

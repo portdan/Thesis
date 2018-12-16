@@ -1,4 +1,4 @@
-(define (problem probLOGISTICS-4-0_169) (:domain logistics)
+(define (problem probLOGISTICS-4-0_101) (:domain logistics)
 (:objects
 	cit1 - city
 	cit2 - city
@@ -34,14 +34,14 @@
 (:goal
 	(and
 		(at obj23 pos2)
-		(in obj22 tru2)
+		(at obj22 pos2)
 		(at obj21 pos2)
 		(at obj13 pos1)
 		(at obj12 pos1)
 		(at obj11 pos1)
 		(at apn1 apt2)
 		(at tru1 pos1)
-		(at tru2 pos2)
+		(at tru2 apt2)
 	)
 )
 )
