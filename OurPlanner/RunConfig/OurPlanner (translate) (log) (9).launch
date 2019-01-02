@@ -8,7 +8,7 @@
     </listAttribute>
     <stringAttribute key="org.eclipse.ui.externaltools.ATTR_LOCATION" value="${workspace_loc:OurPlanner/Scripts/translate/translate.py}"/>
     <stringAttribute key="org.eclipse.ui.externaltools.ATTR_OTHER_WORKING_DIRECTORY" value=""/>
-    <stringAttribute key="org.eclipse.ui.externaltools.ATTR_TOOL_ARGUMENTS" value="./Output/temp/domain.pddl ./Output/temp/probLOGISTICS-4-0_60.pddl --ignore_unsolvable"/>
+    <stringAttribute key="org.eclipse.ui.externaltools.ATTR_TOOL_ARGUMENTS" value="./Output/temp/domain.pddl ./Output/temp/probLOGISTICS-4-0_191.pddl"/>
     <stringAttribute key="org.python.pydev.debug.ATTR_INTERPRETER" value="__default"/>
     <stringAttribute key="org.python.pydev.debug.ATTR_PROJECT" value="OurPlanner"/>
     <stringAttribute key="process_factory_id" value="org.python.pydev.debug.processfactory.PyProcessFactory"/>

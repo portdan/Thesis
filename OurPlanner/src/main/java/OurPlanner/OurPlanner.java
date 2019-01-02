@@ -13,13 +13,12 @@ import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
 import cz.agents.alite.creator.Creator;
-import cz.agents.madla.executor.PlanTestExecutor;
 
 public class OurPlanner implements Creator  {
 
 	/* Global variables */
 	private final static Logger LOGGER = Logger.getLogger(OurPlanner.class);
-	private final static int ARGS_NUM = 6;
+	private final static int ARGS_NUM = 5;
 	private final static int SCRIPT_SUCCESS = 0;
 	private final static int RANDOM_SEED = 1;
 
@@ -32,8 +31,8 @@ public class OurPlanner implements Creator  {
 	private String problemFileName = "";
 	private String agentsFilePath = "";
 
-	private File localViewFile = null;
 	private File groundedFile = null;
+	private File localViewFile = null;
 	private File domainFile = null;
 	private File problemFile = null;
 	private File agentsFile = null;
@@ -102,7 +101,7 @@ public class OurPlanner implements Creator  {
 			if(leaderAgentPlan == null)
 				continue;		
 
-			if(verifyPlans(leaderAgentPlan))
+			if(verifyPlan(leaderAgentPlan))
 				return true;
 
 		}
@@ -110,24 +109,21 @@ public class OurPlanner implements Creator  {
 		return false;
 	}
 
-	private boolean verifyPlans(List<String> plan) {
+	private boolean verifyPlan(List<String> plan) {
 
-		LOGGER.info("Verifing plans");
+		LOGGER.info("Verifing plan");
+
+		//plan.add("\n apn1 fly-airplane-apn1 apn1 apt2 apt1 -123123");
 
 		String groundedDomainPath = groundedFolder + "/" + domainFileName;
 		String groundedProblemPath = groundedFolder + "/" + problemFileName;
-		String agentADDLPath = Globals.TEMP_PATH + "/" + problemFileName.split("\\.")[0] + ".addl";
 
-		PlanVerifier planVerifier = new PlanVerifier(groundedDomainPath,groundedProblemPath
-				,agentADDLPath);		
+		PlanVerifier planVerifier = new PlanVerifier(groundedDomainPath,groundedProblemPath, agentList,domainFileName,problemFileName,localViewFolder);		
 
-		ArrayList<String> agentsExceptLeader = new ArrayList<>(agentList);	
-		//TODO agentsExceptLeader.remove(currentLeaderAgent);
+		boolean isVerified = planVerifier.verifyPlan(plan,0);
 
-		boolean isVerified = planVerifier.verifyPlan(plan, agentsExceptLeader);
-		
 		delelteTemporaryFiles();
-		
+
 		return isVerified;
 	}
 
@@ -143,7 +139,7 @@ public class OurPlanner implements Creator  {
 		int timeLimitMin = 10;
 
 		MADLAPlanner planner = new MADLAPlanner(agentDomainPath, agentProblemPath, agentADDLPath,
-				heuristic, recursionLevel, timeLimitMin, agentName);
+				heuristic, recursionLevel, timeLimitMin,agentList, agentName);
 
 		List<String> result = planner.plan();
 
@@ -224,7 +220,6 @@ public class OurPlanner implements Creator  {
 		return agentsReaderValid(pr);
 	}
 
-
 	private boolean agentsReaderValid(Process prc) {
 
 		LOGGER.info("Agents reading check");
@@ -266,7 +261,7 @@ public class OurPlanner implements Creator  {
 		boolean valid = true;
 
 		if ((valid = ArgsLenghtValid(args)) == false) 
-			status = "Usage: <path to grounded .pddl files> <path to .pddl problem file> <path to .plan file>";	
+			status = "Usage: <path to grounded folder> <path to localview folder> <domain name> <problem name> <addl name>";	
 
 		if ((valid = ArgsParsingValid(args)) == false) 
 			status = "Bad path to one or more provided files";	

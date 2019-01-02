@@ -626,7 +626,7 @@ if __name__ == "__main__":
       pp.print_problem()
 
     if not os.path.exists(sys.argv[4]):
-      os.mkdir(sys.argv[4])
+      os.makedirs(sys.argv[4])
 
     pp.write_pddl_domain(sys.argv[4] + "/" + sys.argv[2] + ".pddl")
     pp.write_pddl_problem(sys.argv[4] + "/" + sys.argv[3] + ".pddl")

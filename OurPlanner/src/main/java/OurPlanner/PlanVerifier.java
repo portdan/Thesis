@@ -8,17 +8,16 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
 import cz.agents.dimaptools.input.addl.ADDLObject;
 import cz.agents.dimaptools.input.addl.ADDLParser;
-import cz.agents.dimaptools.input.sas.SASParser;
-import cz.agents.dimaptools.input.sas.SASPreprocessor;
-import cz.agents.dimaptools.model.Action;
-import cz.agents.dimaptools.model.Problem;
-import cz.agents.dimaptools.model.State;
-import cz.agents.dimaptools.model.SuperState;
+import cz.agents.dimaptools.model.*;
+
+import model.*;
 
 public class PlanVerifier {
 
@@ -29,51 +28,116 @@ public class PlanVerifier {
 	private static final String CONVERTOR = "./Scripts/ma-pddl/ma-to-pddl.py";
 
 	private static final String TEMP = Globals.TEMP_PATH;
+	private static final String SAS_FILE_NAME = "output";
 
-	private String domainFileName;
-	private String problemFileName;
-	private String agentFileName;
-	private String sasFileName;
+	private static final boolean LV_MODE = true;
+
+
+	private String domainFileName = "";
+	private String problemFileName = "";
+	private String sasFileName = "";
+	private String localViewPath = "";
+	private String groundedDomainPath = "";
+	private String groundedProblemPath = "";
+
+	private List<String> agentList = null;
 
 	private boolean sasSolvable = false;
 
-	protected SASPreprocessor preprocessor;
+	protected SASPreprocessor preprocessor = null;
 
-	public PlanVerifier(String domainFileName, String problemFileName, String agentFileName) {
+	Problem p = null;
+
+	Map<String,Problem> problems = new HashMap<String,Problem>();
+	Map<String,State> states = new HashMap<String,State>();
+	Map<String,SuperState> goalStates = new HashMap<String,SuperState>();
+
+	Map<String,Map<String,Set<String>>> agentVarVals = new HashMap<String,Map<String,Set<String>>>();
+	Map<String,Map<String,Integer>> agentVarCodes = new HashMap<String,Map<String,Integer>>();
+	Map<String,Map<String,Integer>> agentValCodes = new HashMap<String,Map<String,Integer>>();
+
+
+	public PlanVerifier(String groundedDomainPath, String groundedProblemPath,
+			List<String> agentList, String domainFileName, String problemFileName,
+			String groundedPath) {
 
 		LOGGER.info("PlanVerifier constructor");
 
-		sasFileName = "output";
+		sasFileName = SAS_FILE_NAME;
+		this.groundedDomainPath = groundedDomainPath;
+		this.groundedProblemPath = groundedProblemPath;
+		this.agentList = agentList;
 		this.domainFileName = domainFileName;
 		this.problemFileName = problemFileName;
-		this.agentFileName = agentFileName;
+		this.localViewPath = groundedPath;
 
 		logInput();
+
+		if(LV_MODE)
+			generateProblemsFromLV();
+		else
+			generateProblemsFromGrounded();
 	}
 
 	private void logInput() {
 
 		LOGGER.info("Logging input");
 
+		LOGGER.info("agentList: " + agentList);
 		LOGGER.info("sasFileName: " + sasFileName);
+		LOGGER.info("groundedDomainPath: " + groundedDomainPath);
+		LOGGER.info("groundedProblemPath: " + groundedProblemPath);
 		LOGGER.info("domainFileName: " + domainFileName);
 		LOGGER.info("problemFileName: " + problemFileName);
-		LOGGER.info("agentFileName: " + agentFileName);
+		LOGGER.info("localViewPath: " + localViewPath);
+
 	}
 
-	public boolean verifyPlan(List<String> plan, List<String> agents) {
+	private void generateProblemsFromGrounded() {
 
-		LOGGER.info("Verifing");
+		LOGGER.info("Generating problems");
 
-		if(!runConvert()) {
-			LOGGER.info("Convert failure");
-			return false;
+		String agentADDLPath = Globals.TEMP_PATH + "/" + problemFileName.split("\\.")[0] + ".addl";		
+
+		for (String agentName : agentList) {
+			problems.put(agentName, generateProblem(agentName,groundedDomainPath ,
+					groundedProblemPath, agentADDLPath));
+			delelteTemporaryFiles();
+		}
+	}
+	private void generateProblemsFromLV() {
+
+		LOGGER.info("Generating problems");
+
+		for (String agentName : agentList) {
+
+			String groundedDomainPath = localViewPath + "/"  + agentName + "/" + domainFileName;
+			String groundedProblemPath = localViewPath + "/" + agentName + "/" + problemFileName;
+			String agentADDLPath = Globals.TEMP_PATH + "/" + problemFileName.split("\\.")[0] + ".addl";		
+
+			Problem problem = generateProblem(agentName,groundedDomainPath , groundedProblemPath, agentADDLPath);
+
+			problems.put(agentName, problem);
+
+			delelteTemporaryFiles();
 		}
 
-		File agentFile = new File( agentFileName);
+	}
+
+	private Problem generateProblem(String agentName, String groundedDomainPath,
+			String groundedProblemPath, String agentADDLPath) {
+
+		LOGGER.info("Generating problem for agent: " + agentName);
+
+		if(!runConvert(groundedDomainPath,groundedProblemPath)) {
+			LOGGER.info("Convert failure");
+			return null;
+		}
+
+		File agentFile = new File(agentADDLPath);
 		if (!agentFile.exists()) {
-			LOGGER.info("Agent file " + agentFileName + " does not exist!");
-			return false;
+			LOGGER.info("Agent file " + agentADDLPath + " does not exist!");
+			return null;
 		}
 
 		ADDLObject addl = new ADDLParser().parse(agentFile);
@@ -83,85 +147,176 @@ public class PlanVerifier {
 
 		if(!runTranslate()) {
 			LOGGER.info("Translate failure");
-			return false;
+			return null;
 		}
 
 		if (!sasSolvable) {
 			LOGGER.info("Sas not Solvable. Plan not found!");
-			return false;
+			return null;
 		}
 
 		if(!runPreprocess()) {
 			LOGGER.info("Preprocess failure");
-			return false;
+			return null;
 		}
 
 		File sasFile = new File(sasFileName);
 		if (!sasFile.exists()) {
 			LOGGER.info("SAS file " + sasFileName + " does not exist!");
-			return false;
+			return null;
 		}
 
 		SASParser parser = new SASParser(sasFile);
-		preprocessor = new SASPreprocessor(parser.getDomain(), addl);
+		SASDomain sasDom = parser.getDomain();
+		preprocessor = new SASPreprocessor(sasDom, addl);
 
-		return verifyPlanForAgent(plan, agents);
+		states.put(agentName, preprocessor.getGlobalInit());
+		goalStates.put(agentName, preprocessor.getGlobalGoal());
+
+		agentVarCodes.put(agentName, preprocessor.varCodes);
+		agentValCodes.put(agentName, preprocessor.valCodes);
+
+		agentVarVals.put(agentName,preprocessor.getAgentVarVals(agentName));
+
+		return preprocessor.getProblemForAgent(agentName);
 	}
 
-	private boolean verifyPlanForAgent(List<String> plan, List<String> agents) {
+	public boolean verifyPlan(List<String> plan, int actionIndex) {
 
-		LOGGER.info("Verifiing plan for agent " + agents);
+		LOGGER.info("Verifying plan");
 
-		LOGGER.info("Generating problems:");
+		String actionStr = plan.get(actionIndex);
 
-		Map<String,Problem> problems = new HashMap<String,Problem>();
+		String agentName = getAgentFromAction(actionStr);
 
-		for (String agent : agents) {
-			LOGGER.info("Generating problem for agent: " + agent);
-			problems.put(agent, preprocessor.getProblemForAgent(agent));
+		Action action = getActionFromPlan(actionStr, agentName);
+
+		if(action != null) {
+
+			if(!verifyActionForAllAgents(action)) {
+				LOGGER.info("Action " + action.getSimpleLabel() + " is not applicable!");
+				return false;
+			}
+		}
+		else {
+			LOGGER.info("agent " + agentName + " is not the owner of this action - plan not verified!");
+			return false;
 		}
 
-		State state = preprocessor.getGlobalInit();
-		SuperState goalState = preprocessor.getGlobalGoal();
+		//		if(actionIndex == plan.size() - 1){
+		//			LOGGER.info("Plan verifing finished - plan verified!");
+		//			return true;
+		//		}
+		//		if(state.unifiesWith(goalState)){
+		//			LOGGER.info("Goal is reached - plan verified!");
+		//			return true;
+		//		}
 
-		for(String s : plan){
-			String[] split = s.split(" ");
-			String agent = split[1];
+		if(actionIndex == plan.size() - 1) {
 
-			int hash = Integer.parseInt(split[split.length-1]);
+			if(isGoalReached()){
+				LOGGER.info("Goal is reached - plan verified!");
+				return true;
+			}
+			else{
+				LOGGER.info("Goal is not reached - plan not verified!");
+				return false;
+			}
+		}
+		else {
 
-			Action a = problems.get(agent).getAction(hash);
+			LOGGER.info("verify next action");
 
-			if(a!=null) {
+			return verifyPlan(plan, actionIndex + 1);
+		}
+	}
 
-				if(a.isApplicableIn(state)){
-					a.transform(state);
-				}
-				else{
-					LOGGER.info("Action " + a + " of agent " + agent + "is not applicable in " + s +"!");
-					return false;
+	private boolean verifyActionForAllAgents(Action action) {
+
+		LOGGER.info("Verifying action " + action.getSimpleLabel() + " of agent " + action);
+
+		boolean applicable = false;
+
+		for (String agentName : agentList) {
+
+			State state = states.get(agentName);
+
+			Action agentAction =  null;
+
+			for (Action act : problems.get(agentName).getAllActions()) {
+				if(act.equals(action))
+					agentAction = act;
+			}
+
+			if(agentAction != null) {
+				if(agentAction.isApplicableIn(state)){
+					agentAction.transform(state);
+					applicable = true;
 				}
 			}
 		}
 
-		if(state.unifiesWith(goalState)){
-			LOGGER.info("Goal is reached - plan verified!");
-			return true;
-		}
-		else{
-			LOGGER.info("Goal is not reached - plan not verified!");
-			return false;
-		}
-
+		return applicable;
 	}
 
-	private boolean runConvert(){
+	private boolean isGoalReached() {
+
+		LOGGER.info("checking if goal is reached for all agents");
+
+		for (String agentName : agentList) {
+
+			LOGGER.info("checking goal for agent " + agentName);
+
+			State state = states.get(agentName);
+			SuperState goal = goalStates.get(agentName);
+
+			if(!state.unifiesWith(goal)) {
+
+				LOGGER.info("agent " + agentName + " : state " + state + " not unifies with goal " + goal);
+
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	private Action getActionFromPlan(String actionStr, String agentName) {
+
+		String[] split = actionStr.split(" ");
+
+		int hash = Integer.parseInt(split[split.length-1]);
+
+		Action action = problems.get(agentName).getAction(hash);
+		
+		String label = split[2];
+		for (int i = 3; i < split.length-1; i++)
+			label += " " + split[i];
+		
+		for (Action act : problems.get(agentName).getAllActions()) {
+			if(act.getSimpleLabel().equals(label))
+				action = act;
+		}
+
+		return action;		
+	}
+
+	private String getAgentFromAction(String actionStr) {
+
+		String[] split = actionStr.split(" ");
+
+		String agent = split[1];
+
+		return agent;		
+	}
+
+	private boolean runConvert(String groundedDomainPath, String groundedProblemPath){
 
 		LOGGER.info("Converting to pddl");
 
-		String path = domainFileName.substring(0, domainFileName.lastIndexOf("/"));
-		String domain = domainFileName.substring(domainFileName.lastIndexOf("/")+1, domainFileName.lastIndexOf("."));
-		String problem = problemFileName.substring(problemFileName.lastIndexOf("/")+1, problemFileName.lastIndexOf("."));
+		String path = groundedDomainPath.substring(0, groundedDomainPath.lastIndexOf("/"));
+		String domain = groundedDomainPath.substring(groundedDomainPath.lastIndexOf("/")+1, groundedDomainPath.lastIndexOf("."));
+		String problem = groundedProblemPath.substring(groundedProblemPath.lastIndexOf("/")+1, groundedProblemPath.lastIndexOf("."));
 
 		try {
 			String cmd = CONVERTOR + " " + path + " " + domain + " " + problem + " " + TEMP;
@@ -177,9 +332,6 @@ public class PlanVerifier {
 			return false;
 		}
 
-		domainFileName = TEMP + "/" + domain + ".pddl";
-		problemFileName = TEMP + "/" + problem + ".pddl";
-
 		return true;
 	}
 
@@ -188,7 +340,11 @@ public class PlanVerifier {
 		LOGGER.info("Translating to sas");
 
 		try {
-			String cmd = TRANSLATOR + " " + domainFileName + " " + problemFileName;
+
+			String tempDomainPDDL = TEMP + "/" + domainFileName;
+			String tempProblemPDDL = TEMP + "/" + problemFileName;
+
+			String cmd = TRANSLATOR + " " + tempDomainPDDL + " " + tempProblemPDDL + " --ignore_unsolvable";
 			LOGGER.info("RUN: " + cmd);
 			Process pr = Runtime.getRuntime().exec(cmd);
 
@@ -248,4 +404,34 @@ public class PlanVerifier {
 
 		return true;
 	}
+
+	private void delelteTemporaryFiles() {
+
+		LOGGER.info("Deleting temporary files");
+
+		File temp = new File(Globals.TEMP_PATH);		
+		if(temp.exists()) {
+			LOGGER.info("Deleting 'temp' folder");
+
+			try {
+				FileUtils.deleteDirectory(temp);
+			} catch (IOException e) {
+				LOGGER.fatal(e, e);
+				System.exit(1);
+			}
+		}
+
+		File output = new File("output");		
+		if(output.exists()) {
+			LOGGER.info("Deleting 'output' file");
+			output.delete();
+		}
+
+		File outputSAS = new File("output.sas");		
+		if(outputSAS.exists()) {
+			LOGGER.info("Deleting 'output.sas' file");
+			outputSAS.delete();
+		}
+	}
+
 }

@@ -32,7 +32,8 @@ import cz.agents.dimaptools.heuristic.relaxed.evaluator.AddEvaluator;
 import cz.agents.dimaptools.heuristic.relaxed.evaluator.EvaluatorInterface;
 import cz.agents.dimaptools.heuristic.relaxed.evaluator.FFEvaluator;
 import cz.agents.dimaptools.heuristic.relaxed.evaluator.MaxEvaluator;
-import cz.agents.dimaptools.model.Problem;
+import cz.agents.dimaptools.model.*;
+import cz.agents.dimaptools.search.AStar;
 import cz.agents.dimaptools.search.AsyncDistributedBestFirstSearch;
 import cz.agents.dimaptools.search.DistributedBestFirstSearch;
 import cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch;
@@ -107,6 +108,7 @@ public class Planner {
 		EvaluatorInterface evaluator2 = null;
 		EvaluatorInterface evaluator3 = null;
 
+		boolean astar=false;
 		boolean helpful=false;
 		boolean noha=false;
 		boolean multi=false;
@@ -124,7 +126,10 @@ public class Planner {
 		if(!hParams.isEmpty()){
 			String param = hParams.pollFirst();
 
-			if(param.equals("ha")){	//helpful actions (=preferred operators)
+			if(param.equals("A*")){	
+				astar=true;
+			}
+			else if(param.equals("ha")){	//helpful actions (=preferred operators)
 				helpful=true;
 				helpfulInf=true;
 			}else if(param.equals("noha")){	//probably not used?
@@ -244,7 +249,10 @@ public class Planner {
 			LOGGER.error("Unknown evaluator " + eval, new RuntimeException("Unknown evaluator " + eval));
 		}
 
-		if(noha){
+		if(astar){
+			configureAStar();
+		}
+		else if(noha){
 			configureHelpful(evaluator1, evaluator2, false, recompute);
 		}else if(multi){
 			configureMulti(evaluator1, evaluator2, evaluator3, helpful, helpfulInf, recompute, qsync, gsync);
@@ -340,6 +348,15 @@ public class Planner {
 			provider = new SharedProblemInfoProvider(world,world.getNumberOfAgents());
 		}
 		return provider;
+	}
+
+	public void configureAStar(){
+
+		Problem problem = world.getProblem();
+
+		search = new AStar(problem,problem.getAllActions());
+		plannerConfig  = new MapConfiguration("endWithFirstSolution", true);
+
 	}
 
 
@@ -452,6 +469,7 @@ public class Planner {
 					DataAccumulator.getAccumulator().planLength = plan.size();
 					long time = DataAccumulator.getAccumulator().finishTimeMs - DataAccumulator.getAccumulator().startTimeMs;
 					LOGGER.info(time +" - "+ plan);
+					//TODO
 					DataAccumulator.getAccumulator().planValid = executor.executePlan(plan);
 					DataAccumulator.getAccumulator().writeOutput(FORCE_EXIT_AFTER_WRITE);
 
@@ -505,7 +523,8 @@ public class Planner {
 
 			@Override
 			public void partialPlanReconstructed(List<String> plan, String initiator, int solutionCost) {
-				executor.executePartialPlan(plan,initiator,solutionCost);
+				//TODO
+				//executor.executePartialPlan(plan,initiator,solutionCost);
 			}
 
 		});

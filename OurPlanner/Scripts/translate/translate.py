@@ -493,14 +493,15 @@ def unsolvable_sas_task(msg):
                              operators, axioms, metric, False)
 
 
-def pddl_to_sas(task):
+def pddl_to_sas(task, ignore_unsolvable = False):
     with timers.timing("Instantiating", block=True):
         (relaxed_reachable, atoms, actions, axioms,
          reachable_action_params) = instantiate.explore(task)
-
-    if not relaxed_reachable:
-        return unsolvable_sas_task("No relaxed solution")
-
+         
+    if not ignore_unsolvable:
+        if not relaxed_reachable:
+            return unsolvable_sas_task("No relaxed solution")
+        
     # HACK! Goals should be treated differently.
     if isinstance(task.goal, pddl.Conjunction):
         goal_list = task.goal.parts
@@ -644,6 +645,9 @@ def parse_args():
     argparser.add_argument(
         "--relaxed", dest="generate_relaxed_task", action="store_true",
         help="output relaxed task (no delete effects)")
+    argparser.add_argument(
+        "--ignore_unsolvable", dest="ignore_unsolvable_solution", action="store_true",
+        help="ignore unsolvable solution")
     return argparser.parse_args()
 
 
@@ -664,7 +668,7 @@ def main():
                 if effect.literal.negated:
                     del action.effects[index]
 
-    sas_task = pddl_to_sas(task)
+    sas_task = pddl_to_sas(task, args.ignore_unsolvable_solution)
     dump_statistics(sas_task)
 
     output_file_name = "output.sas";

@@ -304,7 +304,7 @@ def compute_model(prog):
     with timers.timing("Preparing model"):
         rules = convert_rules(prog)
         unifier = Unifier(rules)
-        # unifier.dump()
+        unifier.dump()
         fact_atoms = sorted(fact.atom for fact in prog.facts)
         queue = Queue(fact_atoms)
 

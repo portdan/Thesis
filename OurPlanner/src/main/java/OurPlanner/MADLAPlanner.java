@@ -5,8 +5,12 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.lang.Thread.UncaughtExceptionHandler;
 import java.lang.management.ManagementFactory;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -44,25 +48,31 @@ public class MADLAPlanner {
 
 	private boolean fromSAS = true;
 
-	private String domainFileName;
-	private String problemFileName;
-	private String sasFileName;
-	private String agentFileName;
+	private String domainFileName = "";
+	private String problemFileName = "";
+	private String sasFileName = "";
+	private String agentFileName = "";
 
-	private String heuristic;
-	private int recursionLevel;
-	private int timeLimitMin;
+	private String heuristic = "";
+	private int recursionLevel = -1;
+	private int timeLimitMin = -1;
 
-	private String agentName;
+	private List<String> agentNames = null;
+	
+	private String planninAagentName = "";
 
 	private boolean sasSolvable = false;
 
-	protected SASPreprocessor preprocessor;
+	protected SASPreprocessor preprocessor = null;
 
-	private Planner planner = null;
+	//private Planner planner = null;
+	
+    private final Set<Planner> planners = new LinkedHashSet<Planner>();
+    private final Set<Thread> threadSet = new LinkedHashSet<Thread>();
 
 	public MADLAPlanner(String domainFileName, String problemFileName, String agentFileName,
-			String heuristic , int recursionLevel, int timeLimitMin, String agentName ) {
+			String heuristic , int recursionLevel, int timeLimitMin, List<String> agentNames,
+			String planninAagentName ) {
 
 		LOGGER.info("MADLAPlanner constructor (not from .sas)");
 
@@ -74,13 +84,14 @@ public class MADLAPlanner {
 		this.heuristic = heuristic;
 		this.recursionLevel = recursionLevel;
 		this.timeLimitMin = timeLimitMin;
-		this.agentName = agentName;
+		this.agentNames = agentNames;
+		this.planninAagentName = planninAagentName;
 
 		logInput();
 	}
 
 	public MADLAPlanner(String sasFileName, String agentFileName, String heuristic ,
-			int recursionLevel, int timeLimitMin, String agentName ) {
+			int recursionLevel, int timeLimitMin,List<String> agentNames, String planninAagentName ) {
 
 		LOGGER.info("MADLAPlanner constructor (from .sas)");
 
@@ -89,7 +100,8 @@ public class MADLAPlanner {
 		this.heuristic = heuristic;
 		this.recursionLevel = recursionLevel;
 		this.timeLimitMin = timeLimitMin;
-		this.agentName = agentName;
+		this.agentNames = agentNames;
+		this.planninAagentName = planninAagentName;
 
 		logInput();
 	}
@@ -105,8 +117,8 @@ public class MADLAPlanner {
 		LOGGER.info("heuristic: " + heuristic);
 		LOGGER.info("recursionLevel: " + recursionLevel);
 		LOGGER.info("timeLimitMin: " + timeLimitMin);
-		LOGGER.info("agentName: " + agentName);
-
+		LOGGER.info("agentNames: " + agentNames);
+		LOGGER.info("agentName: " + planninAagentName);
 	}
 
 	public List<String> plan() {
@@ -119,7 +131,9 @@ public class MADLAPlanner {
 		DataAccumulator.getAccumulator().startTimeMs = startTime;
 
 		long tCPU = ManagementFactory.getThreadMXBean().getCurrentThreadCpuTime();
-		DataAccumulator.getAccumulator().startCPUTimeMs.put(agentName, tCPU);
+		
+		for (String agent : agentNames)
+			DataAccumulator.getAccumulator().startCPUTimeMs.put(agent, tCPU);
 
 		DataAccumulator.getAccumulator().setOutputFile(OUTPUT);
 
@@ -195,7 +209,12 @@ public class MADLAPlanner {
 			LOGGER.warn("Shutdown interrupted!");
 		}
 
-		return planner.foundPlan;
+        for (final Planner planner : planners) {    
+        	if (planner.foundPlan != null)
+        		return planner.foundPlan;
+        }
+        
+        return null;      
 	}
 
 	private boolean runConvert(){
@@ -222,7 +241,7 @@ public class MADLAPlanner {
 
 		domainFileName = TEMP + "/" + domain + ".pddl";
 		problemFileName = TEMP + "/" + problem + ".pddl";
-		
+
 		return true;
 	}
 
@@ -295,6 +314,7 @@ public class MADLAPlanner {
 
 	}
 
+	/*
 	private void createEntities(ADDLObject addl) {
 		LOGGER.info(">>> ENTITIES CREATION");
 
@@ -304,6 +324,8 @@ public class MADLAPlanner {
 
 		DIMAPWorldInterface world = initWorld(agentName,addl.getAgentCount());
 
+		//planner = new Planner("add-A*",recursionLevel,world,executor,(long)timeLimitMin*60L*1000L);
+
 		planner = new Planner(heuristic,recursionLevel,world,executor,(long)timeLimitMin*60L*1000L);
 
 		executor.addProblem(world.getProblem());
@@ -311,6 +333,27 @@ public class MADLAPlanner {
 		executor.setInitAndGoal(preprocessor.getGlobalInit(), preprocessor.getGlobalGoal());
 
 	}
+	*/
+	
+	private void createEntities(ADDLObject addl) {
+        LOGGER.info(">>> ENTITIES CREATION");
+
+		String planOutputFileName = Globals.OUTPUT_PATH + "/out.plan";
+
+        IPCOutputExecutor executor = new IPCOutputExecutor(planOutputFileName);
+
+        for (String agentName: addl.getAgentList()) {
+
+            DIMAPWorldInterface world = initWorld(agentName,addl.getAgentCount());
+
+            planners.add(new Planner(heuristic,recursionLevel,world,executor,(long)timeLimitMin*60L*1000L));
+
+            executor.addProblem(world.getProblem());
+        }
+
+        executor.setInitAndGoal(preprocessor.getGlobalInit(), preprocessor.getGlobalGoal());
+
+    }
 
 	public PerformerCommunicator initQueuedCommunicator(String address){
 		QueuedCommunicator communicator = new QueuedCommunicator(address);
@@ -338,6 +381,7 @@ public class MADLAPlanner {
 				);
 	}
 
+	/*
 	private void runEntities() {
 		LOGGER.info(">>> ENTITIES RUNNING");
 
@@ -354,4 +398,62 @@ public class MADLAPlanner {
 			planner.getWorld().getCommPerformer().performClose();
 		}
 	}
+*/
+	
+    @SuppressWarnings("deprecation")
+    private void runEntities() {
+        LOGGER.info(">>> ENTITIES RUNNING");
+
+
+        final Thread mainThread = Thread.currentThread();
+        final UncaughtExceptionHandler exceptionHandler = new UncaughtExceptionHandler() {
+
+            @Override
+            public void uncaughtException(Thread t, Throwable e) {
+                LOGGER.error("Uncaught exception in agent/planner thread!", e);
+
+                DataAccumulator.getAccumulator().finishTimeMs = DataAccumulator.getAccumulator().startTimeMs-1;
+                DataAccumulator.getAccumulator().writeOutput(Planner.FORCE_EXIT_AFTER_WRITE);
+
+                for (final Planner agent : planners) {
+                    agent.getWorld().getCommPerformer().performClose();
+                }
+
+                mainThread.interrupt();
+            }
+
+        };
+
+        for (final Planner agent : planners) {
+
+//            final Communicator comm = initCommunicator(agent);
+
+            Thread thread = new Thread(new Runnable() {
+
+                @Override
+                public void run() {
+                    agent.planAndExecuteFinal();
+                }
+            }, agent.getName());
+            thread.setUncaughtExceptionHandler(exceptionHandler);
+            threadSet.add(thread);
+            thread.start();
+        }
+
+        try {
+            for (Thread thread : threadSet) {
+                thread.join();
+            }
+        } catch (InterruptedException e) {
+            LOGGER.debug("Main thread interrupted.");
+        }
+
+        for (Thread thread : threadSet) {
+            if (thread.isAlive()) {
+                // TODO: refactor using a stop flag
+                thread.stop();
+            }
+        }
+    }
+	 
 }

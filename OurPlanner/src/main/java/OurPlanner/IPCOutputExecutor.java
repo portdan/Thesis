@@ -8,11 +8,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import cz.agents.dimaptools.model.Action;
-import cz.agents.dimaptools.model.Problem;
-import cz.agents.dimaptools.model.State;
-import cz.agents.dimaptools.model.SuperState;
+import cz.agents.dimaptools.model.*;
 import cz.agents.madla.executor.PlanExecutorInterface;
+
 
 public class IPCOutputExecutor implements PlanExecutorInterface {
 
