@@ -1,7 +1,8 @@
 #!/bin/bash
 
-#./PlanForAll.sh <.pddl domain full path> <.pddl problems path> <.plan plans path> <heuristic> <recursion> <timeout (min)>
-#./PlanForAll.sh Input/logistics00/domain.pddl Input/logistics00 Traces/logistics00 saFF-glcl -1 10
+# ./PlanForAll.sh <.pddl domain full path> <.pddl problems path> <.plan plans path> <heuristic> <recursion> <timeout (min)>
+# ./PlanForAll.sh Input/logistics00/domain.pddl Input/logistics00 Traces/logistics00 saFF-glcl -1 10
+# ./PlanForAll.sh Input/logistics00/Grounded/domain.pddl Input/logistics00/Grounded Traces/logistics00 saFF-glcl -1 10
 
 JAVA="/usr/bin/java"
 #MADLA_JAR="Planner/madla-planner.jar"
