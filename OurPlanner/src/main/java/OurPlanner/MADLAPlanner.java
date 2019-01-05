@@ -7,7 +7,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.lang.management.ManagementFactory;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -31,6 +30,8 @@ import cz.agents.dimaptools.input.addl.ADDLObject;
 import cz.agents.dimaptools.input.addl.ADDLParser;
 import cz.agents.dimaptools.input.sas.SASParser;
 import cz.agents.dimaptools.input.sas.SASPreprocessor;
+import model.IPCOutputExecutor;
+import model.Planner;
 
 public class MADLAPlanner {
 
@@ -58,17 +59,15 @@ public class MADLAPlanner {
 	private int timeLimitMin = -1;
 
 	private List<String> agentNames = null;
-	
+
 	private String planninAagentName = "";
 
 	private boolean sasSolvable = false;
 
 	protected SASPreprocessor preprocessor = null;
 
-	//private Planner planner = null;
-	
-    private final Set<Planner> planners = new LinkedHashSet<Planner>();
-    private final Set<Thread> threadSet = new LinkedHashSet<Thread>();
+	private final Set<Planner> planners = new LinkedHashSet<Planner>();
+	private final Set<Thread> threadSet = new LinkedHashSet<Thread>();
 
 	public MADLAPlanner(String domainFileName, String problemFileName, String agentFileName,
 			String heuristic , int recursionLevel, int timeLimitMin, List<String> agentNames,
@@ -131,7 +130,7 @@ public class MADLAPlanner {
 		DataAccumulator.getAccumulator().startTimeMs = startTime;
 
 		long tCPU = ManagementFactory.getThreadMXBean().getCurrentThreadCpuTime();
-		
+
 		for (String agent : agentNames)
 			DataAccumulator.getAccumulator().startCPUTimeMs.put(agent, tCPU);
 
@@ -173,6 +172,7 @@ public class MADLAPlanner {
 				DataAccumulator.getAccumulator().planLength = -1;
 				DataAccumulator.getAccumulator().planValid = false; 
 				DataAccumulator.getAccumulator().writeOutput(Planner.FORCE_EXIT_AFTER_WRITE);
+				return null;
 			}
 
 			if(!runPreprocess()) {
@@ -192,15 +192,10 @@ public class MADLAPlanner {
 
 		DataAccumulator.getAccumulator().startAfterPreprocessTimeMs = System.currentTimeMillis();
 
-		//            Timer.setCreatEntetiesTime(System.nanoTime());
 		createEntities(addl);
-		//            Timer.setCreatEntetiesTime(System.nanoTime()-Timer.getCreatEntetiesTime());
-		//            Timer.setRunEntetiesTime(System.nanoTime());
+
 		runEntities();
-		//            Timer.setRunEntetiesTime(System.nanoTime()-Timer.getRunEntetiesTime());
-
-		//        writeOutput();
-
+		
 		executorService.shutdown();
 
 		try {
@@ -209,12 +204,12 @@ public class MADLAPlanner {
 			LOGGER.warn("Shutdown interrupted!");
 		}
 
-        for (final Planner planner : planners) {    
-        	if (planner.foundPlan != null)
-        		return planner.foundPlan;
-        }
-        
-        return null;      
+		for (final Planner planner : planners) {    
+			if (planner.foundPlan != null)
+				return planner.foundPlan;
+		}
+
+		return null;      
 	}
 
 	private boolean runConvert(){
@@ -314,7 +309,6 @@ public class MADLAPlanner {
 
 	}
 
-	/*
 	private void createEntities(ADDLObject addl) {
 		LOGGER.info(">>> ENTITIES CREATION");
 
@@ -322,38 +316,18 @@ public class MADLAPlanner {
 
 		IPCOutputExecutor executor = new IPCOutputExecutor(planOutputFileName);
 
-		DIMAPWorldInterface world = initWorld(agentName,addl.getAgentCount());
+		for (String agentName: addl.getAgentList()) {
 
-		//planner = new Planner("add-A*",recursionLevel,world,executor,(long)timeLimitMin*60L*1000L);
+			DIMAPWorldInterface world = initWorld(agentName,addl.getAgentCount());
 
-		planner = new Planner(heuristic,recursionLevel,world,executor,(long)timeLimitMin*60L*1000L);
+			planners.add(new Planner(heuristic,recursionLevel,world,executor,(long)timeLimitMin*60L*1000L));
 
-		executor.addProblem(world.getProblem());
+			executor.addProblem(world.getProblem());
+		}
 
 		executor.setInitAndGoal(preprocessor.getGlobalInit(), preprocessor.getGlobalGoal());
 
 	}
-	*/
-	
-	private void createEntities(ADDLObject addl) {
-        LOGGER.info(">>> ENTITIES CREATION");
-
-		String planOutputFileName = Globals.OUTPUT_PATH + "/out.plan";
-
-        IPCOutputExecutor executor = new IPCOutputExecutor(planOutputFileName);
-
-        for (String agentName: addl.getAgentList()) {
-
-            DIMAPWorldInterface world = initWorld(agentName,addl.getAgentCount());
-
-            planners.add(new Planner(heuristic,recursionLevel,world,executor,(long)timeLimitMin*60L*1000L));
-
-            executor.addProblem(world.getProblem());
-        }
-
-        executor.setInitAndGoal(preprocessor.getGlobalInit(), preprocessor.getGlobalGoal());
-
-    }
 
 	public PerformerCommunicator initQueuedCommunicator(String address){
 		QueuedCommunicator communicator = new QueuedCommunicator(address);
@@ -381,79 +355,60 @@ public class MADLAPlanner {
 				);
 	}
 
-	/*
+	@SuppressWarnings("deprecation")
 	private void runEntities() {
 		LOGGER.info(">>> ENTITIES RUNNING");
 
-		try {
-			planner.planAndExecuteFinal();
+
+		final Thread mainThread = Thread.currentThread();
+		final UncaughtExceptionHandler exceptionHandler = new UncaughtExceptionHandler() {
+
+			@Override
+			public void uncaughtException(Thread t, Throwable e) {
+				LOGGER.error("Uncaught exception in agent/planner thread!", e);
+
+				DataAccumulator.getAccumulator().finishTimeMs = DataAccumulator.getAccumulator().startTimeMs-1;
+				DataAccumulator.getAccumulator().writeOutput(Planner.FORCE_EXIT_AFTER_WRITE);
+
+				for (final Planner agent : planners) {
+					agent.getWorld().getCommPerformer().performClose();
+				}
+
+				mainThread.interrupt();
+			}
+
+		};
+
+		for (final Planner agent : planners) {
+
+			//            final Communicator comm = initCommunicator(agent);
+
+			Thread thread = new Thread(new Runnable() {
+
+				@Override
+				public void run() {
+					agent.planAndExecuteFinal();
+				}
+			}, agent.getName());
+			thread.setUncaughtExceptionHandler(exceptionHandler);
+			threadSet.add(thread);
+			thread.start();
 		}
-		catch (Exception e) {
 
-			LOGGER.fatal(e, e);
+		try {
+			for (Thread thread : threadSet) {
+				thread.join();
+			}
+		} catch (InterruptedException e) {
+			LOGGER.debug("Main thread interrupted.");
+		}
 
-			DataAccumulator.getAccumulator().finishTimeMs = DataAccumulator.getAccumulator().startTimeMs-1;
-			DataAccumulator.getAccumulator().writeOutput(Planner.FORCE_EXIT_AFTER_WRITE);
-
-			planner.getWorld().getCommPerformer().performClose();
+		for (Thread thread : threadSet) {
+			if (thread.isAlive()) {
+				// TODO: refactor using a stop flag
+				thread.stop();
+			}
 		}
 	}
-*/
-	
-    @SuppressWarnings("deprecation")
-    private void runEntities() {
-        LOGGER.info(">>> ENTITIES RUNNING");
 
-
-        final Thread mainThread = Thread.currentThread();
-        final UncaughtExceptionHandler exceptionHandler = new UncaughtExceptionHandler() {
-
-            @Override
-            public void uncaughtException(Thread t, Throwable e) {
-                LOGGER.error("Uncaught exception in agent/planner thread!", e);
-
-                DataAccumulator.getAccumulator().finishTimeMs = DataAccumulator.getAccumulator().startTimeMs-1;
-                DataAccumulator.getAccumulator().writeOutput(Planner.FORCE_EXIT_AFTER_WRITE);
-
-                for (final Planner agent : planners) {
-                    agent.getWorld().getCommPerformer().performClose();
-                }
-
-                mainThread.interrupt();
-            }
-
-        };
-
-        for (final Planner agent : planners) {
-
-//            final Communicator comm = initCommunicator(agent);
-
-            Thread thread = new Thread(new Runnable() {
-
-                @Override
-                public void run() {
-                    agent.planAndExecuteFinal();
-                }
-            }, agent.getName());
-            thread.setUncaughtExceptionHandler(exceptionHandler);
-            threadSet.add(thread);
-            thread.start();
-        }
-
-        try {
-            for (Thread thread : threadSet) {
-                thread.join();
-            }
-        } catch (InterruptedException e) {
-            LOGGER.debug("Main thread interrupted.");
-        }
-
-        for (Thread thread : threadSet) {
-            if (thread.isAlive()) {
-                // TODO: refactor using a stop flag
-                thread.stop();
-            }
-        }
-    }
-	 
 }

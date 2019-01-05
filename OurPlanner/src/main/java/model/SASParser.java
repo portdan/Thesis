@@ -27,11 +27,11 @@ public class SASParser {
 
 	public SASParser(File sasFile) {
 
-//    	LOGGER.setLevel(Level.DEBUG);
+		//    	LOGGER.setLevel(Level.DEBUG);
 
-    	LOGGER.info("SAS: " + sasFile);
+		LOGGER.info("SAS: " + sasFile);
 
-    	domain = new SASDomain();
+		domain = new SASDomain();
 
 		try {
 			FileInputStream fstream = new FileInputStream(sasFile);
@@ -45,7 +45,7 @@ public class SASParser {
 					break;
 				}
 			}
-			
+
 			metric = Integer.parseInt(br.readLine()); //metric
 			br.readLine(); //end metric
 
@@ -69,156 +69,156 @@ public class SASParser {
 			System.err.println("Error: " + e.getMessage());
 		}
 
-    }
+	}
 
 	public SASDomain getDomain(){
 		return domain;
 	}
 
 	private void readVariables(BufferedReader br) throws IOException{
-    	int vars = Integer.decode(br.readLine());
+		int vars = Integer.decode(br.readLine());
 
-    	for(int i = 0; i < vars; i++){
-    		br.readLine(); //begin
+		for(int i = 0; i < vars; i++){
+			br.readLine(); //begin
 
-    		String var = br.readLine(); //name
-    		domain.addVariable(var);
+			String var = br.readLine(); //name
+			domain.addVariable(var);
 
-    		br.readLine(); //axiom layer
+			br.readLine(); //axiom layer
 
-    		int domainSize = Integer.parseInt(br.readLine()); //domain size
+			int domainSize = Integer.parseInt(br.readLine()); //domain size
 
-    		for(int j = 0; j<domainSize;++j){
-    			String atom = br.readLine(); //value
-    			String val;
+			for(int j = 0; j<domainSize;++j){
+				String atom = br.readLine(); //value
+				String val;
 
-    			if(atom.endsWith("<none of those>")){
-    				val = "NONE";
-    			}else{
-    				val = atom.replaceAll("Atom ", "");
-    			}
+				if(atom.endsWith("<none of those>")){
+					val = "NONE";
+				}else{
+					val = atom.replaceAll("Atom ", "");
+				}
 
-    			domain.addValue(var, val);
-    		}
+				domain.addValue(var, val);
+			}
 
-    		br.readLine(); //end
-    	}
+			br.readLine(); //end
+		}
 
-    	domain.finishVariables();
+		domain.finishVariables();
 
-    }
+	}
 
 	private void readMutexes(BufferedReader br) throws IOException{
-    	int mxgs = Integer.decode(br.readLine());
+		int mxgs = Integer.decode(br.readLine());
 
-    	for(int i = 0; i < mxgs; i++){
-    		br.readLine(); //begin
+		for(int i = 0; i < mxgs; i++){
+			br.readLine(); //begin
 
-    		int mxs = Integer.decode(br.readLine());
+			int mxs = Integer.decode(br.readLine());
 
-    		for(int j = 0; j < mxs; j++){
-    			br.readLine(); //var val - skip for now
-    		}
+			for(int j = 0; j < mxs; j++){
+				br.readLine(); //var val - skip for now
+			}
 
-    		br.readLine(); //end
-    	}
-    }
+			br.readLine(); //end
+		}
+	}
 
 	private void readState(BufferedReader br) throws IOException{
-    	br.readLine(); //begin
+		br.readLine(); //begin
 
-    	Map<String, String> stateVariableMap = new HashMap<String,String>();
+		Map<String, String> stateVariableMap = new HashMap<String,String>();
 
-    	for(String var : domain.getVariables()){
-    		int valIndex = Integer.parseInt(br.readLine());
-    		String val = domain.getVal(var,valIndex);
-    		stateVariableMap.put(var, val);
-    	}
+		for(String var : domain.getVariables()){
+			int valIndex = Integer.parseInt(br.readLine());
+			String val = domain.getVal(var,valIndex);
+			stateVariableMap.put(var, val);
+		}
 
-    	br.readLine(); //end
+		br.readLine(); //end
 
-    	domain.setInit(stateVariableMap);
-    }
+		domain.setInit(stateVariableMap);
+	}
 
 	private void readGoal(BufferedReader br) throws IOException{
-    	String s = br.readLine(); //begin
+		String s = br.readLine(); //begin
 
-    	Map<String, String> stateVariableMap = new HashMap<String,String>();
+		Map<String, String> stateVariableMap = new HashMap<String,String>();
 
-    	int vars = Integer.parseInt(s = br.readLine()); //num of variables
+		int vars = Integer.parseInt(s = br.readLine()); //num of variables
 
-    	for(int i = 0; i<vars; ++i){
-    		String[] ln = (s= br.readLine()).split(" "); //var val
-    		int var = Integer.parseInt(ln[0]);
-    		int val = Integer.parseInt(ln[1]);
+		for(int i = 0; i<vars; ++i){
+			String[] ln = (s= br.readLine()).split(" "); //var val
+			int var = Integer.parseInt(ln[0]);
+			int val = Integer.parseInt(ln[1]);
 
-    		stateVariableMap.put(
-    				domain.getVar(var),
-    				domain.getVal(var,val));
-    	}
+			stateVariableMap.put(
+					domain.getVar(var),
+					domain.getVal(var,val));
+		}
 
 
-    	br.readLine(); //end
+		br.readLine(); //end
 
-    	domain.setGoal(stateVariableMap);
-    }
+		domain.setGoal(stateVariableMap);
+	}
 
 	private void readOperators(BufferedReader br) throws NumberFormatException, IOException{
-    	int ops = Integer.parseInt(br.readLine()); //num of operators
+		int ops = Integer.parseInt(br.readLine()); //num of operators
 
-    	for(int i = 0; i < ops; ++i){
-    		br.readLine(); //begin
-    		String label = br.readLine(); //name
-    		String name = label.split(" ")[0];
-    		//label = label.replaceAll(" ", "-");
+		for(int i = 0; i < ops; ++i){
+			br.readLine(); //begin
+			String label = br.readLine(); //name
+			String name = label.split(" ")[0];
+			//label = label.replaceAll(" ", "-");
 
-    		Map<String, String> pre = new HashMap<String, String>();
-    		Map<String, String> eff = new HashMap<String, String>();
+			Map<String, String> pre = new HashMap<String, String>();
+			Map<String, String> eff = new HashMap<String, String>();
 
-    		int maxP = Integer.parseInt(br.readLine()); //prevail conditions
-    		for(int p = 0; p < maxP; ++ p){
-    			String[] cond = br.readLine().split(" "); //var val
-    			int var = Integer.parseInt(cond[0]);
-        		int val = Integer.parseInt(cond[1]);
+			int maxP = Integer.parseInt(br.readLine()); //prevail conditions
+			for(int p = 0; p < maxP; ++ p){
+				String[] cond = br.readLine().split(" "); //var val
+				int var = Integer.parseInt(cond[0]);
+				int val = Integer.parseInt(cond[1]);
 
-    			pre.put(domain.getVar(var), domain.getVal(var,val));
-    		}
+				pre.put(domain.getVar(var), domain.getVal(var,val));
+			}
 
-    		int maxE = Integer.parseInt(br.readLine()); //effects
-    		for(int e = 0; e < maxE; ++ e){
-    			String[] effects = br.readLine().split(" "); //var val
+			int maxE = Integer.parseInt(br.readLine()); //effects
+			for(int e = 0; e < maxE; ++ e){
+				String[] effects = br.readLine().split(" "); //var val
 
-    			//effect conditions
-    			int ec = 1;
-    			for(; ec< Integer.parseInt(effects[0]);ec+=2){
-    				int var = Integer.parseInt(effects[ec]);
-            		int val = Integer.parseInt(effects[ec+1]);
+				//effect conditions
+				int ec = 1;
+				for(; ec< Integer.parseInt(effects[0]);ec+=2){
+					int var = Integer.parseInt(effects[ec]);
+					int val = Integer.parseInt(effects[ec+1]);
 
-            		pre.put(domain.getVar(var), domain.getVal(var,val));
-    			}
+					pre.put(domain.getVar(var), domain.getVal(var,val));
+				}
 
-    			//affected variable
-    			String var = domain.getVar(Integer.parseInt(effects[ec]));
-    			//pre value
-    			if(Integer.parseInt(effects[ec+1]) > -1){
-    				String valPre = domain.getVal(var,Integer.parseInt(effects[ec+1]));
-    				pre.put(var, valPre);
-    			}
-    			//eff value
-    			String valEff = domain.getVal(var,Integer.parseInt(effects[ec+2]));
-    			eff.put(var, valEff);
+				//affected variable
+				String var = domain.getVar(Integer.parseInt(effects[ec]));
+				//pre value
+				if(Integer.parseInt(effects[ec+1]) > -1){
+					String valPre = domain.getVal(var,Integer.parseInt(effects[ec+1]));
+					pre.put(var, valPre);
+				}
+				//eff value
+				String valEff = domain.getVal(var,Integer.parseInt(effects[ec+2]));
+				eff.put(var, valEff);
 
-    		}
+			}
 
-    		int cost = Integer.parseInt(br.readLine()); //cost
+			int cost = Integer.parseInt(br.readLine()); //cost
 
-    		domain.addOperator(name,label,pre,eff,cost);
+			domain.addOperator(name,label,pre,eff,cost);
 
-    		br.readLine(); //end
-    	}
-    	
-    	
-    }
+			br.readLine(); //end
+		}
+
+
+	}
 
 	public boolean isMetric() {
 		return metric == 1;

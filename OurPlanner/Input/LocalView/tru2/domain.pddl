@@ -57,4 +57,5 @@
 		(at ?truck ?loc-to)
 	)
 )
+
 )

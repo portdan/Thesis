@@ -9,7 +9,11 @@ import cz.agents.alite.configurator.MapConfiguration;
 import cz.agents.dimaptools.input.addl.ADDLObject;
 import cz.agents.dimaptools.input.sas.SASFact;
 import cz.agents.dimaptools.input.sas.SASOperator;
-import cz.agents.dimaptools.model.*;
+import cz.agents.dimaptools.model.Action;
+import cz.agents.dimaptools.model.Domain;
+import cz.agents.dimaptools.model.Problem;
+import cz.agents.dimaptools.model.State;
+import cz.agents.dimaptools.model.SuperState;
 
 /**
  * Translates textual representation into concise integer representation and performs factorization of the operators and

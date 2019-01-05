@@ -9,7 +9,7 @@
     <booleanAttribute key="org.eclipse.jdt.launching.ATTR_USE_START_ON_FIRST_THREAD" value="true"/>
     <stringAttribute key="org.eclipse.jdt.launching.CLASSPATH_PROVIDER" value="org.eclipse.m2e.launchconfig.classpathProvider"/>
     <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="OurPlanner.Main"/>
-    <stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="OurPlanner.OurPlanner ./Input/Grounded ./Input/LocalView ./Input/Trajectories domain.pddl probLOGISTICS-4-0.pddl ./Input/Agent/probLOGISTICS-4-0.agents"/>
+    <stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="OurPlanner.OurPlanner ./Input/Grounded ./Input/LocalView domain.pddl roverprob3726_84.pddl ./Input/Agent/roverprob3726_84.agents"/>
     <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="OurPlanner"/>
     <stringAttribute key="org.eclipse.jdt.launching.SOURCE_PATH_PROVIDER" value="org.eclipse.m2e.launchconfig.sourcepathProvider"/>
 </launchConfiguration>
