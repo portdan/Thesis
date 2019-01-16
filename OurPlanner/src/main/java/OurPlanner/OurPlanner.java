@@ -69,6 +69,21 @@ public class OurPlanner implements Creator  {
 			System.exit(1);
 		}
 
+		if(!deleteLearnedFiles()) {
+			LOGGER.info("Deleting Learned files failure");
+			System.exit(1);
+		}
+
+		if(!deleteTempFiles()) {
+			LOGGER.info("Deleting Temporary files failure");
+			System.exit(1);
+		}
+
+		if(!copyOriginalProblem()) {
+			LOGGER.info("Coping original files failure");
+			System.exit(1);
+		}
+
 		if(!runPlanningAlgorithm())
 		{
 			LOGGER.fatal("Planning algorithem failure");
@@ -97,34 +112,53 @@ public class OurPlanner implements Creator  {
 			}
 
 			currentLeaderAgent = pickLeader();
-			
-			learnFromTrajectories(currentLeaderAgent);
 
-			/*
-			leaderAgentPlan = planForAgent(currentLeaderAgent);
+			boolean isLearning = learnFromTrajectories(currentLeaderAgent);
+
+			leaderAgentPlan = planForAgent(currentLeaderAgent, isLearning);
 
 			if(leaderAgentPlan == null)
 				continue;		
 
 			if(verifyPlan(leaderAgentPlan))
 				return true;
-			 */
 		}
 
 		return false;
 	}
-	
+
 	private boolean learnFromTrajectories(String agentName) {
 
 		LOGGER.info("Running learning algorithm");
-		
-		TrajectoryLearner learner = new TrajectoryLearner(agentName,groundedFolder,trajectoriesFile, domainFileName,problemFileName);		
 
-		boolean isLearned = learner.learn();
+		TrajectoryLearner learner = new TrajectoryLearner(agentName,groundedFolder,trajectoriesFile,
+				localViewFile,domainFileName,problemFileName);		
 
-		deleteTempFiles();
+		boolean isLearned = learner.learnNewActions();
+
+		if(!deleteTempFiles()) {
+			LOGGER.info("Deleting Temporary files failure");
+			return false;
+		}
 
 		return isLearned;
+
+	}
+
+	private boolean copyOriginalProblem() {
+
+		LOGGER.info("Copy the original problem files");
+
+		File destDir = new File(Globals.LEARNED_PATH);
+
+		try {
+			FileUtils.copyDirectory(localViewFile, destDir);
+		} catch (IOException e) {
+			LOGGER.fatal(e, e);
+			return false;
+		}
+
+		return true;
 	}
 
 
@@ -132,22 +166,30 @@ public class OurPlanner implements Creator  {
 
 		LOGGER.info("Verifing plan");
 
-		//plan.add(0,"\n apn1 fly-airplane-apn1 apn1 apt2 apt1 -123123");
-
 		PlanVerifier planVerifier = new PlanVerifier(agentList,domainFileName,problemFileName,localViewFolder);		
 
 		boolean isVerified = planVerifier.verifyPlan(plan,0);
 
-		deleteTempFiles();
+		if(!deleteTempFiles()) {
+			LOGGER.info("Deleting Temporary files failure");
+			return false;	
+		}
 
 		return isVerified;
 	}
 
-	private List<String> planForAgent(String agentName) {
+	private List<String> planForAgent(String agentName, boolean isLearning) {
 
 		LOGGER.info("Planning for leader agent");
 
-		String agentDomainPath = localViewFolder + "/" + agentName + "/" + domainFileName;
+		String agentDomainPath = "";
+
+
+		if (isLearning) 
+			agentDomainPath = Globals.LEARNED_PATH  + "/" + agentName + "/" + domainFileName;
+		else 
+			agentDomainPath = localViewFolder + "/" + agentName + "/" + domainFileName;
+
 		String agentProblemPath = localViewFolder + "/" + agentName + "/" + problemFileName;
 		String agentADDLPath = Globals.TEMP_PATH + "/" + problemFileName.split("\\.")[0] + ".addl";
 		String heuristic = "saFF-glcl";
@@ -159,7 +201,10 @@ public class OurPlanner implements Creator  {
 
 		List<String> result = planner.plan();
 
-		deleteTempFiles();
+		if(!deleteTempFiles()) {
+			LOGGER.info("Deleting Temporary files failure");
+			return null;
+		}
 
 		return result;
 	}
@@ -248,7 +293,7 @@ public class OurPlanner implements Creator  {
 		boolean valid = true;
 
 		if ((valid = ArgsLenghtValid(args)) == false) 
-			status = "Usage: <path to grounded folder> <path to localview folder> <trajectories folder> <domain name> <problem name> <addl name>";	
+			status = "Usage: <grounded folder> <localview folder> <trajectories folder> <domain name> <problem name> <addl name>";	
 
 		if ((valid = ArgsParsingValid(args)) == false) 
 			status = "Bad path to one or more provided files";	
@@ -290,7 +335,7 @@ public class OurPlanner implements Creator  {
 			LOGGER.fatal("provided path to local view folder not existing");
 			return false;
 		}
-		
+
 		trajectoriesFolder = args[3];
 		trajectoriesFile = new File(trajectoriesFolder);
 
@@ -325,8 +370,8 @@ public class OurPlanner implements Creator  {
 
 		return true;
 	}
-	
-	private void deleteTempFiles() {
+
+	private boolean deleteTempFiles() {
 
 		LOGGER.info("Deleting temporary files");
 
@@ -338,7 +383,7 @@ public class OurPlanner implements Creator  {
 				FileUtils.deleteDirectory(temp);
 			} catch (IOException e) {
 				LOGGER.fatal(e, e);
-				System.exit(1);
+				return false;
 			}
 		}
 
@@ -353,6 +398,26 @@ public class OurPlanner implements Creator  {
 			LOGGER.info("Deleting 'output.sas' file");
 			outputSAS.delete();
 		}
+
+		return true;
 	}
 
+	private boolean deleteLearnedFiles() {
+
+		LOGGER.info("Deleting learned files");
+
+		File temp = new File(Globals.LEARNED_PATH);		
+		if(temp.exists()) {
+			LOGGER.info("Deleting 'learned' folder");
+
+			try {
+				FileUtils.deleteDirectory(temp);
+			} catch (IOException e) {
+				LOGGER.fatal(e, e);
+				return false;
+			}
+		}
+
+		return true;
+	}
 }

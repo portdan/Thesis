@@ -76,7 +76,7 @@ public class MADLAPlanner {
 		LOGGER.info("MADLAPlanner constructor (not from .sas)");
 
 		fromSAS = false;
-		sasFileName = "output";
+		sasFileName = "output.sas";
 		this.domainFileName = domainFileName;
 		this.problemFileName = problemFileName;
 		this.agentFileName = agentFileName;

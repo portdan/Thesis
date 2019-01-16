@@ -30,11 +30,13 @@ public class StateActionStateSequencer {
 	private static final String CONVERTOR = "./Scripts/ma-pddl/ma-to-pddl.py";
 
 	private static final String TEMP = Globals.TEMP_PATH;
-	private static final String SAS_FILE_NAME = "output";
+	private static final String SAS_FILE_NAME = "output.sas";
 
 	private String agentName = "";
 	private String domainFileName = "";
 	private String problemFileName = "";
+	private String convertedDomainPath = "";
+	private String convertedProblemPath = "";
 	private String sasFileName = "";
 	private String groundedPath = "";
 
@@ -49,10 +51,10 @@ public class StateActionStateSequencer {
 
 		sasFileName = SAS_FILE_NAME;
 
-		this.agentName = agentName;
-		this.groundedPath = groundedPath;
-		this.domainFileName = domainFileName;
-		this.problemFileName = problemFileName;
+		this.agentName = new String(agentName);
+		this.groundedPath = new String(groundedPath);
+		this.domainFileName = new String(domainFileName);
+		this.problemFileName = new String(problemFileName);
 
 		logInput();
 	}
@@ -116,8 +118,8 @@ public class StateActionStateSequencer {
 
 		ADDLObject addl = new ADDLParser().parse(agentFile);
 
-		if(domainFileName == null) domainFileName = sasFileName;
-		if(problemFileName == null) problemFileName = sasFileName;
+		if(convertedDomainPath == null) convertedDomainPath = sasFileName;
+		if(convertedProblemPath == null) convertedProblemPath = sasFileName;
 
 		if(!runTranslate()) {
 			LOGGER.info("Translate failure");
@@ -170,8 +172,8 @@ public class StateActionStateSequencer {
 			return false;
 		}
 
-		domainFileName = TEMP + "/" + domain + ".pddl";
-		problemFileName = TEMP + "/" + problem + ".pddl";
+		convertedDomainPath = TEMP + "/" + domain + ".pddl";
+		convertedProblemPath = TEMP + "/" + problem + ".pddl";
 
 		return true;
 	}
@@ -181,7 +183,7 @@ public class StateActionStateSequencer {
 		LOGGER.info("Translating to sas");
 
 		try {
-			String cmd = TRANSLATOR + " " + domainFileName + " " + problemFileName + " --ignore_unsolvable";
+			String cmd = TRANSLATOR + " " + convertedDomainPath + " " + convertedProblemPath + " --ignore_unsolvable";
 			LOGGER.info("RUN: " + cmd);
 			Process pr = Runtime.getRuntime().exec(cmd);
 

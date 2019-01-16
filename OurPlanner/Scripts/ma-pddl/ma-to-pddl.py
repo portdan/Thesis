@@ -77,6 +77,8 @@ class Action(object):
       rep += "\t:precondition (and\n"
     else:
       rep += "\t:precondition \n"
+    if not self.precondition:
+      rep += "\t\t()\n"
     for precon in self.precondition:
       rep += "\t\t" + str(precon) + "\n"
     if len(self.precondition) > 1:
@@ -85,6 +87,8 @@ class Action(object):
       rep += "\t:effect (and\n"
     else:
       rep += "\t:effect \n"
+    if not self.effect:
+      rep += "\t\t()\n"
     for eff in self.effect:
       rep += "\t\t" + str(eff) + "\n"
     if len(self.effect) > 1:
@@ -497,6 +501,13 @@ class PlanningProblem(object):
     Expects array such as [(and, (, at, ?a, ?x, ), ...].
     """
     prop_list = []
+    
+    #DANL 
+    if array is None:
+        return prop_list
+    elif array == ['(',')']:
+        return prop_list
+    
     if array[0:3] == ['(', 'and', '(']:
       array = array[2:-1]
     #Split array into blocks
