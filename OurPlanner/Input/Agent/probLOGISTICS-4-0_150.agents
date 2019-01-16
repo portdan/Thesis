@@ -1,0 +1,7 @@
+(define (problem probLOGISTICS-4-0_150) (:domain logistics)
+	(:agents
+		apn1 - airplane
+		tru1 - truck
+		tru2 - truck
+	)
+)
