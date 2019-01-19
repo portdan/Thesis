@@ -32,27 +32,27 @@ public class StateActionStateSequencer {
 	private static final String TEMP = Globals.TEMP_PATH;
 	private static final String SAS_FILE_NAME = "output.sas";
 
-	private String agentName = "";
+	private List<String> agentList = null;
 	private String domainFileName = "";
 	private String problemFileName = "";
 	private String convertedDomainPath = "";
 	private String convertedProblemPath = "";
 	private String sasFileName = "";
-	private String groundedPath = "";
+	private String pathToProblemFiles = "";
 
 	private boolean sasSolvable = false;
 
-	Problem problem = null;
 	State currentState = null;
 
-	public StateActionStateSequencer(String agentName, String groundedPath, String domainFileName,String problemFileName) {
+	public StateActionStateSequencer(List<String> agentList, String pathToProblemFiles, 
+			String domainFileName, String problemFileName) {
 
 		LOGGER.info("StateActionStateSequencer constructor");
 
 		sasFileName = SAS_FILE_NAME;
 
-		this.agentName = new String(agentName);
-		this.groundedPath = new String(groundedPath);
+		this.agentList = agentList;
+		this.pathToProblemFiles = new String(pathToProblemFiles);
 		this.domainFileName = new String(domainFileName);
 		this.problemFileName = new String(problemFileName);
 
@@ -63,31 +63,36 @@ public class StateActionStateSequencer {
 
 		LOGGER.info("Logging input");
 
-		LOGGER.info("agentName: " + agentName);
+		LOGGER.info("agentList: " + agentList);
 		LOGGER.info("sasFileName: " + sasFileName);
 		LOGGER.info("domainFileName: " + domainFileName);
 		LOGGER.info("problemFileName: " + problemFileName);
-		LOGGER.info("groundedPath: " + groundedPath);
+		LOGGER.info("pathToProblemFiles: " + pathToProblemFiles);
 	}
-
-	public List<StateActionState> generateSequance(String trajectoryPath){
+	
+	public List<StateActionState> generateSequance(String agentName, String trajectoryPath){
 
 		LOGGER.info("Generating state action state sequence for " + trajectoryPath );
 
 		List<StateActionState> res = new ArrayList<StateActionState>();
 
-		String groundedDomainPath = groundedPath + "/" + domainFileName;
-		String groundedProblemPath = groundedPath + "/" + problemFileName;
+		String domainPath = pathToProblemFiles + "/" + domainFileName;
+		String problemPath = pathToProblemFiles + "/" + problemFileName;
 		String agentADDLPath = TEMP + "/" + problemFileName.split("\\.")[0] + ".addl";		
 
-		problem = generateProblem(groundedDomainPath, groundedProblemPath, agentADDLPath);
+		Problem problem = generateProblem(agentName, domainPath, problemPath, agentADDLPath);
 		currentState = problem.initState;
 
 		try (BufferedReader br = new BufferedReader(new FileReader(trajectoryPath))) {
 
 			String line = br.readLine();
 			while (line != null) {
-				res.add(processAction(line));
+				
+				StateActionState sas = processAction(problem, line);
+				
+				if(sas!=null)
+					res.add(sas);
+				
 				line = br.readLine();
 			}
 
@@ -101,7 +106,8 @@ public class StateActionStateSequencer {
 		return res;
 	}
 
-	private Problem generateProblem(String groundedDomainPath, String groundedProblemPath, String agentADDLPath) {
+	private Problem generateProblem(String agentName, String groundedDomainPath, 
+			String groundedProblemPath, String agentADDLPath) {
 
 		LOGGER.info("Generating problem");
 
@@ -153,7 +159,7 @@ public class StateActionStateSequencer {
 
 		LOGGER.info("Converting to pddl");
 
-		String path = groundedPath;
+		String path = pathToProblemFiles;
 		String domain = domainFileName.substring(0, domainFileName.lastIndexOf("."));
 		String problem = problemFileName.substring(0, problemFileName.lastIndexOf("."));
 
@@ -247,11 +253,12 @@ public class StateActionStateSequencer {
 
 	}
 
-	private StateActionState processAction(String line) {
+	private StateActionState processAction(Problem problem, String line) {
 
 		LOGGER.info("Processing action " + line);
 
 		State pre = new State(currentState);
+
 		Action action = getActionFromPlan(problem, line);
 
 		if(action != null) {
@@ -265,7 +272,7 @@ public class StateActionStateSequencer {
 			return null;
 	}
 
-	private Action getActionFromPlan(Problem agentPoblem, String actionStr) {
+	private Action getActionFromPlan(Problem problem, String actionStr) {
 
 		LOGGER.info("Extracting action object from action " + actionStr);
 
@@ -277,14 +284,12 @@ public class StateActionStateSequencer {
 
 		String label = actionStr.substring(start+1, end);
 
-		Action action = null;
-
-		for (Action act : agentPoblem.getAllActions()) {
+		for (Action act : problem.getAllActions()) {
 			if(act.getSimpleLabel().equals(label))
-				action = act;
+				return act;
 		}
 
-		return action;		
+		return null;
 	}
 
 	private void deleteTempFiles() {

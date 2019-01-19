@@ -15,5 +15,18 @@ public class StateActionState {
 		this.action = new Action(action);
 		this.post = new State(post);
 	}
+	
+	/*
+	Set<String> pre = null;
+	String action = null;
+	Set<String> post = null;
+
+	public StateActionState(Set<String> pre, String action, Set<String> post) {
+
+		this.pre = new HashSet<String>(pre);
+		this.action = new String(action);
+		this.post = new HashSet<String>(post);
+	}
+	 */
 
 }

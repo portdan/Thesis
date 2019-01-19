@@ -131,8 +131,8 @@ public class OurPlanner implements Creator  {
 
 		LOGGER.info("Running learning algorithm");
 
-		TrajectoryLearner learner = new TrajectoryLearner(agentName,groundedFolder,trajectoriesFile,
-				localViewFile,domainFileName,problemFileName);		
+		TrajectoryLearner learner = new TrajectoryLearner(agentName, agentList, groundedFile, 
+				trajectoriesFile, localViewFile, domainFileName, problemFileName);		
 
 		boolean isLearned = learner.learnNewActions();
 
