@@ -255,6 +255,18 @@ def parse_action(alist, type_dict, predicate_dict):
     assert action_tag == ":action"
     name = next(iterator)
     parameters_tag_opt = next(iterator)
+    
+    # DANL
+    """name = ""
+    parameters_tag_opt = next(iterator)
+        
+    while not parameters_tag_opt == ":parameters" or parameters_tag_opt == ":precondition":
+        name += str(parameters_tag_opt) + ' '
+        parameters_tag_opt = next(iterator)
+        
+    name = name[:-1]"""
+    #
+    
     if parameters_tag_opt == ":parameters":
         parameters = parse_typed_list(next(iterator),
                                       only_variables=True)

@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import OurPlanner.Globals;
 import cz.agents.dimaptools.model.*;
 import cz.agents.madla.executor.PlanExecutorInterface;
 
@@ -62,9 +63,30 @@ public class IPCOutputExecutor implements PlanExecutorInterface {
 		try {
 			writer = new PrintWriter(outputPath, "UTF-8");
 
+			/*
 			int i = 0;
 			for(Action a : actionPlan){
 				writer.println(i + ": " + a.printToPlan());
+				++i;
+			}
+			 */
+			
+			int i = 0;	
+			for(Action a : actionPlan){
+
+				String[] split = a.getSimpleLabel().split(" ");
+
+				String label = split[0];
+
+				if(label.contains(Globals.PARAMETER_INDICATION)){
+					label = label.replace(Globals.PARAMETER_INDICATION, " ");
+				}
+				else {
+					for (int ind = 1; ind < split.length-1; ind++)
+						label += " " + split[ind];
+				}
+
+				writer.println(i + ": (" + label + ")");
 				++i;
 			}
 

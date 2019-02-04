@@ -281,9 +281,19 @@ class PlanningProblem(object):
     for action in self.actions:
       if action[0] == '-':
         action = action[2:]
+        
       act_name = action[1]
       act = {}
       action = action[2:]
+        
+      # DANL
+      """action_str = ' '.join(action)
+      start = action_str.find(action[1])
+      end = start + action_str[start:].find(":")
+      act_name = action_str[start:end]  
+      act = {}
+      action = action[2:]"""
+      #
       keyword = ''
       for word in action:
         if word.startswith(':'):

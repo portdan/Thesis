@@ -120,7 +120,7 @@ public class OurPlanner implements Creator  {
 			if(leaderAgentPlan == null)
 				continue;		
 
-			if(verifyPlan(leaderAgentPlan))
+			if(verifyPlan(leaderAgentPlan, isLearning))
 				return true;
 		}
 
@@ -131,8 +131,8 @@ public class OurPlanner implements Creator  {
 
 		LOGGER.info("Running learning algorithm");
 
-		TrajectoryLearner learner = new TrajectoryLearner(agentName, agentList, groundedFile, 
-				trajectoriesFile, localViewFile, domainFileName, problemFileName);		
+		TrajectoryLearner learner = new TrajectoryLearner(agentList,agentName,trajectoriesFile, 
+				groundedFile, localViewFile, domainFileName, problemFileName);	
 
 		boolean isLearned = learner.learnNewActions();
 
@@ -162,11 +162,18 @@ public class OurPlanner implements Creator  {
 	}
 
 
-	private boolean verifyPlan(List<String> plan) {
+	private boolean verifyPlan(List<String> plan, boolean isLearning) {
 
 		LOGGER.info("Verifing plan");
 
-		PlanVerifier planVerifier = new PlanVerifier(agentList,domainFileName,problemFileName,localViewFolder);		
+		String localViewPath = "";
+
+		if (isLearning) 
+			localViewPath = Globals.LEARNED_PATH;
+		else 
+			localViewPath = this.localViewFolder;
+
+		PlanVerifier planVerifier = new PlanVerifier(agentList,domainFileName,problemFileName,localViewPath,groundedFolder);		
 
 		boolean isVerified = planVerifier.verifyPlan(plan,0);
 
@@ -183,7 +190,6 @@ public class OurPlanner implements Creator  {
 		LOGGER.info("Planning for leader agent");
 
 		String agentDomainPath = "";
-
 
 		if (isLearning) 
 			agentDomainPath = Globals.LEARNED_PATH  + "/" + agentName + "/" + domainFileName;

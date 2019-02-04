@@ -30,12 +30,13 @@ public class PlanVerifier {
 	private static final String CONVERTOR = "./Scripts/ma-pddl/ma-to-pddl.py";
 
 	private static final String TEMP = Globals.TEMP_PATH;
-	private static final String SAS_FILE_NAME = "output";
+	private static final String SAS_FILE_NAME = "output.sas";
 
 	private String domainFileName = "";
 	private String problemFileName = "";
 	private String sasFileName = "";
 	private String localViewPath = "";
+	private String problemsPath = "";
 
 	private List<String> agentList = null;
 
@@ -49,7 +50,7 @@ public class PlanVerifier {
 	Map<String,String> agentProblemPDDL = new HashMap<String,String>();
 
 	public PlanVerifier(List<String> agentList, String domainFileName,
-			String problemFileName,	String localViewPath) {
+			String problemFileName,	String localViewPath, String grounedPath) {
 
 		LOGGER.info("PlanVerifier constructor");
 
@@ -58,6 +59,7 @@ public class PlanVerifier {
 		this.domainFileName = domainFileName;
 		this.problemFileName = problemFileName;
 		this.localViewPath = localViewPath;
+		this.problemsPath = grounedPath;
 
 		logInput();
 
@@ -81,7 +83,7 @@ public class PlanVerifier {
 		LOGGER.info("domainFileName: " + domainFileName);
 		LOGGER.info("problemFileName: " + problemFileName);
 		LOGGER.info("localViewPath: " + localViewPath);
-
+		LOGGER.info("grounedPath: " + problemsPath);
 	}
 
 	private boolean preparePDDls() {
@@ -165,8 +167,8 @@ public class PlanVerifier {
 		return true;
 	}
 
-	private Problem generateProblem(String agentName, String groundedDomainPath,
-			String groundedProblemPath, String agentADDLPath) {
+	private Problem generateProblem(String agentName, String domainPath,
+			String problemPath, String agentADDLPath) {
 
 		LOGGER.info("Generating problem for agent: " + agentName);
 
@@ -181,7 +183,7 @@ public class PlanVerifier {
 		if(domainFileName == null) domainFileName = sasFileName;
 		if(problemFileName == null) problemFileName = sasFileName;
 
-		if(!runTranslate(agentName)) {
+		if(!runTranslate(domainPath, problemPath)) {
 			LOGGER.info("Translate failure");
 			return null;
 		}
@@ -204,7 +206,7 @@ public class PlanVerifier {
 
 		SASParser parser = new SASParser(sasFile);
 		SASDomain sasDom = parser.getDomain();
-		SASPreprocessor preprocessor = new SASPreprocessor(sasDom, addl);
+		PlanVerifierSASPreprocessor preprocessor = new PlanVerifierSASPreprocessor(sasDom, addl);
 
 		agentInitState = preprocessor.getGlobalInit();
 		agentGoalState = preprocessor.getGlobalGoal();
@@ -239,16 +241,12 @@ public class PlanVerifier {
 		return true;
 	}
 
-	private boolean runTranslate(String agentName){
+	private boolean runTranslate(String domainPath, String problemPath){
 
 		LOGGER.info("Translating to sas");
 
 		try {
-
-			String tempDomainPDDL = TEMP + "/" + agentName +"/" + domainFileName;
-			String tempProblemPDDL = TEMP + "/" + agentName +"/" + problemFileName;
-
-			String cmd = TRANSLATOR + " " + tempDomainPDDL + " " + tempProblemPDDL + " --ignore_unsolvable";
+			String cmd = TRANSLATOR + " " + domainPath + " " + problemPath + " --ignore_unsolvable";
 			LOGGER.info("RUN: " + cmd);
 			Process pr = Runtime.getRuntime().exec(cmd);
 
@@ -317,13 +315,13 @@ public class PlanVerifier {
 
 		String agentName = getAgentFromAction(actionStr);
 
-		String groundedDomainPath = TEMP + "/"  + agentName + "/" + domainFileName;
-		String groundedProblemPath = TEMP + "/" + agentName + "/" + problemFileName;
+		String domainPath = TEMP + "/"  + agentName + "/" + domainFileName;
+		String problemPath = TEMP + "/" + agentName + "/" + problemFileName;
 		String agentADDLPath = TEMP + "/" + agentName + "/" + problemFileName.split("\\.")[0] + ".addl";		
 
-		Problem agentPoblem = generateProblem(agentName, groundedDomainPath, groundedProblemPath, agentADDLPath);
+		Problem agentProblem = generateProblem(agentName, domainPath, problemPath, agentADDLPath);
 
-		Action action = getActionFromPlan(agentPoblem, actionStr);
+		Action action = getActionFromPlan(agentProblem, actionStr);
 
 		State state = new State(agentInitState);
 
@@ -385,9 +383,8 @@ public class PlanVerifier {
 
 		Action action = agentPoblem.getAction(hash);
 
-		String label = split[2];
-		for (int i = 3; i < split.length-1; i++)
-			label += " " + split[i];
+		//String label = split[2];
+		String label = GetLabelFormated(split);	
 
 		for (Action act : agentPoblem.getAllActions()) {
 			if(act.getSimpleLabel().equals(label))
@@ -397,8 +394,23 @@ public class PlanVerifier {
 		return action;		
 	}
 
+	private String GetLabelFormated(String[] split) {
+
+		String label = split[2];
+
+		if(label.contains(Globals.PARAMETER_INDICATION)){
+			return label.replace(Globals.PARAMETER_INDICATION, " ");
+		}
+		else {
+			for (int i = 3; i < split.length-1; i++)
+				label += " " + split[i];
+
+			return label;
+		}
+	}
+
 	private String getAgentFromAction(String actionStr) {
-		
+
 		LOGGER.info("Extracting agent name from action " + actionStr);
 
 		String[] split = actionStr.split(" ");
@@ -420,7 +432,7 @@ public class PlanVerifier {
 
 				String oldPDDL = agentProblemPDDL.get(agentName);
 
-				int initIndex = oldPDDL.indexOf(Globals.INIT_KEYWORD);
+				int initIndex = oldPDDL.indexOf(Globals.INIT_KEYWORD) + Globals.INIT_KEYWORD.length();
 				int goalIndex = oldPDDL.indexOf(Globals.GOAL_KEYWORD);
 
 				String initSection = oldPDDL.substring(initIndex,goalIndex);
@@ -432,7 +444,12 @@ public class PlanVerifier {
 					String oldFact = pair.getKey();
 					String newFact = pair.getValue();
 
-					initSection = initSection.replaceAll(oldFact, newFact);
+					if(oldFact == Globals.ADD_NEW_FACT_INDICATION)
+						initSection = "\t(" + newFact + ")\n" + initSection;
+					else if(newFact == Globals.REMOVE_OLD_FACT_INDICATION)
+						initSection = initSection.replace("\t(" + oldFact + ")\n", "");
+					else
+						initSection = initSection.replaceAll(oldFact, newFact);
 				}
 
 				String newPDDL = oldPDDL.substring(0,initIndex) 
@@ -440,7 +457,7 @@ public class PlanVerifier {
 						+ oldPDDL.substring(goalIndex,oldPDDL.length());
 
 				agentProblemPDDL.put(agentName, newPDDL);
-				
+
 				String ProblemPath = TEMP + "/" + agentName + "/" + problemFileName;
 
 				FileUtils.writeStringToFile(new File(ProblemPath), newPDDL, Charset.defaultCharset());
@@ -463,6 +480,13 @@ public class PlanVerifier {
 				String oldFact = formatFact(agentInitState, i);
 				String newFact = formatFact(state, i);
 
+				if(oldFact.startsWith(Globals.NEGATED_KEYWORD) && 
+						!newFact.startsWith(Globals.NEGATED_KEYWORD))
+					oldFact = Globals.ADD_NEW_FACT_INDICATION;
+
+				if(newFact.startsWith(Globals.NEGATED_KEYWORD))
+					newFact = Globals.REMOVE_OLD_FACT_INDICATION;
+
 				oldnewFacts.put(oldFact, newFact);
 			}
 		}
@@ -472,15 +496,16 @@ public class PlanVerifier {
 
 	private String formatFact(State state, int i) {
 
-		String a = getKeyFromValue(agentValCodes, state.getValue(i));
+		String res = getKeyFromValue(agentValCodes, state.getValue(i));
 		String[] words = null;
 
-		a = a.replaceAll("\\s+","");
-		words = a.split("[ \n\t\r.,;:!?(){\\s+]");
-		a = words[0];
+		res = res.replaceAll("\\s+","");
+		words = res.split("[ \n\t\r.,;:!?(){\\s+]");
+		res = words[0];
 		for (int j = 1; j < words.length; j++)
-			a += " " + words[j];
-		return a;
+			res += " " + words[j];
+
+		return res;
 	}
 
 	private String getKeyFromValue(Map<String,Integer> hm, int value) {

@@ -2,15 +2,14 @@ package OurPlanner;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Random;
 import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
 
 import cz.agents.dimaptools.model.Action;
@@ -20,87 +19,81 @@ public class TrajectoryLearner {
 
 	private final static Logger LOGGER = Logger.getLogger(TrajectoryLearner.class);
 
-	private String learningAgentName = "";
+	private String agentName = "";
 	private List<String> agentList = null;
-	private File groundedFile = null;
-	private File trajectoriesFile = null;
-	private File localViewFile = null;
+
+	private File trajectoryFiles = null;
+	private File problemFiles = null;
+	private File localViewFiles = null;
+
 	private String domainFileName = "";
 	private String problemFileName = "";
 
-	List<StateActionState> trajectorySequences = new ArrayList<StateActionState>();
-	private Random randomGenerator = new Random();
-
-	public TrajectoryLearner(String learningAgentName ,List<String> agentList, File groundedFile, File trajectoriesFile, 
-			File localViewFile, String domainFileName, String problemFileName) {
+	public TrajectoryLearner(List<String> agentList, String agentName ,File trajectoryFiles ,
+			File problemFiles , File localViewFiles ,String domainFileName ,String problemFileName) {
 
 		LOGGER.info("TrajectoryLearner constructor");
 
-		this.learningAgentName = learningAgentName;
+		this.agentName = new String(agentName);
 		this.agentList = agentList;
-		this.groundedFile = groundedFile;
-		this.trajectoriesFile = trajectoriesFile;
-		this.localViewFile = localViewFile;
+		this.trajectoryFiles = trajectoryFiles;
+		this.problemFiles = problemFiles;
+		this.localViewFiles = localViewFiles;
 		this.domainFileName = new String(domainFileName);
 		this.problemFileName = new String(problemFileName);
 
 		logInput();
-
-		generateSequences();
-	}
-
-	private void generateSequences() {
-
-		LOGGER.info("Generating sequences");
-
-		StateActionStateSequencer sequencer = 
-				new StateActionStateSequencer(agentList, groundedFile.getPath(),
-						domainFileName,problemFileName);
-
-		File[] TrajDir = trajectoriesFile.listFiles();
-		File[] ProbDir = groundedFile.listFiles();
-
-		if (TrajDir != null) 
-			for (File trj : TrajDir) {
-
-				String trajectoryPath = trj.getPath();
-				String trajectoryName = FilenameUtils.getBaseName(trajectoryPath);
-
-				String ext = FilenameUtils.getExtension(trajectoryPath); 
-
-				if(ext.equals(Globals.TRAJECTORY_FILE_EXTENSION)) {
-
-					LOGGER.info("Generating sequence for trajectory in " + trajectoryName);
-
-					if (ProbDir != null) 
-						for (File prb : ProbDir) {
-
-							String problemPath = prb.getPath();
-							String problemName = FilenameUtils.getBaseName(problemPath);
-
-							if(problemName.equals(trajectoryName)) {		
-
-								List<StateActionState> res = sequencer.generateSequance(learningAgentName, trajectoryPath);
-								trajectorySequences.addAll(res);
-							}
-						}
-				}
-
-			}
 	}
 
 	private void logInput() {
 
 		LOGGER.info("Logging input");
 
-		LOGGER.info("learningAgentName: " + learningAgentName);
+		LOGGER.info("agentName: " + agentName);
 		LOGGER.info("agentList: " + agentList);
-		LOGGER.info("groundedFile: " + groundedFile);
-		LOGGER.info("trajectoriesFile: " + trajectoriesFile);
-		LOGGER.info("localViewFile: " + localViewFile);
+		LOGGER.info("trajectoryFiles: " + trajectoryFiles);
+		LOGGER.info("problemFiles: " + problemFiles);
+		LOGGER.info("localViewFiles: " + localViewFiles);
 		LOGGER.info("domainFileName: " + domainFileName);
 		LOGGER.info("problemFileName: " + problemFileName);
 	}
+
+	/*
+	 * 	public boolean learnNewActions() {
+
+		LOGGER.info("Learning new actions");
+
+		List<String> learnedActions = new ArrayList<String>();
+
+		StateActionStateSequencer sasSequencer = new StateActionStateSequencer(agentList, 
+				problemFiles, domainFileName, problemFileName, trajectoryFiles);
+
+		List<StateActionState> trajectorySequences = sasSequencer.generateSequences();
+
+		while(!trajectorySequences.isEmpty()) {
+
+			StateActionState firstValue = (StateActionState)trajectorySequences.get(0);
+
+			//LOGGER.info("Learning action: " + getActionName(firstValue.action));
+
+			LOGGER.info("Learning action: " + firstValue.action);
+
+			List<StateActionState> sasList = getAllStateActionStateWithAction(trajectorySequences, firstValue.action);
+
+			if(!firstValue.action.getOwner().equals(agentName)) {
+
+				Set<String> pre = learnPreconditions(sasList);
+				Set<String> eff = learnEffects(sasList);
+
+				learnedActions.add(generateLearnedAction(pre,eff,firstValue.action));
+			}
+
+			trajectorySequences.removeAll(sasList);
+		}
+
+		return writeNewLearnedProblemFiles(learnedActions);
+	}
+	 */
 
 	public boolean learnNewActions() {
 
@@ -108,35 +101,33 @@ public class TrajectoryLearner {
 
 		List<String> learnedActions = new ArrayList<String>();
 
+		StateActionStateSequencer sasSequencer = new StateActionStateSequencer(agentList, 
+				problemFiles, domainFileName, problemFileName, trajectoryFiles);
+
+		List<StateActionState> trajectorySequences = sasSequencer.generateSequences();
+
 		while(!trajectorySequences.isEmpty()) {
 
-			StateActionState firstValue = getRandomTrajectory();
+			StateActionState firstValue = (StateActionState)trajectorySequences.get(0);
 
-			LOGGER.info("Learning action: " + getActionName(firstValue.action));
+			//LOGGER.info("Learning action: " + getActionName(firstValue.action));
 
-			List<StateActionState> sasList = getAllStateActionStateWithAction(firstValue.action);
+			LOGGER.info("Learning action: " + firstValue.action);
 
-			if(firstValue.action.getOwner().equals(learningAgentName)) {
+			List<StateActionState> sasList = getAllStateActionStateWithAction(trajectorySequences, firstValue.action);
+
+			if(!firstValue.actionOwner.equals(agentName)) {
 
 				Set<String> pre = learnPreconditions(sasList);
 				Set<String> eff = learnEffects(sasList);
 
-				learnedActions.add(generateLearnedActionString(pre,eff,firstValue.action));
+				learnedActions.add(generateLearnedAction(pre,eff,firstValue.action,firstValue.actionOwner));
 			}
 
 			trajectorySequences.removeAll(sasList);
-
 		}
 
 		return writeNewLearnedProblemFiles(learnedActions);
-	}
-
-	public StateActionState getRandomTrajectory(){
-
-		LOGGER.info("Get a random value from trajectorySequences list");
-		int index = randomGenerator.nextInt(trajectorySequences.size());
-		StateActionState item = trajectorySequences.get(index);
-		return item;
 	}
 
 	private boolean writeNewLearnedProblemFiles(List<String> learnedActions) {
@@ -151,7 +142,7 @@ public class TrajectoryLearner {
 			return false;
 		}
 
-		domainStr = addActionsToDomainString(learnedActions,domainStr ,learningAgentName);
+		domainStr = addActionsToDomainString(learnedActions,domainStr ,agentName);
 
 		if(domainStr.isEmpty())
 		{
@@ -171,7 +162,7 @@ public class TrajectoryLearner {
 
 		LOGGER.info("Writing new PDDL domain file");
 
-		String learnedDomainPath = Globals.LEARNED_PATH + "/" + learningAgentName + "/" + domainFileName;
+		String learnedDomainPath = Globals.LEARNED_PATH + "/" + agentName + "/" + domainFileName;
 
 		try {
 			FileUtils.writeStringToFile(new File(learnedDomainPath), newDomainString, Charset.defaultCharset());
@@ -206,7 +197,7 @@ public class TrajectoryLearner {
 
 		LOGGER.info("Reading domain pddl");
 
-		String learnedDomainPath = Globals.LEARNED_PATH + "/" + learningAgentName + "/" + domainFileName;
+		String learnedDomainPath = Globals.LEARNED_PATH + "/" + agentName + "/" + domainFileName;
 
 		String fileStr = "";
 
@@ -220,7 +211,8 @@ public class TrajectoryLearner {
 		return fileStr;
 	}
 
-	private String generateLearnedActionString(Set<String> pre, Set<String> eff, Action action) {
+	/*
+	private String generateLearnedAction(Set<String> pre, Set<String> eff, Action action) {
 
 		LOGGER.info("Building action string");
 
@@ -254,11 +246,55 @@ public class TrajectoryLearner {
 				rep += "\t\t(" + e + ")\n";
 		if (eff.size() > 1)
 			rep += "\t)\n";
-		rep += ")\n\n";
+		rep += ")\n";
+
+		return rep;
+	}
+	 */
+
+
+	private String generateLearnedAction(Set<String> pre, Set<String> eff, String action, String actionOwner) {
+
+		LOGGER.info("Building action string");
+
+		String rep = "";
+
+		String actionName = action.replace(" ",Globals.PARAMETER_INDICATION);
+		//String actionName = action;
+		
+		rep += "(:action " + actionName + "\n";
+		rep += "\t:agent ?" + actionOwner + " - " + actionOwner + "\n";
+		rep += "\t:parameters ()\n";
+
+		if (pre.size() > 1)
+			rep += "\t:precondition (and\n";
+		else
+			rep += "\t:precondition \n";
+		if(pre.isEmpty())
+			rep += "\t\t()\n";
+		else
+			for (String p : pre) 
+				rep += "\t\t(" + p + ")\n";
+		if (pre.size() > 1)
+			rep += "\t)\n";
+		if (eff.size() > 1)
+			rep += "\t:effect (and\n";
+		else
+			rep += "\t:effect \n";
+		if(eff.isEmpty())
+			rep += "\t\t()\n";
+		else
+			for (String e : eff) 
+				rep += "\t\t(" + e + ")\n";
+		if (eff.size() > 1)
+			rep += "\t)\n";
+		rep += ")\n";
 
 		return rep;
 	}
 
+
+	/*
 	private Set<String> learnPreconditions(List<StateActionState> sasList) {
 
 		LOGGER.info("Learning preconditions");
@@ -297,6 +333,43 @@ public class TrajectoryLearner {
 
 		return res;
 	}
+	 */
+
+
+	private Set<String> learnPreconditions(List<StateActionState> sasList) {
+
+		LOGGER.info("Learning preconditions");
+
+		Set<String> res = new HashSet<String>();
+
+		res.addAll(sasList.get(0).pre);
+
+		for (StateActionState sas : sasList) {
+			res.retainAll(sas.pre);
+		}
+
+		return res;
+	}
+
+	private Set<String> learnEffects(List<StateActionState> sasList) {
+
+		LOGGER.info("Learning effects");
+
+		Set<String> res = new HashSet<String>();
+
+		for (StateActionState sas : sasList) {
+
+			Set<String> preFacts = new HashSet<String>(sas.pre);
+			Set<String> postFacts = new HashSet<String>(sas.post);
+
+			postFacts.removeAll(preFacts);
+
+			res.addAll(postFacts);		
+		}
+
+		return res;
+	}
+
 
 	private List<String> getStateFacts(State state) {
 
@@ -328,7 +401,8 @@ public class TrajectoryLearner {
 		return res;
 	}
 
-	private List<StateActionState> getAllStateActionStateWithAction(Action action) {
+	/*
+	private List<StateActionState> getAllStateActionStateWithAction(List<StateActionState> trajectorySequences, Action action) {
 
 		LOGGER.info("Getting all StateActionState's with action " + getActionName(action));
 
@@ -341,12 +415,28 @@ public class TrajectoryLearner {
 
 		return res;
 	}
+	 */
+
+
+	private List<StateActionState> getAllStateActionStateWithAction(List<StateActionState> trajectorySequences, String action) {
+
+		LOGGER.info("Getting all StateActionState's with action " + action);
+
+		List<StateActionState> res = new ArrayList<StateActionState>();
+
+		for (StateActionState sas: trajectorySequences) {
+			if(sas.action.equals(action))
+				res.add(sas);
+		}
+
+		return res;
+	}
+
 
 	private String getActionName(Action action) {
 
 		LOGGER.info("Getting action for: " + action.getSimpleLabel());
 
-		/*
 		Field field = null;
 
 		try {
@@ -363,8 +453,5 @@ public class TrajectoryLearner {
 		}
 
 		return "";
-		 */
-
-		return action.getSimpleLabel(); 
 	}
 }
