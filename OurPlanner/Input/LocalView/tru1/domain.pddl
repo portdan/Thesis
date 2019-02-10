@@ -3,13 +3,13 @@
 (:types
 	apn1 - airplane
 	location vehicle package city - object
-	tru1 tru2 - truck
+	tru1 - truck
 	airport - location
 	truck airplane - vehicle
 )
 (:predicates
-	(at ?obj - object ?loc - location)
 	(in ?obj1 - package ?veh - vehicle)
+	(at ?obj - object ?loc - location)
 
 	(:private ?agent - truck
 		(in-city ?loc - location ?city - city)

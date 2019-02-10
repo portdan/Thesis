@@ -379,9 +379,9 @@ public class PlanVerifier {
 
 		String[] split = actionStr.split(" ");
 
-		int hash = Integer.parseInt(split[split.length-1]);
+		//int hash = Integer.parseInt(split[split.length-1]);
 
-		Action action = agentPoblem.getAction(hash);
+		Action action = null;//agentPoblem.getAction(hash);
 
 		//String label = split[2];
 		String label = GetLabelFormated(split);	

@@ -1,0 +1,2 @@
+0: (load-truck-tru1 tru1 obj11 pos1)
+1: (drive-truck-tru1 tru1 pos1 apt1 cit1)

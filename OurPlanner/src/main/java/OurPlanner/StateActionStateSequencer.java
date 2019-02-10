@@ -128,34 +128,34 @@ public class StateActionStateSequencer {
 		List<StateActionState> trajectorySequences = new ArrayList<StateActionState>();
 
 		File[] TrajDir = trajectoryFiles.listFiles();
-		File[] ProbDir = problemFiles.listFiles();
 
-		if (TrajDir != null) 
-			for (File trj : TrajDir) {
+		if (TrajDir != null)
+			for (File trajectoryFolder : TrajDir) {
 
-				String trajectoryPath = trj.getPath();
+				File[] folder = trajectoryFolder.listFiles();
+
+				File trajectory = folder[0];
+				File problem = folder[1];
+
+				String trajectoryPath = trajectory.getPath();
+				String problemPath = problem.getPath();
+				
 				String trajectoryName = FilenameUtils.getBaseName(trajectoryPath);
 
 				String ext = FilenameUtils.getExtension(trajectoryPath); 
 
-				if(ext.equals(Globals.TRAJECTORY_FILE_EXTENSION)) {
-
-					LOGGER.info("Generating sequence for trajectory in " + trajectoryName);
-
-					if (ProbDir != null) 
-						for (File prb : ProbDir) {
-
-							String problemPath = prb.getPath();
-							String problemName = FilenameUtils.getBaseName(problemPath);
-
-							if(problemName.equals(trajectoryName)) {	
-
-								List<StateActionState> res = generateSequance(trajectoryPath);
-								trajectorySequences.addAll(res);
-
-							}
-						}
+				if(!ext.equals(Globals.TRAJECTORY_FILE_EXTENSION)) {
+					problem = folder[0];
+					trajectory = folder[1];
 				}
+
+				LOGGER.info("Generating sequence for trajectory in " + trajectoryName);
+
+				problemPath = problem.getPath();
+				trajectoryPath = trajectory.getPath();
+
+				List<StateActionState> res = generateSequance(trajectoryPath, problemPath);
+				trajectorySequences.addAll(res);
 
 			}
 
@@ -200,14 +200,13 @@ public class StateActionStateSequencer {
 	}
 	 */
 
-	private List<StateActionState> generateSequance(String trajectoryPath){
+	private List<StateActionState> generateSequance(String trajectoryPath, String problemPath){
 
 		LOGGER.info("Generating state action state sequence for " + trajectoryPath );
 
 		List<StateActionState> res = new ArrayList<StateActionState>();
 
 		String domainPath = problemFiles.getPath() + "/" + domainFileName;
-		String problemPath = problemFiles.getPath() + "/" + problemFileName;
 
 		Problem problem = generateProblem(domainPath, problemPath);
 		currentState = problem.initState;

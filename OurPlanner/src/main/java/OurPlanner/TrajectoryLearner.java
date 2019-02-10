@@ -155,7 +155,7 @@ public class TrajectoryLearner {
 			return false;
 		}
 
-		return true;
+		return !learnedActions.isEmpty();
 	}
 
 	private boolean writeNewDomain(String newDomainString) {
