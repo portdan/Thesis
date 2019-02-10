@@ -1,5 +1,1048 @@
-11:45:20 0 [INFO ] (MAPDDLCreator.java:192) - RUN: ./misc/ma-pddl/ma-to-pddl.py ./Input/logistics00/Grounded domain domain ./temp
-11:45:20 16 [INFO ] (MAPDDLCreator.java:118) - >>> CREATION
-11:45:20 16 [INFO ] (MAPDDLCreator.java:119) - >>>   sas: output
-11:45:20 17 [INFO ] (MAPDDLCreator.java:120) - >>>   agents: temp/domain.addl
-11:45:20 17 [FATAL] (MAPDDLCreator.java:124) - Agent file ./temp/domain.addl does not exist!
+11:13:31 0 [INFO ] (MAPDDLCreator.java:192) - RUN: ./misc/ma-pddl/ma-to-pddl.py ./Input/logistics00 domain probLOGISTICS-4-0_66 ./temp
+11:13:31 16 [INFO ] (MAPDDLCreator.java:118) - >>> CREATION
+11:13:31 16 [INFO ] (MAPDDLCreator.java:119) - >>>   sas: output
+11:13:31 16 [INFO ] (MAPDDLCreator.java:120) - >>>   agents: temp/probLOGISTICS-4-0_66.addl
+11:13:31 20 [INFO ] (MAPDDLCreator.java:213) - RUN: ./misc/fd/src/translate/translate.py ./temp/domain.pddl ./temp/probLOGISTICS-4-0_66.pddl
+11:13:31 51 [DEBUG] (MAPDDLCreator.java:235) - test: /home/daniel/Work/WorkSpace/Thesis/PlanForAll/output.sas
+11:13:31 51 [INFO ] (MAPDDLCreator.java:256) - RUN: ./preprocess-runner
+11:13:31 54 [INFO ] (SASParser.java:32) - SAS: output
+11:13:31 55 [DEBUG] (SASParser.java:43) - skip: begin_version
+11:13:31 55 [DEBUG] (SASParser.java:43) - skip: 3
+11:13:31 55 [DEBUG] (SASParser.java:43) - skip: end_version
+11:13:31 55 [DEBUG] (SASParser.java:43) - skip: begin_metric
+11:13:31 58 [DEBUG] (SASPreprocessor.java:126) - apn1 - tru1
+11:13:31 59 [DEBUG] (SASPreprocessor.java:136) - op1
+SASOperator [label=fly-airplane-apn1 apn1 apt2 apt1, pre={var0=at(apn1, apt2)}, eff={var0=at(apn1, apt1)}pub=false]
+11:13:31 59 [DEBUG] (SASPreprocessor.java:137) - op2
+SASOperator [label=unload-truck-tru1 tru1 obj11 pos1, pre={var2=at(tru1, pos1), var1=in(obj11, tru1)}, eff={var1=at(obj11, pos1)}pub=false]
+11:13:31 59 [INFO ] (SASPreprocessor.java:152) - public(goal): var0-at(apn1, apt2)
+11:13:31 61 [INFO ] (SASPreprocessor.java:179) - apn1: var0-at(apn1, apt2)
+11:13:31 61 [INFO ] (SASPreprocessor.java:183) - tru1: var1-at(obj11, pos1)
+11:13:31 61 [INFO ] (SASPreprocessor.java:179) - apn1: var0-at(apn1, apt1)
+11:13:31 61 [INFO ] (SASPreprocessor.java:183) - tru1: var1-in(obj11, tru1)
+11:13:31 61 [INFO ] (SASPreprocessor.java:152) - public(goal): var2-at(tru1, pos1)
+11:13:31 61 [INFO ] (SASPreprocessor.java:183) - tru1: var2-at(tru1, pos1)
+11:13:31 61 [DEBUG] (SASPreprocessor.java:136) - op1
+SASOperator [label=fly-airplane-apn1 apn1 apt2 apt1, pre={var0=at(apn1, apt2)}, eff={var0=at(apn1, apt1)}pub=true]
+11:13:31 62 [DEBUG] (SASPreprocessor.java:137) - op2
+SASOperator [label=load-truck-tru1 tru1 obj11 pos1, pre={var2=at(tru1, pos1), var1=at(obj11, pos1)}, eff={var1=in(obj11, tru1)}pub=false]
+11:13:31 62 [INFO ] (SASPreprocessor.java:152) - public(goal): var0-at(apn1, apt2)
+11:13:31 62 [INFO ] (SASPreprocessor.java:179) - apn1: var0-at(apn1, apt2)
+11:13:31 62 [INFO ] (SASPreprocessor.java:183) - tru1: var1-at(obj11, pos1)
+11:13:31 62 [INFO ] (SASPreprocessor.java:179) - apn1: var0-at(apn1, apt1)
+11:13:31 62 [INFO ] (SASPreprocessor.java:183) - tru1: var1-in(obj11, tru1)
+11:13:31 62 [INFO ] (SASPreprocessor.java:152) - public(goal): var2-at(tru1, pos1)
+11:13:31 62 [INFO ] (SASPreprocessor.java:183) - tru1: var2-at(tru1, pos1)
+11:13:31 62 [DEBUG] (SASPreprocessor.java:136) - op1
+SASOperator [label=fly-airplane-apn1 apn1 apt2 apt1, pre={var0=at(apn1, apt2)}, eff={var0=at(apn1, apt1)}pub=true]
+11:13:31 63 [DEBUG] (SASPreprocessor.java:137) - op2
+SASOperator [label=drive-truck-tru1 tru1 apt1 pos1 cit1, pre={var2=at(tru1, apt1)}, eff={var2=at(tru1, pos1)}pub=false]
+11:13:31 63 [INFO ] (SASPreprocessor.java:152) - public(goal): var0-at(apn1, apt2)
+11:13:31 63 [INFO ] (SASPreprocessor.java:179) - apn1: var0-at(apn1, apt2)
+11:13:31 63 [INFO ] (SASPreprocessor.java:179) - apn1: var0-at(apn1, apt1)
+11:13:31 63 [INFO ] (SASPreprocessor.java:183) - tru1: var2-at(tru1, apt1)
+11:13:31 63 [INFO ] (SASPreprocessor.java:152) - public(goal): var2-at(tru1, pos1)
+11:13:31 63 [INFO ] (SASPreprocessor.java:183) - tru1: var2-at(tru1, pos1)
+11:13:31 63 [DEBUG] (SASPreprocessor.java:136) - op1
+SASOperator [label=fly-airplane-apn1 apn1 apt2 apt1, pre={var0=at(apn1, apt2)}, eff={var0=at(apn1, apt1)}pub=true]
+11:13:31 63 [DEBUG] (SASPreprocessor.java:137) - op2
+SASOperator [label=unload-truck-tru1 tru1 obj11 apt1, pre={var2=at(tru1, apt1), var1=in(obj11, tru1)}, eff={var1=at(obj11, apt1)}pub=false]
+11:13:31 63 [INFO ] (SASPreprocessor.java:152) - public(goal): var0-at(apn1, apt2)
+11:13:31 64 [INFO ] (SASPreprocessor.java:179) - apn1: var0-at(apn1, apt2)
+11:13:31 64 [INFO ] (SASPreprocessor.java:179) - apn1: var0-at(apn1, apt1)
+11:13:31 64 [INFO ] (SASPreprocessor.java:183) - tru1: var2-at(tru1, apt1)
+11:13:31 64 [INFO ] (SASPreprocessor.java:183) - tru1: var1-in(obj11, tru1)
+11:13:31 64 [INFO ] (SASPreprocessor.java:152) - public(goal): var1-at(obj11, apt1)
+11:13:31 64 [INFO ] (SASPreprocessor.java:183) - tru1: var1-at(obj11, apt1)
+11:13:31 64 [DEBUG] (SASPreprocessor.java:136) - op1
+SASOperator [label=fly-airplane-apn1 apn1 apt2 apt1, pre={var0=at(apn1, apt2)}, eff={var0=at(apn1, apt1)}pub=true]
+11:13:31 64 [DEBUG] (SASPreprocessor.java:137) - op2
+SASOperator [label=drive-truck-tru1 tru1 pos1 apt1 cit1, pre={var2=at(tru1, pos1)}, eff={var2=at(tru1, apt1)}pub=false]
+11:13:31 64 [INFO ] (SASPreprocessor.java:152) - public(goal): var0-at(apn1, apt2)
+11:13:31 65 [INFO ] (SASPreprocessor.java:179) - apn1: var0-at(apn1, apt2)
+11:13:31 65 [INFO ] (SASPreprocessor.java:179) - apn1: var0-at(apn1, apt1)
+11:13:31 65 [INFO ] (SASPreprocessor.java:183) - tru1: var2-at(tru1, apt1)
+11:13:31 65 [INFO ] (SASPreprocessor.java:152) - public(goal): var2-at(tru1, pos1)
+11:13:31 65 [INFO ] (SASPreprocessor.java:183) - tru1: var2-at(tru1, pos1)
+11:13:31 65 [DEBUG] (SASPreprocessor.java:136) - op1
+SASOperator [label=fly-airplane-apn1 apn1 apt2 apt1, pre={var0=at(apn1, apt2)}, eff={var0=at(apn1, apt1)}pub=true]
+11:13:31 65 [DEBUG] (SASPreprocessor.java:137) - op2
+SASOperator [label=load-truck-tru1 tru1 obj11 apt1, pre={var2=at(tru1, apt1), var1=at(obj11, apt1)}, eff={var1=in(obj11, tru1)}pub=false]
+11:13:31 65 [INFO ] (SASPreprocessor.java:152) - public(goal): var0-at(apn1, apt2)
+11:13:31 65 [INFO ] (SASPreprocessor.java:179) - apn1: var0-at(apn1, apt2)
+11:13:31 65 [INFO ] (SASPreprocessor.java:179) - apn1: var0-at(apn1, apt1)
+11:13:31 66 [INFO ] (SASPreprocessor.java:183) - tru1: var2-at(tru1, apt1)
+11:13:31 66 [INFO ] (SASPreprocessor.java:183) - tru1: var1-in(obj11, tru1)
+11:13:31 66 [INFO ] (SASPreprocessor.java:152) - public(goal): var1-at(obj11, apt1)
+11:13:31 66 [INFO ] (SASPreprocessor.java:183) - tru1: var1-at(obj11, apt1)
+11:13:31 66 [DEBUG] (SASPreprocessor.java:136) - op1
+SASOperator [label=unload-airplane-apn1 apn1 obj11 apt2, pre={var1=in(obj11, apn1), var0=at(apn1, apt2)}, eff={var1=at(obj11, apt2)}pub=false]
+11:13:31 66 [DEBUG] (SASPreprocessor.java:137) - op2
+SASOperator [label=unload-truck-tru1 tru1 obj11 pos1, pre={var2=at(tru1, pos1), var1=in(obj11, tru1)}, eff={var1=at(obj11, pos1)}pub=true]
+11:13:31 66 [INFO ] (SASPreprocessor.java:152) - public(goal): var0-at(apn1, apt2)
+11:13:31 66 [INFO ] (SASPreprocessor.java:179) - apn1: var0-at(apn1, apt2)
+11:13:31 66 [INFO ] (SASPreprocessor.java:183) - tru1: var1-at(obj11, pos1)
+11:13:31 66 [INFO ] (SASPreprocessor.java:183) - tru1: var1-in(obj11, tru1)
+11:13:31 67 [INFO ] (SASPreprocessor.java:152) - public(goal): var2-at(tru1, pos1)
+11:13:31 67 [INFO ] (SASPreprocessor.java:183) - tru1: var2-at(tru1, pos1)
+11:13:31 67 [INFO ] (SASPreprocessor.java:179) - apn1: var1-at(obj11, apt2)
+11:13:31 67 [INFO ] (SASPreprocessor.java:179) - apn1: var1-in(obj11, apn1)
+11:13:31 67 [DEBUG] (SASPreprocessor.java:136) - op1
+SASOperator [label=unload-airplane-apn1 apn1 obj11 apt2, pre={var1=in(obj11, apn1), var0=at(apn1, apt2)}, eff={var1=at(obj11, apt2)}pub=true]
+11:13:31 67 [DEBUG] (SASPreprocessor.java:137) - op2
+SASOperator [label=load-truck-tru1 tru1 obj11 pos1, pre={var2=at(tru1, pos1), var1=at(obj11, pos1)}, eff={var1=in(obj11, tru1)}pub=true]
+11:13:31 67 [INFO ] (SASPreprocessor.java:152) - public(goal): var0-at(apn1, apt2)
+11:13:31 67 [INFO ] (SASPreprocessor.java:179) - apn1: var0-at(apn1, apt2)
+11:13:31 67 [INFO ] (SASPreprocessor.java:183) - tru1: var1-at(obj11, pos1)
+11:13:31 67 [INFO ] (SASPreprocessor.java:183) - tru1: var1-in(obj11, tru1)
+11:13:31 67 [INFO ] (SASPreprocessor.java:152) - public(goal): var2-at(tru1, pos1)
+11:13:31 68 [INFO ] (SASPreprocessor.java:183) - tru1: var2-at(tru1, pos1)
+11:13:31 68 [INFO ] (SASPreprocessor.java:179) - apn1: var1-at(obj11, apt2)
+11:13:31 68 [INFO ] (SASPreprocessor.java:179) - apn1: var1-in(obj11, apn1)
+11:13:31 68 [DEBUG] (SASPreprocessor.java:136) - op1
+SASOperator [label=unload-airplane-apn1 apn1 obj11 apt2, pre={var1=in(obj11, apn1), var0=at(apn1, apt2)}, eff={var1=at(obj11, apt2)}pub=true]
+11:13:31 68 [DEBUG] (SASPreprocessor.java:137) - op2
+SASOperator [label=drive-truck-tru1 tru1 apt1 pos1 cit1, pre={var2=at(tru1, apt1)}, eff={var2=at(tru1, pos1)}pub=true]
+11:13:31 68 [INFO ] (SASPreprocessor.java:152) - public(goal): var0-at(apn1, apt2)
+11:13:31 68 [INFO ] (SASPreprocessor.java:179) - apn1: var0-at(apn1, apt2)
+11:13:31 68 [INFO ] (SASPreprocessor.java:183) - tru1: var2-at(tru1, apt1)
+11:13:31 68 [INFO ] (SASPreprocessor.java:152) - public(goal): var2-at(tru1, pos1)
+11:13:31 69 [INFO ] (SASPreprocessor.java:183) - tru1: var2-at(tru1, pos1)
+11:13:31 69 [INFO ] (SASPreprocessor.java:179) - apn1: var1-at(obj11, apt2)
+11:13:31 69 [INFO ] (SASPreprocessor.java:179) - apn1: var1-in(obj11, apn1)
+11:13:31 69 [DEBUG] (SASPreprocessor.java:136) - op1
+SASOperator [label=unload-airplane-apn1 apn1 obj11 apt2, pre={var1=in(obj11, apn1), var0=at(apn1, apt2)}, eff={var1=at(obj11, apt2)}pub=true]
+11:13:31 69 [DEBUG] (SASPreprocessor.java:137) - op2
+SASOperator [label=unload-truck-tru1 tru1 obj11 apt1, pre={var2=at(tru1, apt1), var1=in(obj11, tru1)}, eff={var1=at(obj11, apt1)}pub=true]
+11:13:31 69 [INFO ] (SASPreprocessor.java:152) - public(goal): var0-at(apn1, apt2)
+11:13:31 69 [INFO ] (SASPreprocessor.java:179) - apn1: var0-at(apn1, apt2)
+11:13:31 69 [INFO ] (SASPreprocessor.java:183) - tru1: var2-at(tru1, apt1)
+11:13:31 69 [INFO ] (SASPreprocessor.java:183) - tru1: var1-in(obj11, tru1)
+11:13:31 69 [INFO ] (SASPreprocessor.java:179) - apn1: var1-at(obj11, apt2)
+11:13:31 69 [INFO ] (SASPreprocessor.java:179) - apn1: var1-in(obj11, apn1)
+11:13:31 70 [INFO ] (SASPreprocessor.java:152) - public(goal): var1-at(obj11, apt1)
+11:13:31 70 [INFO ] (SASPreprocessor.java:183) - tru1: var1-at(obj11, apt1)
+11:13:31 70 [DEBUG] (SASPreprocessor.java:136) - op1
+SASOperator [label=unload-airplane-apn1 apn1 obj11 apt2, pre={var1=in(obj11, apn1), var0=at(apn1, apt2)}, eff={var1=at(obj11, apt2)}pub=true]
+11:13:31 70 [DEBUG] (SASPreprocessor.java:137) - op2
+SASOperator [label=drive-truck-tru1 tru1 pos1 apt1 cit1, pre={var2=at(tru1, pos1)}, eff={var2=at(tru1, apt1)}pub=true]
+11:13:31 70 [INFO ] (SASPreprocessor.java:152) - public(goal): var0-at(apn1, apt2)
+11:13:31 70 [INFO ] (SASPreprocessor.java:179) - apn1: var0-at(apn1, apt2)
+11:13:31 70 [INFO ] (SASPreprocessor.java:183) - tru1: var2-at(tru1, apt1)
+11:13:31 70 [INFO ] (SASPreprocessor.java:152) - public(goal): var2-at(tru1, pos1)
+11:13:31 70 [INFO ] (SASPreprocessor.java:183) - tru1: var2-at(tru1, pos1)
+11:13:31 70 [INFO ] (SASPreprocessor.java:179) - apn1: var1-at(obj11, apt2)
+11:13:31 71 [INFO ] (SASPreprocessor.java:179) - apn1: var1-in(obj11, apn1)
+11:13:31 71 [DEBUG] (SASPreprocessor.java:136) - op1
+SASOperator [label=unload-airplane-apn1 apn1 obj11 apt2, pre={var1=in(obj11, apn1), var0=at(apn1, apt2)}, eff={var1=at(obj11, apt2)}pub=true]
+11:13:31 71 [DEBUG] (SASPreprocessor.java:137) - op2
+SASOperator [label=load-truck-tru1 tru1 obj11 apt1, pre={var2=at(tru1, apt1), var1=at(obj11, apt1)}, eff={var1=in(obj11, tru1)}pub=true]
+11:13:31 71 [INFO ] (SASPreprocessor.java:152) - public(goal): var0-at(apn1, apt2)
+11:13:31 71 [INFO ] (SASPreprocessor.java:179) - apn1: var0-at(apn1, apt2)
+11:13:31 71 [INFO ] (SASPreprocessor.java:183) - tru1: var2-at(tru1, apt1)
+11:13:31 71 [INFO ] (SASPreprocessor.java:183) - tru1: var1-in(obj11, tru1)
+11:13:31 71 [INFO ] (SASPreprocessor.java:179) - apn1: var1-at(obj11, apt2)
+11:13:31 71 [INFO ] (SASPreprocessor.java:179) - apn1: var1-in(obj11, apn1)
+11:13:31 71 [INFO ] (SASPreprocessor.java:152) - public(goal): var1-at(obj11, apt1)
+11:13:31 71 [INFO ] (SASPreprocessor.java:183) - tru1: var1-at(obj11, apt1)
+11:13:31 71 [DEBUG] (SASPreprocessor.java:136) - op1
+SASOperator [label=load-airplane-apn1 apn1 obj11 apt2, pre={var1=at(obj11, apt2), var0=at(apn1, apt2)}, eff={var1=in(obj11, apn1)}pub=false]
+11:13:31 72 [DEBUG] (SASPreprocessor.java:137) - op2
+SASOperator [label=unload-truck-tru1 tru1 obj11 pos1, pre={var2=at(tru1, pos1), var1=in(obj11, tru1)}, eff={var1=at(obj11, pos1)}pub=true]
+11:13:31 72 [INFO ] (SASPreprocessor.java:152) - public(goal): var0-at(apn1, apt2)
+11:13:31 72 [INFO ] (SASPreprocessor.java:179) - apn1: var0-at(apn1, apt2)
+11:13:31 72 [INFO ] (SASPreprocessor.java:183) - tru1: var1-at(obj11, pos1)
+11:13:31 72 [INFO ] (SASPreprocessor.java:183) - tru1: var1-in(obj11, tru1)
+11:13:31 72 [INFO ] (SASPreprocessor.java:152) - public(goal): var2-at(tru1, pos1)
+11:13:31 72 [INFO ] (SASPreprocessor.java:183) - tru1: var2-at(tru1, pos1)
+11:13:31 72 [INFO ] (SASPreprocessor.java:179) - apn1: var1-at(obj11, apt2)
+11:13:31 72 [INFO ] (SASPreprocessor.java:179) - apn1: var1-in(obj11, apn1)
+11:13:31 72 [DEBUG] (SASPreprocessor.java:136) - op1
+SASOperator [label=load-airplane-apn1 apn1 obj11 apt2, pre={var1=at(obj11, apt2), var0=at(apn1, apt2)}, eff={var1=in(obj11, apn1)}pub=true]
+11:13:31 72 [DEBUG] (SASPreprocessor.java:137) - op2
+SASOperator [label=load-truck-tru1 tru1 obj11 pos1, pre={var2=at(tru1, pos1), var1=at(obj11, pos1)}, eff={var1=in(obj11, tru1)}pub=true]
+11:13:31 73 [INFO ] (SASPreprocessor.java:152) - public(goal): var0-at(apn1, apt2)
+11:13:31 73 [INFO ] (SASPreprocessor.java:179) - apn1: var0-at(apn1, apt2)
+11:13:31 73 [INFO ] (SASPreprocessor.java:183) - tru1: var1-at(obj11, pos1)
+11:13:31 73 [INFO ] (SASPreprocessor.java:183) - tru1: var1-in(obj11, tru1)
+11:13:31 73 [INFO ] (SASPreprocessor.java:152) - public(goal): var2-at(tru1, pos1)
+11:13:31 73 [INFO ] (SASPreprocessor.java:183) - tru1: var2-at(tru1, pos1)
+11:13:31 73 [INFO ] (SASPreprocessor.java:179) - apn1: var1-at(obj11, apt2)
+11:13:31 73 [INFO ] (SASPreprocessor.java:179) - apn1: var1-in(obj11, apn1)
+11:13:31 73 [DEBUG] (SASPreprocessor.java:136) - op1
+SASOperator [label=load-airplane-apn1 apn1 obj11 apt2, pre={var1=at(obj11, apt2), var0=at(apn1, apt2)}, eff={var1=in(obj11, apn1)}pub=true]
+11:13:31 73 [DEBUG] (SASPreprocessor.java:137) - op2
+SASOperator [label=drive-truck-tru1 tru1 apt1 pos1 cit1, pre={var2=at(tru1, apt1)}, eff={var2=at(tru1, pos1)}pub=true]
+11:13:31 73 [INFO ] (SASPreprocessor.java:152) - public(goal): var0-at(apn1, apt2)
+11:13:31 73 [INFO ] (SASPreprocessor.java:179) - apn1: var0-at(apn1, apt2)
+11:13:31 73 [INFO ] (SASPreprocessor.java:183) - tru1: var2-at(tru1, apt1)
+11:13:31 74 [INFO ] (SASPreprocessor.java:152) - public(goal): var2-at(tru1, pos1)
+11:13:31 74 [INFO ] (SASPreprocessor.java:183) - tru1: var2-at(tru1, pos1)
+11:13:31 74 [INFO ] (SASPreprocessor.java:179) - apn1: var1-at(obj11, apt2)
+11:13:31 74 [INFO ] (SASPreprocessor.java:179) - apn1: var1-in(obj11, apn1)
+11:13:31 74 [DEBUG] (SASPreprocessor.java:136) - op1
+SASOperator [label=load-airplane-apn1 apn1 obj11 apt2, pre={var1=at(obj11, apt2), var0=at(apn1, apt2)}, eff={var1=in(obj11, apn1)}pub=true]
+11:13:31 74 [DEBUG] (SASPreprocessor.java:137) - op2
+SASOperator [label=unload-truck-tru1 tru1 obj11 apt1, pre={var2=at(tru1, apt1), var1=in(obj11, tru1)}, eff={var1=at(obj11, apt1)}pub=true]
+11:13:31 74 [INFO ] (SASPreprocessor.java:152) - public(goal): var0-at(apn1, apt2)
+11:13:31 74 [INFO ] (SASPreprocessor.java:179) - apn1: var0-at(apn1, apt2)
+11:13:31 74 [INFO ] (SASPreprocessor.java:183) - tru1: var2-at(tru1, apt1)
+11:13:31 74 [INFO ] (SASPreprocessor.java:183) - tru1: var1-in(obj11, tru1)
+11:13:31 74 [INFO ] (SASPreprocessor.java:179) - apn1: var1-at(obj11, apt2)
+11:13:31 74 [INFO ] (SASPreprocessor.java:179) - apn1: var1-in(obj11, apn1)
+11:13:31 74 [INFO ] (SASPreprocessor.java:152) - public(goal): var1-at(obj11, apt1)
+11:13:31 75 [INFO ] (SASPreprocessor.java:183) - tru1: var1-at(obj11, apt1)
+11:13:31 75 [DEBUG] (SASPreprocessor.java:136) - op1
+SASOperator [label=load-airplane-apn1 apn1 obj11 apt2, pre={var1=at(obj11, apt2), var0=at(apn1, apt2)}, eff={var1=in(obj11, apn1)}pub=true]
+11:13:31 75 [DEBUG] (SASPreprocessor.java:137) - op2
+SASOperator [label=drive-truck-tru1 tru1 pos1 apt1 cit1, pre={var2=at(tru1, pos1)}, eff={var2=at(tru1, apt1)}pub=true]
+11:13:31 75 [INFO ] (SASPreprocessor.java:152) - public(goal): var0-at(apn1, apt2)
+11:13:31 75 [INFO ] (SASPreprocessor.java:179) - apn1: var0-at(apn1, apt2)
+11:13:31 75 [INFO ] (SASPreprocessor.java:183) - tru1: var2-at(tru1, apt1)
+11:13:31 75 [INFO ] (SASPreprocessor.java:152) - public(goal): var2-at(tru1, pos1)
+11:13:31 75 [INFO ] (SASPreprocessor.java:183) - tru1: var2-at(tru1, pos1)
+11:13:31 75 [INFO ] (SASPreprocessor.java:179) - apn1: var1-at(obj11, apt2)
+11:13:31 75 [INFO ] (SASPreprocessor.java:179) - apn1: var1-in(obj11, apn1)
+11:13:31 75 [DEBUG] (SASPreprocessor.java:136) - op1
+SASOperator [label=load-airplane-apn1 apn1 obj11 apt2, pre={var1=at(obj11, apt2), var0=at(apn1, apt2)}, eff={var1=in(obj11, apn1)}pub=true]
+11:13:31 75 [DEBUG] (SASPreprocessor.java:137) - op2
+SASOperator [label=load-truck-tru1 tru1 obj11 apt1, pre={var2=at(tru1, apt1), var1=at(obj11, apt1)}, eff={var1=in(obj11, tru1)}pub=true]
+11:13:31 75 [INFO ] (SASPreprocessor.java:152) - public(goal): var0-at(apn1, apt2)
+11:13:31 76 [INFO ] (SASPreprocessor.java:179) - apn1: var0-at(apn1, apt2)
+11:13:31 76 [INFO ] (SASPreprocessor.java:183) - tru1: var2-at(tru1, apt1)
+11:13:31 76 [INFO ] (SASPreprocessor.java:183) - tru1: var1-in(obj11, tru1)
+11:13:31 76 [INFO ] (SASPreprocessor.java:179) - apn1: var1-at(obj11, apt2)
+11:13:31 76 [INFO ] (SASPreprocessor.java:179) - apn1: var1-in(obj11, apn1)
+11:13:31 76 [INFO ] (SASPreprocessor.java:152) - public(goal): var1-at(obj11, apt1)
+11:13:31 76 [INFO ] (SASPreprocessor.java:183) - tru1: var1-at(obj11, apt1)
+11:13:31 76 [DEBUG] (SASPreprocessor.java:136) - op1
+SASOperator [label=fly-airplane-apn1 apn1 apt1 apt2, pre={var0=at(apn1, apt1)}, eff={var0=at(apn1, apt2)}pub=false]
+11:13:31 76 [DEBUG] (SASPreprocessor.java:137) - op2
+SASOperator [label=unload-truck-tru1 tru1 obj11 pos1, pre={var2=at(tru1, pos1), var1=in(obj11, tru1)}, eff={var1=at(obj11, pos1)}pub=true]
+11:13:31 76 [INFO ] (SASPreprocessor.java:152) - public(goal): var0-at(apn1, apt2)
+11:13:31 76 [INFO ] (SASPreprocessor.java:179) - apn1: var0-at(apn1, apt2)
+11:13:31 76 [INFO ] (SASPreprocessor.java:183) - tru1: var1-at(obj11, pos1)
+11:13:31 77 [INFO ] (SASPreprocessor.java:179) - apn1: var0-at(apn1, apt1)
+11:13:31 77 [INFO ] (SASPreprocessor.java:183) - tru1: var1-in(obj11, tru1)
+11:13:31 77 [INFO ] (SASPreprocessor.java:152) - public(goal): var2-at(tru1, pos1)
+11:13:31 77 [INFO ] (SASPreprocessor.java:183) - tru1: var2-at(tru1, pos1)
+11:13:31 77 [DEBUG] (SASPreprocessor.java:136) - op1
+SASOperator [label=fly-airplane-apn1 apn1 apt1 apt2, pre={var0=at(apn1, apt1)}, eff={var0=at(apn1, apt2)}pub=true]
+11:13:31 77 [DEBUG] (SASPreprocessor.java:137) - op2
+SASOperator [label=load-truck-tru1 tru1 obj11 pos1, pre={var2=at(tru1, pos1), var1=at(obj11, pos1)}, eff={var1=in(obj11, tru1)}pub=true]
+11:13:31 77 [INFO ] (SASPreprocessor.java:152) - public(goal): var0-at(apn1, apt2)
+11:13:31 77 [INFO ] (SASPreprocessor.java:179) - apn1: var0-at(apn1, apt2)
+11:13:31 77 [INFO ] (SASPreprocessor.java:183) - tru1: var1-at(obj11, pos1)
+11:13:31 77 [INFO ] (SASPreprocessor.java:179) - apn1: var0-at(apn1, apt1)
+11:13:31 77 [INFO ] (SASPreprocessor.java:183) - tru1: var1-in(obj11, tru1)
+11:13:31 77 [INFO ] (SASPreprocessor.java:152) - public(goal): var2-at(tru1, pos1)
+11:13:31 77 [INFO ] (SASPreprocessor.java:183) - tru1: var2-at(tru1, pos1)
+11:13:31 77 [DEBUG] (SASPreprocessor.java:136) - op1
+SASOperator [label=fly-airplane-apn1 apn1 apt1 apt2, pre={var0=at(apn1, apt1)}, eff={var0=at(apn1, apt2)}pub=true]
+11:13:31 78 [DEBUG] (SASPreprocessor.java:137) - op2
+SASOperator [label=drive-truck-tru1 tru1 apt1 pos1 cit1, pre={var2=at(tru1, apt1)}, eff={var2=at(tru1, pos1)}pub=true]
+11:13:31 78 [INFO ] (SASPreprocessor.java:152) - public(goal): var0-at(apn1, apt2)
+11:13:31 78 [INFO ] (SASPreprocessor.java:179) - apn1: var0-at(apn1, apt2)
+11:13:31 78 [INFO ] (SASPreprocessor.java:179) - apn1: var0-at(apn1, apt1)
+11:13:31 78 [INFO ] (SASPreprocessor.java:183) - tru1: var2-at(tru1, apt1)
+11:13:31 78 [INFO ] (SASPreprocessor.java:152) - public(goal): var2-at(tru1, pos1)
+11:13:31 78 [INFO ] (SASPreprocessor.java:183) - tru1: var2-at(tru1, pos1)
+11:13:31 78 [DEBUG] (SASPreprocessor.java:136) - op1
+SASOperator [label=fly-airplane-apn1 apn1 apt1 apt2, pre={var0=at(apn1, apt1)}, eff={var0=at(apn1, apt2)}pub=true]
+11:13:31 78 [DEBUG] (SASPreprocessor.java:137) - op2
+SASOperator [label=unload-truck-tru1 tru1 obj11 apt1, pre={var2=at(tru1, apt1), var1=in(obj11, tru1)}, eff={var1=at(obj11, apt1)}pub=true]
+11:13:31 78 [INFO ] (SASPreprocessor.java:152) - public(goal): var0-at(apn1, apt2)
+11:13:31 78 [INFO ] (SASPreprocessor.java:179) - apn1: var0-at(apn1, apt2)
+11:13:31 78 [INFO ] (SASPreprocessor.java:179) - apn1: var0-at(apn1, apt1)
+11:13:31 78 [INFO ] (SASPreprocessor.java:183) - tru1: var2-at(tru1, apt1)
+11:13:31 79 [INFO ] (SASPreprocessor.java:183) - tru1: var1-in(obj11, tru1)
+11:13:31 79 [INFO ] (SASPreprocessor.java:152) - public(goal): var1-at(obj11, apt1)
+11:13:31 79 [INFO ] (SASPreprocessor.java:183) - tru1: var1-at(obj11, apt1)
+11:13:31 79 [DEBUG] (SASPreprocessor.java:136) - op1
+SASOperator [label=fly-airplane-apn1 apn1 apt1 apt2, pre={var0=at(apn1, apt1)}, eff={var0=at(apn1, apt2)}pub=true]
+11:13:31 79 [DEBUG] (SASPreprocessor.java:137) - op2
+SASOperator [label=drive-truck-tru1 tru1 pos1 apt1 cit1, pre={var2=at(tru1, pos1)}, eff={var2=at(tru1, apt1)}pub=true]
+11:13:31 79 [INFO ] (SASPreprocessor.java:152) - public(goal): var0-at(apn1, apt2)
+11:13:31 79 [INFO ] (SASPreprocessor.java:179) - apn1: var0-at(apn1, apt2)
+11:13:31 79 [INFO ] (SASPreprocessor.java:179) - apn1: var0-at(apn1, apt1)
+11:13:31 79 [INFO ] (SASPreprocessor.java:183) - tru1: var2-at(tru1, apt1)
+11:13:31 79 [INFO ] (SASPreprocessor.java:152) - public(goal): var2-at(tru1, pos1)
+11:13:31 79 [INFO ] (SASPreprocessor.java:183) - tru1: var2-at(tru1, pos1)
+11:13:31 79 [DEBUG] (SASPreprocessor.java:136) - op1
+SASOperator [label=fly-airplane-apn1 apn1 apt1 apt2, pre={var0=at(apn1, apt1)}, eff={var0=at(apn1, apt2)}pub=true]
+11:13:31 80 [DEBUG] (SASPreprocessor.java:137) - op2
+SASOperator [label=load-truck-tru1 tru1 obj11 apt1, pre={var2=at(tru1, apt1), var1=at(obj11, apt1)}, eff={var1=in(obj11, tru1)}pub=true]
+11:13:31 80 [INFO ] (SASPreprocessor.java:152) - public(goal): var0-at(apn1, apt2)
+11:13:31 80 [INFO ] (SASPreprocessor.java:179) - apn1: var0-at(apn1, apt2)
+11:13:31 80 [INFO ] (SASPreprocessor.java:179) - apn1: var0-at(apn1, apt1)
+11:13:31 80 [INFO ] (SASPreprocessor.java:183) - tru1: var2-at(tru1, apt1)
+11:13:31 80 [INFO ] (SASPreprocessor.java:183) - tru1: var1-in(obj11, tru1)
+11:13:31 80 [INFO ] (SASPreprocessor.java:152) - public(goal): var1-at(obj11, apt1)
+11:13:31 80 [INFO ] (SASPreprocessor.java:183) - tru1: var1-at(obj11, apt1)
+11:13:31 80 [DEBUG] (SASPreprocessor.java:136) - op1
+SASOperator [label=load-airplane-apn1 apn1 obj11 apt1, pre={var1=at(obj11, apt1), var0=at(apn1, apt1)}, eff={var1=in(obj11, apn1)}pub=false]
+11:13:31 80 [DEBUG] (SASPreprocessor.java:137) - op2
+SASOperator [label=unload-truck-tru1 tru1 obj11 pos1, pre={var2=at(tru1, pos1), var1=in(obj11, tru1)}, eff={var1=at(obj11, pos1)}pub=true]
+11:13:31 80 [INFO ] (SASPreprocessor.java:183) - tru1: var1-at(obj11, pos1)
+11:13:31 80 [INFO ] (SASPreprocessor.java:179) - apn1: var0-at(apn1, apt1)
+11:13:31 80 [INFO ] (SASPreprocessor.java:183) - tru1: var1-in(obj11, tru1)
+11:13:31 81 [INFO ] (SASPreprocessor.java:152) - public(goal): var2-at(tru1, pos1)
+11:13:31 81 [INFO ] (SASPreprocessor.java:183) - tru1: var2-at(tru1, pos1)
+11:13:31 81 [INFO ] (SASPreprocessor.java:152) - public(goal): var1-at(obj11, apt1)
+11:13:31 81 [INFO ] (SASPreprocessor.java:179) - apn1: var1-at(obj11, apt1)
+11:13:31 81 [INFO ] (SASPreprocessor.java:179) - apn1: var1-in(obj11, apn1)
+11:13:31 81 [DEBUG] (SASPreprocessor.java:136) - op1
+SASOperator [label=load-airplane-apn1 apn1 obj11 apt1, pre={var1=at(obj11, apt1), var0=at(apn1, apt1)}, eff={var1=in(obj11, apn1)}pub=true]
+11:13:31 81 [DEBUG] (SASPreprocessor.java:137) - op2
+SASOperator [label=load-truck-tru1 tru1 obj11 pos1, pre={var2=at(tru1, pos1), var1=at(obj11, pos1)}, eff={var1=in(obj11, tru1)}pub=true]
+11:13:31 81 [INFO ] (SASPreprocessor.java:183) - tru1: var1-at(obj11, pos1)
+11:13:31 81 [INFO ] (SASPreprocessor.java:179) - apn1: var0-at(apn1, apt1)
+11:13:31 81 [INFO ] (SASPreprocessor.java:183) - tru1: var1-in(obj11, tru1)
+11:13:31 81 [INFO ] (SASPreprocessor.java:152) - public(goal): var2-at(tru1, pos1)
+11:13:31 81 [INFO ] (SASPreprocessor.java:183) - tru1: var2-at(tru1, pos1)
+11:13:31 82 [INFO ] (SASPreprocessor.java:152) - public(goal): var1-at(obj11, apt1)
+11:13:31 82 [INFO ] (SASPreprocessor.java:179) - apn1: var1-at(obj11, apt1)
+11:13:31 82 [INFO ] (SASPreprocessor.java:179) - apn1: var1-in(obj11, apn1)
+11:13:31 82 [DEBUG] (SASPreprocessor.java:136) - op1
+SASOperator [label=load-airplane-apn1 apn1 obj11 apt1, pre={var1=at(obj11, apt1), var0=at(apn1, apt1)}, eff={var1=in(obj11, apn1)}pub=true]
+11:13:31 82 [DEBUG] (SASPreprocessor.java:137) - op2
+SASOperator [label=drive-truck-tru1 tru1 apt1 pos1 cit1, pre={var2=at(tru1, apt1)}, eff={var2=at(tru1, pos1)}pub=true]
+11:13:31 82 [INFO ] (SASPreprocessor.java:179) - apn1: var0-at(apn1, apt1)
+11:13:31 82 [INFO ] (SASPreprocessor.java:183) - tru1: var2-at(tru1, apt1)
+11:13:31 82 [INFO ] (SASPreprocessor.java:152) - public(goal): var2-at(tru1, pos1)
+11:13:31 82 [INFO ] (SASPreprocessor.java:183) - tru1: var2-at(tru1, pos1)
+11:13:31 82 [INFO ] (SASPreprocessor.java:152) - public(goal): var1-at(obj11, apt1)
+11:13:31 82 [INFO ] (SASPreprocessor.java:179) - apn1: var1-at(obj11, apt1)
+11:13:31 82 [INFO ] (SASPreprocessor.java:179) - apn1: var1-in(obj11, apn1)
+11:13:31 83 [DEBUG] (SASPreprocessor.java:136) - op1
+SASOperator [label=load-airplane-apn1 apn1 obj11 apt1, pre={var1=at(obj11, apt1), var0=at(apn1, apt1)}, eff={var1=in(obj11, apn1)}pub=true]
+11:13:31 83 [DEBUG] (SASPreprocessor.java:137) - op2
+SASOperator [label=unload-truck-tru1 tru1 obj11 apt1, pre={var2=at(tru1, apt1), var1=in(obj11, tru1)}, eff={var1=at(obj11, apt1)}pub=true]
+11:13:31 83 [INFO ] (SASPreprocessor.java:179) - apn1: var0-at(apn1, apt1)
+11:13:31 83 [INFO ] (SASPreprocessor.java:183) - tru1: var2-at(tru1, apt1)
+11:13:31 83 [INFO ] (SASPreprocessor.java:183) - tru1: var1-in(obj11, tru1)
+11:13:31 83 [INFO ] (SASPreprocessor.java:152) - public(goal): var1-at(obj11, apt1)
+11:13:31 83 [INFO ] (SASPreprocessor.java:172) - public: var1-at(obj11, apt1)
+11:13:31 83 [INFO ] (SASPreprocessor.java:173) - 	on operators: load-airplane-apn1 apn1 obj11 apt1 and unload-truck-tru1 tru1 obj11 apt1
+11:13:31 83 [INFO ] (SASPreprocessor.java:179) - apn1: var1-in(obj11, apn1)
+11:13:31 83 [DEBUG] (SASPreprocessor.java:136) - op1
+SASOperator [label=load-airplane-apn1 apn1 obj11 apt1, pre={var1=at(obj11, apt1), var0=at(apn1, apt1)}, eff={var1=in(obj11, apn1)}pub=true]
+11:13:31 83 [DEBUG] (SASPreprocessor.java:137) - op2
+SASOperator [label=drive-truck-tru1 tru1 pos1 apt1 cit1, pre={var2=at(tru1, pos1)}, eff={var2=at(tru1, apt1)}pub=true]
+11:13:31 83 [INFO ] (SASPreprocessor.java:179) - apn1: var0-at(apn1, apt1)
+11:13:31 83 [INFO ] (SASPreprocessor.java:183) - tru1: var2-at(tru1, apt1)
+11:13:31 84 [INFO ] (SASPreprocessor.java:152) - public(goal): var2-at(tru1, pos1)
+11:13:31 84 [INFO ] (SASPreprocessor.java:183) - tru1: var2-at(tru1, pos1)
+11:13:31 84 [INFO ] (SASPreprocessor.java:152) - public(goal): var1-at(obj11, apt1)
+11:13:31 84 [INFO ] (SASPreprocessor.java:179) - apn1: var1-at(obj11, apt1)
+11:13:31 84 [INFO ] (SASPreprocessor.java:179) - apn1: var1-in(obj11, apn1)
+11:13:31 84 [DEBUG] (SASPreprocessor.java:136) - op1
+SASOperator [label=load-airplane-apn1 apn1 obj11 apt1, pre={var1=at(obj11, apt1), var0=at(apn1, apt1)}, eff={var1=in(obj11, apn1)}pub=true]
+11:13:31 84 [DEBUG] (SASPreprocessor.java:137) - op2
+SASOperator [label=load-truck-tru1 tru1 obj11 apt1, pre={var2=at(tru1, apt1), var1=at(obj11, apt1)}, eff={var1=in(obj11, tru1)}pub=true]
+11:13:31 84 [INFO ] (SASPreprocessor.java:179) - apn1: var0-at(apn1, apt1)
+11:13:31 84 [INFO ] (SASPreprocessor.java:183) - tru1: var2-at(tru1, apt1)
+11:13:31 84 [INFO ] (SASPreprocessor.java:183) - tru1: var1-in(obj11, tru1)
+11:13:31 84 [INFO ] (SASPreprocessor.java:152) - public(goal): var1-at(obj11, apt1)
+11:13:31 84 [INFO ] (SASPreprocessor.java:172) - public: var1-at(obj11, apt1)
+11:13:31 84 [INFO ] (SASPreprocessor.java:173) - 	on operators: load-airplane-apn1 apn1 obj11 apt1 and load-truck-tru1 tru1 obj11 apt1
+11:13:31 84 [INFO ] (SASPreprocessor.java:179) - apn1: var1-in(obj11, apn1)
+11:13:31 85 [DEBUG] (SASPreprocessor.java:136) - op1
+SASOperator [label=unload-airplane-apn1 apn1 obj11 apt1, pre={var1=in(obj11, apn1), var0=at(apn1, apt1)}, eff={var1=at(obj11, apt1)}pub=false]
+11:13:31 85 [DEBUG] (SASPreprocessor.java:137) - op2
+SASOperator [label=unload-truck-tru1 tru1 obj11 pos1, pre={var2=at(tru1, pos1), var1=in(obj11, tru1)}, eff={var1=at(obj11, pos1)}pub=true]
+11:13:31 85 [INFO ] (SASPreprocessor.java:183) - tru1: var1-at(obj11, pos1)
+11:13:31 85 [INFO ] (SASPreprocessor.java:179) - apn1: var0-at(apn1, apt1)
+11:13:31 85 [INFO ] (SASPreprocessor.java:183) - tru1: var1-in(obj11, tru1)
+11:13:31 85 [INFO ] (SASPreprocessor.java:152) - public(goal): var2-at(tru1, pos1)
+11:13:31 85 [INFO ] (SASPreprocessor.java:183) - tru1: var2-at(tru1, pos1)
+11:13:31 85 [INFO ] (SASPreprocessor.java:179) - apn1: var1-in(obj11, apn1)
+11:13:31 85 [INFO ] (SASPreprocessor.java:152) - public(goal): var1-at(obj11, apt1)
+11:13:31 85 [INFO ] (SASPreprocessor.java:179) - apn1: var1-at(obj11, apt1)
+11:13:31 85 [DEBUG] (SASPreprocessor.java:136) - op1
+SASOperator [label=unload-airplane-apn1 apn1 obj11 apt1, pre={var1=in(obj11, apn1), var0=at(apn1, apt1)}, eff={var1=at(obj11, apt1)}pub=true]
+11:13:31 85 [DEBUG] (SASPreprocessor.java:137) - op2
+SASOperator [label=load-truck-tru1 tru1 obj11 pos1, pre={var2=at(tru1, pos1), var1=at(obj11, pos1)}, eff={var1=in(obj11, tru1)}pub=true]
+11:13:31 85 [INFO ] (SASPreprocessor.java:183) - tru1: var1-at(obj11, pos1)
+11:13:31 85 [INFO ] (SASPreprocessor.java:179) - apn1: var0-at(apn1, apt1)
+11:13:31 85 [INFO ] (SASPreprocessor.java:183) - tru1: var1-in(obj11, tru1)
+11:13:31 86 [INFO ] (SASPreprocessor.java:152) - public(goal): var2-at(tru1, pos1)
+11:13:31 86 [INFO ] (SASPreprocessor.java:183) - tru1: var2-at(tru1, pos1)
+11:13:31 86 [INFO ] (SASPreprocessor.java:179) - apn1: var1-in(obj11, apn1)
+11:13:31 86 [INFO ] (SASPreprocessor.java:152) - public(goal): var1-at(obj11, apt1)
+11:13:31 86 [INFO ] (SASPreprocessor.java:179) - apn1: var1-at(obj11, apt1)
+11:13:31 86 [DEBUG] (SASPreprocessor.java:136) - op1
+SASOperator [label=unload-airplane-apn1 apn1 obj11 apt1, pre={var1=in(obj11, apn1), var0=at(apn1, apt1)}, eff={var1=at(obj11, apt1)}pub=true]
+11:13:31 86 [DEBUG] (SASPreprocessor.java:137) - op2
+SASOperator [label=drive-truck-tru1 tru1 apt1 pos1 cit1, pre={var2=at(tru1, apt1)}, eff={var2=at(tru1, pos1)}pub=true]
+11:13:31 86 [INFO ] (SASPreprocessor.java:179) - apn1: var0-at(apn1, apt1)
+11:13:31 86 [INFO ] (SASPreprocessor.java:183) - tru1: var2-at(tru1, apt1)
+11:13:31 86 [INFO ] (SASPreprocessor.java:152) - public(goal): var2-at(tru1, pos1)
+11:13:31 86 [INFO ] (SASPreprocessor.java:183) - tru1: var2-at(tru1, pos1)
+11:13:31 86 [INFO ] (SASPreprocessor.java:179) - apn1: var1-in(obj11, apn1)
+11:13:31 86 [INFO ] (SASPreprocessor.java:152) - public(goal): var1-at(obj11, apt1)
+11:13:31 86 [INFO ] (SASPreprocessor.java:179) - apn1: var1-at(obj11, apt1)
+11:13:31 86 [DEBUG] (SASPreprocessor.java:136) - op1
+SASOperator [label=unload-airplane-apn1 apn1 obj11 apt1, pre={var1=in(obj11, apn1), var0=at(apn1, apt1)}, eff={var1=at(obj11, apt1)}pub=true]
+11:13:31 86 [DEBUG] (SASPreprocessor.java:137) - op2
+SASOperator [label=unload-truck-tru1 tru1 obj11 apt1, pre={var2=at(tru1, apt1), var1=in(obj11, tru1)}, eff={var1=at(obj11, apt1)}pub=true]
+11:13:31 87 [INFO ] (SASPreprocessor.java:179) - apn1: var0-at(apn1, apt1)
+11:13:31 87 [INFO ] (SASPreprocessor.java:183) - tru1: var2-at(tru1, apt1)
+11:13:31 87 [INFO ] (SASPreprocessor.java:183) - tru1: var1-in(obj11, tru1)
+11:13:31 87 [INFO ] (SASPreprocessor.java:179) - apn1: var1-in(obj11, apn1)
+11:13:31 87 [INFO ] (SASPreprocessor.java:152) - public(goal): var1-at(obj11, apt1)
+11:13:31 87 [INFO ] (SASPreprocessor.java:172) - public: var1-at(obj11, apt1)
+11:13:31 87 [INFO ] (SASPreprocessor.java:173) - 	on operators: unload-airplane-apn1 apn1 obj11 apt1 and unload-truck-tru1 tru1 obj11 apt1
+11:13:31 87 [DEBUG] (SASPreprocessor.java:136) - op1
+SASOperator [label=unload-airplane-apn1 apn1 obj11 apt1, pre={var1=in(obj11, apn1), var0=at(apn1, apt1)}, eff={var1=at(obj11, apt1)}pub=true]
+11:13:31 87 [DEBUG] (SASPreprocessor.java:137) - op2
+SASOperator [label=drive-truck-tru1 tru1 pos1 apt1 cit1, pre={var2=at(tru1, pos1)}, eff={var2=at(tru1, apt1)}pub=true]
+11:13:31 87 [INFO ] (SASPreprocessor.java:179) - apn1: var0-at(apn1, apt1)
+11:13:31 87 [INFO ] (SASPreprocessor.java:183) - tru1: var2-at(tru1, apt1)
+11:13:31 87 [INFO ] (SASPreprocessor.java:152) - public(goal): var2-at(tru1, pos1)
+11:13:31 87 [INFO ] (SASPreprocessor.java:183) - tru1: var2-at(tru1, pos1)
+11:13:31 87 [INFO ] (SASPreprocessor.java:179) - apn1: var1-in(obj11, apn1)
+11:13:31 87 [INFO ] (SASPreprocessor.java:152) - public(goal): var1-at(obj11, apt1)
+11:13:31 87 [INFO ] (SASPreprocessor.java:179) - apn1: var1-at(obj11, apt1)
+11:13:31 87 [DEBUG] (SASPreprocessor.java:136) - op1
+SASOperator [label=unload-airplane-apn1 apn1 obj11 apt1, pre={var1=in(obj11, apn1), var0=at(apn1, apt1)}, eff={var1=at(obj11, apt1)}pub=true]
+11:13:31 88 [DEBUG] (SASPreprocessor.java:137) - op2
+SASOperator [label=load-truck-tru1 tru1 obj11 apt1, pre={var2=at(tru1, apt1), var1=at(obj11, apt1)}, eff={var1=in(obj11, tru1)}pub=true]
+11:13:31 88 [INFO ] (SASPreprocessor.java:179) - apn1: var0-at(apn1, apt1)
+11:13:31 88 [INFO ] (SASPreprocessor.java:183) - tru1: var2-at(tru1, apt1)
+11:13:31 88 [INFO ] (SASPreprocessor.java:183) - tru1: var1-in(obj11, tru1)
+11:13:31 88 [INFO ] (SASPreprocessor.java:179) - apn1: var1-in(obj11, apn1)
+11:13:31 88 [INFO ] (SASPreprocessor.java:152) - public(goal): var1-at(obj11, apt1)
+11:13:31 88 [INFO ] (SASPreprocessor.java:172) - public: var1-at(obj11, apt1)
+11:13:31 88 [INFO ] (SASPreprocessor.java:173) - 	on operators: unload-airplane-apn1 apn1 obj11 apt1 and load-truck-tru1 tru1 obj11 apt1
+11:13:31 91 [INFO ] (SASPreprocessor.java:255) - Domain(3) [agent=apn1, vars=<3, 3), vals=<4, 7)]
+11:13:31 91 [INFO ] (SASPreprocessor.java:256) - 
+public:
+   vars: 0(var2), 1(var1), 2(var0), 
+   vals: 0(at(tru1, pos1)), 1(at(obj11, pos1)), 2(at(obj11, apt1)), 3(at(apn1, apt2)), 
+apn1:
+   vars: 
+   vals: 4(in(obj11, apn1)), 5(at(obj11, apt2)), 6(at(apn1, apt1)), 
+11:13:31 91 [INFO ] (SASPreprocessor.java:255) - Domain(3) [agent=tru1, vars=<3, 3), vals=<7, 9)]
+11:13:31 91 [INFO ] (SASPreprocessor.java:256) - 
+public:
+   vars: 0(var2), 1(var1), 2(var0), 
+   vals: 0(at(tru1, pos1)), 1(at(obj11, pos1)), 2(at(obj11, apt1)), 3(at(apn1, apt2)), 
+tru1:
+   vars: 
+   vals: 7(at(tru1, apt1)), 8(in(obj11, tru1)), 
+11:13:31 91 [INFO ] (MAPDDLCreator.java:269) - >>> ENTITIES CREATION
+11:13:31 94 [INFO ] (SASPreprocessor.java:406) - var2:0, at(tru1, pos1):0
+11:13:31 95 [INFO ] (SASPreprocessor.java:406) - var1:1, at(obj11, pos1):1
+11:13:31 95 [INFO ] (SASPreprocessor.java:406) - var0:2, at(apn1, apt2):3
+11:13:31 95 [INFO ] (SASPreprocessor.java:431) - var0:2, at(apn1, apt1):6
+11:13:31 96 [INFO ] (SASPreprocessor.java:436) - Action [label=fly-airplane-apn1 apn1 apt2 apt1, cost=1.0, precondition=SuperState [stateVariableMap[[-1, -1, 3]]={var0=at(apn1, apt2),}], effect=SuperState [stateVariableMap[[-1, -1, 6]]={var0=at(apn1, apt1),}], isPublic=true, owner=apn1] - -484983754
+
+11:13:31 97 [INFO ] (SASPreprocessor.java:431) - var1:1, at(obj11, apt2):5
+11:13:31 97 [INFO ] (SASPreprocessor.java:436) - Action [label=unload-airplane-apn1 apn1 obj11 apt2, cost=1.0, precondition=SuperState [stateVariableMap[[-1, 4, 3]]={var1=in(obj11, apn1),var0=at(apn1, apt2),}], effect=SuperState [stateVariableMap[[-1, 5, -1]]={var1=at(obj11, apt2),}], isPublic=true, owner=apn1] - -384717189
+
+11:13:31 97 [INFO ] (SASPreprocessor.java:431) - var1:1, in(obj11, apn1):4
+11:13:31 97 [INFO ] (SASPreprocessor.java:436) - Action [label=load-airplane-apn1 apn1 obj11 apt2, cost=1.0, precondition=SuperState [stateVariableMap[[-1, 5, 3]]={var1=at(obj11, apt2),var0=at(apn1, apt2),}], effect=SuperState [stateVariableMap[[-1, 4, -1]]={var1=in(obj11, apn1),}], isPublic=true, owner=apn1] - -1834103774
+
+11:13:31 97 [INFO ] (SASPreprocessor.java:431) - var0:2, at(apn1, apt2):3
+11:13:31 97 [INFO ] (SASPreprocessor.java:436) - Action [label=fly-airplane-apn1 apn1 apt1 apt2, cost=1.0, precondition=SuperState [stateVariableMap[[-1, -1, 6]]={var0=at(apn1, apt1),}], effect=SuperState [stateVariableMap[[-1, -1, 3]]={var0=at(apn1, apt2),}], isPublic=true, owner=apn1] - -513612904
+
+11:13:31 98 [INFO ] (SASPreprocessor.java:431) - var1:1, in(obj11, apn1):4
+11:13:31 98 [INFO ] (SASPreprocessor.java:436) - Action [label=load-airplane-apn1 apn1 obj11 apt1, cost=1.0, precondition=SuperState [stateVariableMap[[-1, 2, 6]]={var1=at(obj11, apt1),var0=at(apn1, apt1),}], effect=SuperState [stateVariableMap[[-1, 4, -1]]={var1=in(obj11, apn1),}], isPublic=true, owner=apn1] - -1834103775
+
+11:13:31 98 [INFO ] (SASPreprocessor.java:431) - var1:1, at(obj11, apt1):2
+11:13:31 98 [INFO ] (SASPreprocessor.java:436) - Action [label=unload-airplane-apn1 apn1 obj11 apt1, cost=1.0, precondition=SuperState [stateVariableMap[[-1, 4, 6]]={var1=in(obj11, apn1),var0=at(apn1, apt1),}], effect=SuperState [stateVariableMap[[-1, 2, -1]]={var1=at(obj11, apt1),}], isPublic=true, owner=apn1] - -384717190
+
+11:13:31 104 [INFO ] (Planner.java:101) - apn1 Configuring planner:[saFF, glcl], rec_limit:-1, time_limit_ms:600000
+11:13:31 106 [DEBUG] (RelaxationHeuristic.java:79) - apn1 init 
+11:13:31 107 [INFO ] (RelaxationHeuristic.java:98) - apn1 built 21 propositions
+11:13:31 107 [DEBUG] (RelaxationHeuristic.java:181) - apn1 added public operator fly-airplane-apn1 apn1 apt2 apt1(2-6):0
+11:13:31 107 [DEBUG] (RelaxationHeuristic.java:181) - apn1 added public operator unload-airplane-apn1 apn1 obj11 apt2(1-5):1
+11:13:31 107 [DEBUG] (RelaxationHeuristic.java:181) - apn1 added public operator load-airplane-apn1 apn1 obj11 apt2(1-4):2
+11:13:31 107 [DEBUG] (RelaxationHeuristic.java:181) - apn1 added public operator fly-airplane-apn1 apn1 apt1 apt2(2-3):3
+11:13:31 107 [DEBUG] (RelaxationHeuristic.java:181) - apn1 added public operator load-airplane-apn1 apn1 obj11 apt1(1-4):4
+11:13:31 108 [DEBUG] (RelaxationHeuristic.java:181) - apn1 added public operator unload-airplane-apn1 apn1 obj11 apt1(1-2):5
+11:13:31 108 [DEBUG] (RelaxationHeuristic.java:181) - apn1 added public operator *unload-truck-tru1 tru1 obj11 pos1(tru1)(1-1):6
+11:13:31 108 [DEBUG] (RelaxationHeuristic.java:181) - apn1 added public operator *drive-truck-tru1 tru1 apt1 pos1 cit1(tru1)(0-0):7
+11:13:31 108 [DEBUG] (RelaxationHeuristic.java:181) - apn1 added public operator *unload-truck-tru1 tru1 obj11 apt1(tru1)(1-2):8
+11:13:31 108 [INFO ] (RelaxationHeuristic.java:161) - apn1 built 9 unary operators
+11:13:31 109 [DEBUG] (RelaxationHeuristic.java:79) - apn1 init 
+11:13:31 109 [INFO ] (RelaxationHeuristic.java:98) - apn1 built 21 propositions
+11:13:31 110 [DEBUG] (RelaxationHeuristic.java:181) - apn1 added public operator fly-airplane-apn1 apn1 apt1 apt2(2-3):0
+11:13:31 110 [DEBUG] (RelaxationHeuristic.java:181) - apn1 added public operator *unload-truck-tru1 tru1 obj11 pos1(tru1)(1-1):1
+11:13:31 110 [DEBUG] (RelaxationHeuristic.java:181) - apn1 added public operator *unload-truck-tru1 tru1 obj11 apt1(tru1)(1-2):2
+11:13:31 110 [DEBUG] (RelaxationHeuristic.java:181) - apn1 added public operator unload-airplane-apn1 apn1 obj11 apt1(1-2):3
+11:13:31 110 [DEBUG] (RelaxationHeuristic.java:181) - apn1 added public operator *drive-truck-tru1 tru1 apt1 pos1 cit1(tru1)(0-0):4
+11:13:31 110 [DEBUG] (RelaxationHeuristic.java:181) - apn1 added public operator fly-airplane-apn1 apn1 apt2 apt1(2-6):5
+11:13:31 110 [DEBUG] (RelaxationHeuristic.java:181) - apn1 added public operator unload-airplane-apn1 apn1 obj11 apt2(1-5):6
+11:13:31 110 [DEBUG] (RelaxationHeuristic.java:181) - apn1 added public operator load-airplane-apn1 apn1 obj11 apt2(1-4):7
+11:13:31 110 [DEBUG] (RelaxationHeuristic.java:181) - apn1 added public operator load-airplane-apn1 apn1 obj11 apt1(1-4):8
+11:13:31 111 [INFO ] (RelaxationHeuristic.java:161) - apn1 built 9 unary operators
+11:13:31 112 [DEBUG] (RelaxationHeuristic.java:79) - apn1 init 
+11:13:31 113 [INFO ] (RelaxationHeuristic.java:98) - apn1 built 21 propositions
+11:13:31 113 [DEBUG] (RelaxationHeuristic.java:181) - apn1 added public operator fly-airplane-apn1 apn1 apt1 apt2(2-3):0
+11:13:31 113 [DEBUG] (RelaxationHeuristic.java:181) - apn1 added public operator *unload-truck-tru1 tru1 obj11 pos1(tru1)(1-1):1
+11:13:31 113 [DEBUG] (RelaxationHeuristic.java:181) - apn1 added public operator *unload-truck-tru1 tru1 obj11 apt1(tru1)(1-2):2
+11:13:31 113 [DEBUG] (RelaxationHeuristic.java:181) - apn1 added public operator unload-airplane-apn1 apn1 obj11 apt1(1-2):3
+11:13:31 113 [DEBUG] (RelaxationHeuristic.java:181) - apn1 added public operator *drive-truck-tru1 tru1 apt1 pos1 cit1(tru1)(0-0):4
+11:13:31 113 [DEBUG] (RelaxationHeuristic.java:181) - apn1 added public operator fly-airplane-apn1 apn1 apt2 apt1(2-6):5
+11:13:31 113 [DEBUG] (RelaxationHeuristic.java:181) - apn1 added public operator unload-airplane-apn1 apn1 obj11 apt2(1-5):6
+11:13:31 113 [DEBUG] (RelaxationHeuristic.java:181) - apn1 added public operator load-airplane-apn1 apn1 obj11 apt2(1-4):7
+11:13:31 113 [DEBUG] (RelaxationHeuristic.java:181) - apn1 added public operator load-airplane-apn1 apn1 obj11 apt1(1-4):8
+11:13:31 113 [INFO ] (RelaxationHeuristic.java:161) - apn1 built 9 unary operators
+11:13:31 117 [INFO ] (SASPreprocessor.java:406) - var2:0, at(tru1, pos1):0
+11:13:31 117 [INFO ] (SASPreprocessor.java:406) - var1:1, at(obj11, pos1):1
+11:13:31 117 [INFO ] (SASPreprocessor.java:406) - var0:2, at(apn1, apt2):3
+11:13:31 117 [INFO ] (SASPreprocessor.java:431) - var1:1, at(obj11, pos1):1
+11:13:31 117 [INFO ] (SASPreprocessor.java:436) - Action [label=unload-truck-tru1 tru1 obj11 pos1, cost=1.0, precondition=SuperState [stateVariableMap[[0, 8, -1]]={var2=at(tru1, pos1),var1=in(obj11, tru1),}], effect=SuperState [stateVariableMap[[-1, 1, -1]]={var1=at(obj11, pos1),}], isPublic=true, owner=tru1] - 462300034
+
+11:13:31 117 [INFO ] (SASPreprocessor.java:431) - var1:1, in(obj11, tru1):8
+11:13:31 117 [INFO ] (SASPreprocessor.java:436) - Action [label=load-truck-tru1 tru1 obj11 pos1, cost=1.0, precondition=SuperState [stateVariableMap[[0, 1, -1]]={var2=at(tru1, pos1),var1=at(obj11, pos1),}], effect=SuperState [stateVariableMap[[-1, 8, -1]]={var1=in(obj11, tru1),}], isPublic=true, owner=tru1] - 1683899707
+
+11:13:31 117 [INFO ] (SASPreprocessor.java:431) - var2:0, at(tru1, pos1):0
+11:13:31 117 [INFO ] (SASPreprocessor.java:436) - Action [label=drive-truck-tru1 tru1 apt1 pos1 cit1, cost=1.0, precondition=SuperState [stateVariableMap[[7, -1, -1]]={var2=at(tru1, apt1),}], effect=SuperState [stateVariableMap[[0, -1, -1]]={var2=at(tru1, pos1),}], isPublic=true, owner=tru1] - -296121693
+
+11:13:31 117 [INFO ] (SASPreprocessor.java:431) - var1:1, at(obj11, apt1):2
+11:13:31 117 [INFO ] (SASPreprocessor.java:436) - Action [label=unload-truck-tru1 tru1 obj11 apt1, cost=1.0, precondition=SuperState [stateVariableMap[[7, 8, -1]]={var2=at(tru1, apt1),var1=in(obj11, tru1),}], effect=SuperState [stateVariableMap[[-1, 2, -1]]={var1=at(obj11, apt1),}], isPublic=true, owner=tru1] - 461854161
+
+11:13:31 117 [INFO ] (SASPreprocessor.java:431) - var2:0, at(tru1, apt1):7
+11:13:31 117 [INFO ] (SASPreprocessor.java:436) - Action [label=drive-truck-tru1 tru1 pos1 apt1 cit1, cost=1.0, precondition=SuperState [stateVariableMap[[0, -1, -1]]={var2=at(tru1, pos1),}], effect=SuperState [stateVariableMap[[7, -1, -1]]={var2=at(tru1, apt1),}], isPublic=true, owner=tru1] - 552113701
+
+11:13:31 117 [INFO ] (SASPreprocessor.java:431) - var1:1, in(obj11, tru1):8
+11:13:31 117 [INFO ] (SASPreprocessor.java:436) - Action [label=load-truck-tru1 tru1 obj11 apt1, cost=1.0, precondition=SuperState [stateVariableMap[[7, 2, -1]]={var2=at(tru1, apt1),var1=at(obj11, apt1),}], effect=SuperState [stateVariableMap[[-1, 8, -1]]={var1=in(obj11, tru1),}], isPublic=true, owner=tru1] - 1683453834
+
+11:13:31 118 [INFO ] (Planner.java:101) - tru1 Configuring planner:[saFF, glcl], rec_limit:-1, time_limit_ms:600000
+11:13:31 118 [DEBUG] (RelaxationHeuristic.java:79) - tru1 init 
+11:13:31 118 [INFO ] (RelaxationHeuristic.java:98) - tru1 built 18 propositions
+11:13:31 118 [DEBUG] (RelaxationHeuristic.java:181) - tru1 added public operator unload-truck-tru1 tru1 obj11 pos1(1-1):0
+11:13:31 118 [DEBUG] (RelaxationHeuristic.java:181) - tru1 added public operator load-truck-tru1 tru1 obj11 pos1(1-8):1
+11:13:31 118 [DEBUG] (RelaxationHeuristic.java:181) - tru1 added public operator drive-truck-tru1 tru1 apt1 pos1 cit1(0-0):2
+11:13:31 118 [DEBUG] (RelaxationHeuristic.java:181) - tru1 added public operator unload-truck-tru1 tru1 obj11 apt1(1-2):3
+11:13:31 118 [DEBUG] (RelaxationHeuristic.java:181) - tru1 added public operator drive-truck-tru1 tru1 pos1 apt1 cit1(0-7):4
+11:13:31 118 [DEBUG] (RelaxationHeuristic.java:181) - tru1 added public operator load-truck-tru1 tru1 obj11 apt1(1-8):5
+11:13:31 118 [DEBUG] (RelaxationHeuristic.java:181) - tru1 added public operator *fly-airplane-apn1 apn1 apt1 apt2(apn1)(2-3):6
+11:13:31 118 [DEBUG] (RelaxationHeuristic.java:181) - tru1 added public operator *unload-airplane-apn1 apn1 obj11 apt1(apn1)(1-2):7
+11:13:31 118 [INFO ] (RelaxationHeuristic.java:161) - tru1 built 8 unary operators
+11:13:31 118 [DEBUG] (RelaxationHeuristic.java:79) - tru1 init 
+11:13:31 119 [INFO ] (RelaxationHeuristic.java:98) - tru1 built 18 propositions
+11:13:31 119 [DEBUG] (RelaxationHeuristic.java:181) - tru1 added public operator *fly-airplane-apn1 apn1 apt1 apt2(apn1)(2-3):0
+11:13:31 119 [DEBUG] (RelaxationHeuristic.java:181) - tru1 added public operator unload-truck-tru1 tru1 obj11 pos1(1-1):1
+11:13:31 119 [DEBUG] (RelaxationHeuristic.java:181) - tru1 added public operator unload-truck-tru1 tru1 obj11 apt1(1-2):2
+11:13:31 119 [DEBUG] (RelaxationHeuristic.java:181) - tru1 added public operator *unload-airplane-apn1 apn1 obj11 apt1(apn1)(1-2):3
+11:13:31 119 [DEBUG] (RelaxationHeuristic.java:181) - tru1 added public operator drive-truck-tru1 tru1 apt1 pos1 cit1(0-0):4
+11:13:31 119 [DEBUG] (RelaxationHeuristic.java:181) - tru1 added public operator load-truck-tru1 tru1 obj11 pos1(1-8):5
+11:13:31 119 [DEBUG] (RelaxationHeuristic.java:181) - tru1 added public operator drive-truck-tru1 tru1 pos1 apt1 cit1(0-7):6
+11:13:31 119 [DEBUG] (RelaxationHeuristic.java:181) - tru1 added public operator load-truck-tru1 tru1 obj11 apt1(1-8):7
+11:13:31 119 [INFO ] (RelaxationHeuristic.java:161) - tru1 built 8 unary operators
+11:13:31 119 [DEBUG] (RelaxationHeuristic.java:79) - tru1 init 
+11:13:31 119 [INFO ] (RelaxationHeuristic.java:98) - tru1 built 18 propositions
+11:13:31 119 [DEBUG] (RelaxationHeuristic.java:181) - tru1 added public operator *fly-airplane-apn1 apn1 apt1 apt2(apn1)(2-3):0
+11:13:31 119 [DEBUG] (RelaxationHeuristic.java:181) - tru1 added public operator unload-truck-tru1 tru1 obj11 pos1(1-1):1
+11:13:31 119 [DEBUG] (RelaxationHeuristic.java:181) - tru1 added public operator unload-truck-tru1 tru1 obj11 apt1(1-2):2
+11:13:31 119 [DEBUG] (RelaxationHeuristic.java:181) - tru1 added public operator *unload-airplane-apn1 apn1 obj11 apt1(apn1)(1-2):3
+11:13:31 120 [DEBUG] (RelaxationHeuristic.java:181) - tru1 added public operator drive-truck-tru1 tru1 apt1 pos1 cit1(0-0):4
+11:13:31 120 [DEBUG] (RelaxationHeuristic.java:181) - tru1 added public operator load-truck-tru1 tru1 obj11 pos1(1-8):5
+11:13:31 120 [DEBUG] (RelaxationHeuristic.java:181) - tru1 added public operator drive-truck-tru1 tru1 pos1 apt1 cit1(0-7):6
+11:13:31 120 [DEBUG] (RelaxationHeuristic.java:181) - tru1 added public operator load-truck-tru1 tru1 obj11 apt1(1-8):7
+11:13:31 120 [INFO ] (RelaxationHeuristic.java:161) - tru1 built 8 unary operators
+11:13:31 120 [INFO ] (MAPDDLCreator.java:316) - >>> ENTITIES RUNNING
+11:13:31 122 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:123) - tru1 get heuristic: {var2=at(tru1, pos1),var1=at(obj11, pos1),var0=at(apn1, apt2),}
+11:13:31 122 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:123) - apn1 get heuristic: {var2=at(tru1, pos1),var1=at(obj11, pos1),var0=at(apn1, apt2),}
+11:13:31 123 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:188) - tru1 get local RP: s:{var2=at(tru1, pos1),var1=at(obj11, pos1),var0=at(apn1, apt2),}, goal: {var2=at(tru1, pos1),var1=at(obj11, apt1),var0=at(apn1, apt2),}
+11:13:31 123 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:188) - apn1 get local RP: s:{var2=at(tru1, pos1),var1=at(obj11, pos1),var0=at(apn1, apt2),}, goal: {var2=at(tru1, pos1),var1=at(obj11, apt1),var0=at(apn1, apt2),}
+11:13:31 123 [DEBUG] (RelaxationHeuristic.java:185) - tru1 build goal propositions: [0, 2, 3]:{var2=at(tru1, pos1),var1=at(obj11, apt1),var0=at(apn1, apt2),}
+11:13:31 123 [DEBUG] (RelaxationHeuristic.java:185) - apn1 build goal propositions: [0, 2, 3]:{var2=at(tru1, pos1),var1=at(obj11, apt1),var0=at(apn1, apt2),}
+11:13:31 123 [DEBUG] (RelaxationHeuristic.java:227) - tru1 setup exploration queue 
+11:13:31 123 [DEBUG] (RelaxationHeuristic.java:227) - apn1 setup exploration queue 
+11:13:31 123 [DEBUG] (RelaxationHeuristic.java:257) - tru1 build goal propositions: {var2=at(tru1, pos1),var1=at(obj11, pos1),var0=at(apn1, apt2),}
+11:13:31 123 [DEBUG] (RelaxationHeuristic.java:257) - apn1 build goal propositions: {var2=at(tru1, pos1),var1=at(obj11, pos1),var0=at(apn1, apt2),}
+11:13:31 124 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:214) - apn1 send request: [461854161]
+11:13:31 124 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:214) - tru1 send request: [-384717190]
+11:13:31 124 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:243) - apn1 send request to tru1: 4000(4000), waiting for: 2
+11:13:31 124 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:243) - tru1 send request to apn1: 3001(3001), waiting for: 2
+11:13:31 124 [DEBUG] (DistributedHeuristicRequestProtocol.java:50) - apn1 send HeuristicRequestMessage [
+state=29825, 
+requestedGoal=[461854161](461854192)] to tru1
+11:13:31 124 [DEBUG] (DistributedHeuristicRequestProtocol.java:50) - tru1 send HeuristicRequestMessage [
+state=29825, 
+requestedGoal=[-384717190](-384717159)] to apn1
+11:13:31 126 [DEBUG] (RelaxationHeuristic.java:330) - apn1 get heuristic: {var2=at(tru1, pos1),var1=at(obj11, pos1),var0=at(apn1, apt2),}
+11:13:31 126 [DEBUG] (RelaxationHeuristic.java:330) - tru1 get heuristic: {var2=at(tru1, pos1),var1=at(obj11, pos1),var0=at(apn1, apt2),}
+11:13:31 127 [DEBUG] (RelaxationHeuristic.java:185) - apn1 build goal propositions: [0, 2, 3]:{var2=at(tru1, pos1),var1=at(obj11, apt1),var0=at(apn1, apt2),}
+11:13:31 127 [DEBUG] (RelaxationHeuristic.java:185) - tru1 build goal propositions: [0, 2, 3]:{var2=at(tru1, pos1),var1=at(obj11, apt1),var0=at(apn1, apt2),}
+11:13:31 127 [DEBUG] (RelaxationHeuristic.java:227) - apn1 setup exploration queue 
+11:13:31 127 [DEBUG] (RelaxationHeuristic.java:227) - tru1 setup exploration queue 
+11:13:31 127 [DEBUG] (RelaxationHeuristic.java:257) - apn1 build goal propositions: {var2=at(tru1, pos1),var1=at(obj11, pos1),var0=at(apn1, apt2),}
+11:13:31 127 [DEBUG] (RelaxationHeuristic.java:257) - tru1 build goal propositions: {var2=at(tru1, pos1),var1=at(obj11, pos1),var0=at(apn1, apt2),}
+11:13:31 129 [DEBUG] (LazilyDistributedSAFFReplyHeuristic.java:43) - apn1 handle request from tru1: HeuristicRequestMessage [
+state=29825, 
+requestedGoal={}(-384717159)]
+11:13:31 129 [DEBUG] (LazilyDistributedSAFFReplyHeuristic.java:43) - tru1 handle request from apn1: HeuristicRequestMessage [
+state=29825, 
+requestedGoal={}(461854192)]
+11:13:31 129 [DEBUG] (RelaxationHeuristic.java:227) - apn1 setup exploration queue 
+11:13:31 129 [DEBUG] (RelaxationHeuristic.java:227) - tru1 setup exploration queue 
+11:13:31 129 [DEBUG] (RelaxationHeuristic.java:257) - apn1 build goal propositions: {var2=at(tru1, pos1),var1=at(obj11, pos1),var0=at(apn1, apt2),}
+11:13:31 129 [DEBUG] (RelaxationHeuristic.java:257) - tru1 build goal propositions: {var2=at(tru1, pos1),var1=at(obj11, pos1),var0=at(apn1, apt2),}
+11:13:31 129 [DEBUG] (LazilyDistributedSAFFReplyHeuristic.java:188) - apn1 send reply to tru1: 3001
+11:13:31 129 [DEBUG] (LazilyDistributedSAFFReplyHeuristic.java:188) - tru1 send reply to apn1: 4000
+11:13:31 129 [DEBUG] (DistributedHeuristicReplyProtocol.java:51) - apn1 send HeuristicReplyWithPublicActionsMessage [requestHash=3001, stateHash=29825, goalHash=0, heuristicValue=1, usedPublicActionIDs=[-1834103775, 461854161, -484983754]] to tru1
+11:13:31 129 [DEBUG] (DistributedHeuristicReplyProtocol.java:51) - tru1 send HeuristicReplyWithPublicActionsMessage [requestHash=4000, stateHash=29825, goalHash=0, heuristicValue=1, usedPublicActionIDs=[1683899707, 552113701]] to apn1
+11:13:31 131 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:63) - tru1 handle reply from apn1: HeuristicReplyWithPublicActionsMessage [requestHash=3001, stateHash=29825, goalHash=0, heuristicValue=1, usedPublicActionIDs=[-1834103775, 461854161, -484983754]]
+11:13:31 131 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:63) - apn1 handle reply from tru1: HeuristicReplyWithPublicActionsMessage [requestHash=4000, stateHash=29825, goalHash=0, heuristicValue=1, usedPublicActionIDs=[1683899707, 552113701]]
+11:13:31 131 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:214) - tru1 send request: [461854161]
+11:13:31 131 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:243) - tru1 send request to tru1: 3001(3001), waiting for: 2
+11:13:31 131 [DEBUG] (LazilyDistributedSAFFReplyHeuristic.java:43) - tru1 handle request from tru1: HeuristicRequestMessage [
+state=29825, 
+requestedGoal={}(461854192)]
+11:13:31 131 [DEBUG] (RelaxationHeuristic.java:227) - tru1 setup exploration queue 
+11:13:31 131 [INFO ] (GlobalLocalDistributedBestFirstSearch.java:308) - apn1: Reached new minimal global [null] /h/: 3
+11:13:31 131 [DEBUG] (RelaxationHeuristic.java:257) - tru1 build goal propositions: {var2=at(tru1, pos1),var1=at(obj11, pos1),var0=at(apn1, apt2),}
+11:13:31 131 [INFO ] (GlobalLocalDistributedBestFirstSearch.java:312) - apn1: Reached new maximal [null] /g/: 1
+11:13:31 131 [DEBUG] (LazilyDistributedSAFFReplyHeuristic.java:188) - tru1 send reply to tru1: 3001
+11:13:31 131 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:123) - apn1 get heuristic: {var2=at(tru1, pos1),var1=at(obj11, pos1),var0=at(apn1, apt1),}
+11:13:31 131 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:63) - tru1 handle reply from tru1: HeuristicReplyWithPublicActionsMessage [requestHash=3001, stateHash=29825, goalHash=0, heuristicValue=1, usedPublicActionIDs=[1683899707, 552113701]]
+11:13:31 131 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:188) - apn1 get local RP: s:{var2=at(tru1, pos1),var1=at(obj11, pos1),var0=at(apn1, apt1),}, goal: {var2=at(tru1, pos1),var1=at(obj11, apt1),var0=at(apn1, apt2),}
+11:13:31 131 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:214) - tru1 send request: [1683899707, 552113701]
+11:13:31 132 [DEBUG] (RelaxationHeuristic.java:185) - apn1 build goal propositions: [0, 2, 3]:{var2=at(tru1, pos1),var1=at(obj11, apt1),var0=at(apn1, apt2),}
+11:13:31 132 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:243) - tru1 send request to tru1: 3001(3001), waiting for: 3
+11:13:31 132 [DEBUG] (RelaxationHeuristic.java:227) - apn1 setup exploration queue 
+11:13:31 132 [DEBUG] (LazilyDistributedSAFFReplyHeuristic.java:43) - tru1 handle request from tru1: HeuristicRequestMessage [
+state=29825, 
+requestedGoal={}(1213398027)]
+11:13:31 132 [DEBUG] (RelaxationHeuristic.java:257) - apn1 build goal propositions: {var2=at(tru1, pos1),var1=at(obj11, pos1),var0=at(apn1, apt1),}
+11:13:31 132 [DEBUG] (RelaxationHeuristic.java:227) - tru1 setup exploration queue 
+11:13:31 132 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:214) - apn1 send request: [461854161]
+11:13:31 132 [DEBUG] (RelaxationHeuristic.java:257) - tru1 build goal propositions: {var2=at(tru1, pos1),var1=at(obj11, pos1),var0=at(apn1, apt2),}
+11:13:31 132 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:243) - apn1 send request to tru1: 5000(5000), waiting for: 2
+11:13:31 132 [DEBUG] (DistributedHeuristicRequestProtocol.java:50) - apn1 send HeuristicRequestMessage [
+state=29828, 
+requestedGoal=[461854161](461854192)] to tru1
+11:13:31 132 [DEBUG] (LazilyDistributedSAFFReplyHeuristic.java:188) - tru1 send reply to tru1: 3001
+11:13:31 132 [INFO ] (GlobalLocalDistributedBestFirstSearch.java:415) - apn1: Reached new minimal local [null] /h/: 3
+11:13:31 132 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:63) - tru1 handle reply from tru1: HeuristicReplyWithPublicActionsMessage [requestHash=3001, stateHash=29825, goalHash=0, heuristicValue=1, usedPublicActionIDs=[]]
+11:13:31 132 [DEBUG] (RelaxationHeuristic.java:330) - apn1 get heuristic: {var2=at(tru1, pos1),var1=at(obj11, pos1),var0=at(apn1, apt1),}
+11:13:31 133 [DEBUG] (RelaxationHeuristic.java:185) - apn1 build goal propositions: [0, 2, 3]:{var2=at(tru1, pos1),var1=at(obj11, apt1),var0=at(apn1, apt2),}
+11:13:31 133 [DEBUG] (RelaxationHeuristic.java:227) - apn1 setup exploration queue 
+11:13:31 133 [DEBUG] (LazilyDistributedSAFFReplyHeuristic.java:43) - tru1 handle request from apn1: HeuristicRequestMessage [
+state=29828, 
+requestedGoal={}(461854192)]
+11:13:31 133 [DEBUG] (RelaxationHeuristic.java:257) - apn1 build goal propositions: {var2=at(tru1, pos1),var1=at(obj11, pos1),var0=at(apn1, apt1),}
+11:13:31 133 [DEBUG] (RelaxationHeuristic.java:227) - tru1 setup exploration queue 
+11:13:31 133 [DEBUG] (RelaxationHeuristic.java:257) - tru1 build goal propositions: {var2=at(tru1, pos1),var1=at(obj11, pos1),}
+11:13:31 133 [DEBUG] (DistributedSearchProtocol.java:55) - apn1 send state State [[0, 1, 6]]
+11:13:31 133 [DEBUG] (LazilyDistributedSAFFReplyHeuristic.java:188) - tru1 send reply to apn1: 5000
+11:13:31 133 [DEBUG] (DistributedHeuristicReplyProtocol.java:51) - tru1 send HeuristicReplyWithPublicActionsMessage [requestHash=5000, stateHash=29828, goalHash=0, heuristicValue=1, usedPublicActionIDs=[1683899707, 552113701]] to apn1
+11:13:31 133 [INFO ] (GlobalLocalDistributedBestFirstSearch.java:308) - tru1: Reached new minimal global [null] /h/: 6
+11:13:31 134 [INFO ] (GlobalLocalDistributedBestFirstSearch.java:312) - tru1: Reached new maximal [null] /g/: 1
+11:13:31 134 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:63) - apn1 handle reply from tru1: HeuristicReplyWithPublicActionsMessage [requestHash=5000, stateHash=29828, goalHash=0, heuristicValue=1, usedPublicActionIDs=[1683899707, 552113701]]
+11:13:31 134 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:123) - tru1 get heuristic: {var2=at(tru1, pos1),var1=in(obj11, tru1),var0=at(apn1, apt2),}
+11:13:31 134 [DEBUG] (DistributedSearchProtocol.java:55) - apn1 send state State [[0, 1, 6]]
+11:13:31 134 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:188) - tru1 get local RP: s:{var2=at(tru1, pos1),var1=in(obj11, tru1),var0=at(apn1, apt2),}, goal: {var2=at(tru1, pos1),var1=at(obj11, apt1),var0=at(apn1, apt2),}
+11:13:31 134 [INFO ] (GlobalLocalDistributedBestFirstSearch.java:312) - apn1: Reached new maximal [null] /g/: 2
+11:13:31 134 [DEBUG] (RelaxationHeuristic.java:185) - tru1 build goal propositions: [0, 2, 3]:{var2=at(tru1, pos1),var1=at(obj11, apt1),var0=at(apn1, apt2),}
+11:13:31 134 [DEBUG] (RelaxationHeuristic.java:227) - tru1 setup exploration queue 
+11:13:31 134 [DEBUG] (RelaxationHeuristic.java:257) - tru1 build goal propositions: {var2=at(tru1, pos1),var1=in(obj11, tru1),var0=at(apn1, apt2),}
+11:13:31 134 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:214) - tru1 send request: [-384717190]
+11:13:31 134 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:243) - tru1 send request to apn1: 6001(6001), waiting for: 2
+11:13:31 135 [DEBUG] (DistributedHeuristicRequestProtocol.java:50) - tru1 send HeuristicRequestMessage [
+state=30042, 
+requestedGoal=[-384717190](-384717159)] to apn1
+11:13:31 135 [DEBUG] (LazilyDistributedSAFFReplyHeuristic.java:43) - apn1 handle request from tru1: HeuristicRequestMessage [
+state=30042, 
+requestedGoal={}(-384717159)]
+11:13:31 135 [DEBUG] (GlobalLocalDistributedBestFirstSearch.java:123) - tru1 receive state [0, 1, 6]
+11:13:31 135 [DEBUG] (RelaxationHeuristic.java:227) - apn1 setup exploration queue 
+11:13:31 135 [DEBUG] (RelaxationHeuristic.java:257) - apn1 build goal propositions: {var2=at(tru1, pos1),var0=at(apn1, apt2),}
+11:13:31 135 [DEBUG] (LazilyDistributedSAFFReplyHeuristic.java:188) - apn1 send reply to tru1: 6001
+11:13:31 135 [DEBUG] (DistributedHeuristicReplyProtocol.java:51) - apn1 send HeuristicReplyWithPublicActionsMessage [requestHash=6001, stateHash=30042, goalHash=0, heuristicValue=1, usedPublicActionIDs=[-1834103775, 461854161, -484983754]] to tru1
+11:13:31 135 [INFO ] (GlobalLocalDistributedBestFirstSearch.java:415) - tru1: Reached new minimal local [null] /h/: 6
+11:13:31 135 [DEBUG] (RelaxationHeuristic.java:330) - tru1 get heuristic: {var2=at(tru1, apt1),var1=at(obj11, pos1),var0=at(apn1, apt2),}
+11:13:31 135 [DEBUG] (RelaxationHeuristic.java:185) - tru1 build goal propositions: [0, 2, 3]:{var2=at(tru1, pos1),var1=at(obj11, apt1),var0=at(apn1, apt2),}
+11:13:31 135 [DEBUG] (RelaxationHeuristic.java:227) - tru1 setup exploration queue 
+11:13:31 136 [DEBUG] (RelaxationHeuristic.java:257) - tru1 build goal propositions: {var2=at(tru1, apt1),var1=at(obj11, pos1),var0=at(apn1, apt2),}
+11:13:31 136 [DEBUG] (DistributedSearchProtocol.java:55) - tru1 send state State [[7, 1, 3]]
+11:13:31 136 [DEBUG] (GlobalLocalDistributedBestFirstSearch.java:123) - tru1 receive state [0, 1, 6]
+11:13:31 136 [DEBUG] (GlobalLocalDistributedBestFirstSearch.java:123) - apn1 receive state [7, 1, 3]
+11:13:31 136 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:63) - tru1 handle reply from apn1: HeuristicReplyWithPublicActionsMessage [requestHash=6001, stateHash=30042, goalHash=0, heuristicValue=1, usedPublicActionIDs=[-1834103775, 461854161, -484983754]]
+11:13:31 136 [INFO ] (GlobalLocalDistributedBestFirstSearch.java:308) - apn1: Reached new minimal global [tru1] /h/: 2
+11:13:31 136 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:214) - tru1 send request: [461854161]
+11:13:31 136 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:123) - apn1 get heuristic: {var1=at(obj11, pos1),var0=at(apn1, apt2),}
+11:13:31 136 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:243) - tru1 send request to tru1: 6001(6001), waiting for: 2
+11:13:31 136 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:188) - apn1 get local RP: s:{var1=at(obj11, pos1),var0=at(apn1, apt2),}, goal: {var2=at(tru1, pos1),var1=at(obj11, apt1),var0=at(apn1, apt2),}
+11:13:31 136 [DEBUG] (LazilyDistributedSAFFReplyHeuristic.java:43) - tru1 handle request from tru1: HeuristicRequestMessage [
+state=30042, 
+requestedGoal={}(461854192)]
+11:13:31 136 [DEBUG] (RelaxationHeuristic.java:185) - apn1 build goal propositions: [0, 2, 3]:{var2=at(tru1, pos1),var1=at(obj11, apt1),var0=at(apn1, apt2),}
+11:13:31 136 [DEBUG] (RelaxationHeuristic.java:227) - tru1 setup exploration queue 
+11:13:31 137 [DEBUG] (RelaxationHeuristic.java:227) - apn1 setup exploration queue 
+11:13:31 137 [DEBUG] (RelaxationHeuristic.java:257) - tru1 build goal propositions: {var2=at(tru1, pos1),var1=in(obj11, tru1),var0=at(apn1, apt2),}
+11:13:31 137 [DEBUG] (RelaxationHeuristic.java:257) - apn1 build goal propositions: {var1=at(obj11, pos1),var0=at(apn1, apt2),}
+11:13:31 137 [DEBUG] (LazilyDistributedSAFFReplyHeuristic.java:188) - tru1 send reply to tru1: 6001
+11:13:31 137 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:214) - apn1 send request: [461854161, -296121693]
+11:13:31 137 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:63) - tru1 handle reply from tru1: HeuristicReplyWithPublicActionsMessage [requestHash=6001, stateHash=30042, goalHash=0, heuristicValue=1, usedPublicActionIDs=[552113701]]
+11:13:31 137 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:243) - apn1 send request to tru1: 7000(7000), waiting for: 2
+11:13:31 137 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:214) - tru1 send request: [552113701]
+11:13:31 137 [DEBUG] (DistributedHeuristicRequestProtocol.java:50) - apn1 send HeuristicRequestMessage [
+state=36552, 
+requestedGoal=[461854161, -296121693](1136456371)] to tru1
+11:13:31 137 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:243) - tru1 send request to tru1: 6001(6001), waiting for: 3
+11:13:31 137 [INFO ] (GlobalLocalDistributedBestFirstSearch.java:415) - apn1: Reached new minimal local [tru1] /h/: 2
+11:13:31 137 [DEBUG] (LazilyDistributedSAFFReplyHeuristic.java:43) - tru1 handle request from tru1: HeuristicRequestMessage [
+state=30042, 
+requestedGoal={}(552113732)]
+11:13:31 137 [DEBUG] (RelaxationHeuristic.java:330) - apn1 get heuristic: {var1=at(obj11, pos1),var0=at(apn1, apt2),}
+11:13:31 137 [DEBUG] (RelaxationHeuristic.java:227) - tru1 setup exploration queue 
+11:13:31 137 [DEBUG] (RelaxationHeuristic.java:185) - apn1 build goal propositions: [0, 2, 3]:{var2=at(tru1, pos1),var1=at(obj11, apt1),var0=at(apn1, apt2),}
+11:13:31 138 [DEBUG] (RelaxationHeuristic.java:257) - tru1 build goal propositions: {var2=at(tru1, pos1),var1=in(obj11, tru1),var0=at(apn1, apt2),}
+11:13:31 138 [DEBUG] (RelaxationHeuristic.java:227) - apn1 setup exploration queue 
+11:13:31 138 [DEBUG] (RelaxationHeuristic.java:257) - apn1 build goal propositions: {var1=at(obj11, pos1),var0=at(apn1, apt2),}
+11:13:31 138 [DEBUG] (LazilyDistributedSAFFReplyHeuristic.java:188) - tru1 send reply to tru1: 6001
+11:13:31 138 [DEBUG] (RelaxationHeuristic.java:330) - apn1 get heuristic: {var1=at(obj11, pos1),var0=at(apn1, apt1),}
+11:13:31 138 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:63) - tru1 handle reply from tru1: HeuristicReplyWithPublicActionsMessage [requestHash=6001, stateHash=30042, goalHash=0, heuristicValue=1, usedPublicActionIDs=[]]
+11:13:31 138 [DEBUG] (RelaxationHeuristic.java:185) - apn1 build goal propositions: [0, 2, 3]:{var2=at(tru1, pos1),var1=at(obj11, apt1),var0=at(apn1, apt2),}
+11:13:31 138 [DEBUG] (RelaxationHeuristic.java:227) - apn1 setup exploration queue 
+11:13:31 138 [DEBUG] (DistributedSearchProtocol.java:55) - tru1 send state State [[0, 8, 3]]
+11:13:31 138 [DEBUG] (RelaxationHeuristic.java:257) - apn1 build goal propositions: {var1=at(obj11, pos1),var0=at(apn1, apt1),}
+11:13:31 138 [DEBUG] (DistributedSearchProtocol.java:55) - apn1 send state State [[7, 1, 6]]
+11:13:31 138 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:123) - tru1 get heuristic: {var2=at(tru1, apt1),var1=at(obj11, pos1),var0=at(apn1, apt2),}
+11:13:31 138 [DEBUG] (GlobalLocalDistributedBestFirstSearch.java:123) - apn1 receive state [0, 8, 3]
+11:13:31 138 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:188) - tru1 get local RP: s:{var2=at(tru1, apt1),var1=at(obj11, pos1),var0=at(apn1, apt2),}, goal: {var2=at(tru1, pos1),var1=at(obj11, apt1),var0=at(apn1, apt2),}
+11:13:31 139 [DEBUG] (RelaxationHeuristic.java:330) - apn1 get heuristic: {var2=at(tru1, pos1),var0=at(apn1, apt2),}
+11:13:31 139 [DEBUG] (RelaxationHeuristic.java:185) - tru1 build goal propositions: [0, 2, 3]:{var2=at(tru1, pos1),var1=at(obj11, apt1),var0=at(apn1, apt2),}
+11:13:31 139 [DEBUG] (RelaxationHeuristic.java:185) - apn1 build goal propositions: [0, 2, 3]:{var2=at(tru1, pos1),var1=at(obj11, apt1),var0=at(apn1, apt2),}
+11:13:31 139 [DEBUG] (RelaxationHeuristic.java:227) - tru1 setup exploration queue 
+11:13:31 139 [DEBUG] (RelaxationHeuristic.java:227) - apn1 setup exploration queue 
+11:13:31 139 [DEBUG] (RelaxationHeuristic.java:257) - tru1 build goal propositions: {var2=at(tru1, apt1),var1=at(obj11, pos1),var0=at(apn1, apt2),}
+11:13:31 139 [DEBUG] (RelaxationHeuristic.java:257) - apn1 build goal propositions: {var2=at(tru1, pos1),var0=at(apn1, apt2),}
+11:13:31 139 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:214) - tru1 send request: [-384717190]
+11:13:31 139 [INFO ] (GlobalLocalDistributedBestFirstSearch.java:415) - apn1: Reached new minimal local [tru1] /h/: 1
+11:13:31 139 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:243) - tru1 send request to apn1: 8001(8001), waiting for: 2
+11:13:31 139 [DEBUG] (RelaxationHeuristic.java:330) - apn1 get heuristic: {var2=at(tru1, pos1),var0=at(apn1, apt1),}
+11:13:31 139 [DEBUG] (DistributedHeuristicRequestProtocol.java:50) - tru1 send HeuristicRequestMessage [
+state=36552, 
+requestedGoal=[-384717190](-384717159)] to apn1
+11:13:31 139 [DEBUG] (RelaxationHeuristic.java:185) - apn1 build goal propositions: [0, 2, 3]:{var2=at(tru1, pos1),var1=at(obj11, apt1),var0=at(apn1, apt2),}
+11:13:31 139 [DEBUG] (RelaxationHeuristic.java:227) - apn1 setup exploration queue 
+11:13:31 139 [DEBUG] (LazilyDistributedSAFFReplyHeuristic.java:43) - tru1 handle request from apn1: HeuristicRequestMessage [
+state=36552, 
+requestedGoal={}(1136456371)]
+11:13:31 139 [DEBUG] (RelaxationHeuristic.java:257) - apn1 build goal propositions: {var2=at(tru1, pos1),var0=at(apn1, apt1),}
+11:13:31 139 [DEBUG] (RelaxationHeuristic.java:227) - tru1 setup exploration queue 
+11:13:31 140 [DEBUG] (DistributedSearchProtocol.java:55) - apn1 send state State [[0, 8, 6]]
+11:13:31 140 [DEBUG] (RelaxationHeuristic.java:257) - tru1 build goal propositions: {var2=at(tru1, apt1),var1=at(obj11, pos1),var0=at(apn1, apt2),}
+11:13:31 140 [DEBUG] (LazilyDistributedSAFFReplyHeuristic.java:43) - apn1 handle request from tru1: HeuristicRequestMessage [
+state=36552, 
+requestedGoal={}(-384717159)]
+11:13:31 140 [DEBUG] (LazilyDistributedSAFFReplyHeuristic.java:188) - tru1 send reply to apn1: 7000
+11:13:31 140 [DEBUG] (RelaxationHeuristic.java:227) - apn1 setup exploration queue 
+11:13:31 140 [DEBUG] (DistributedHeuristicReplyProtocol.java:51) - tru1 send HeuristicReplyWithPublicActionsMessage [requestHash=7000, stateHash=36552, goalHash=0, heuristicValue=1, usedPublicActionIDs=[1683453834, -384717190]] to apn1
+11:13:31 140 [DEBUG] (RelaxationHeuristic.java:257) - apn1 build goal propositions: {var1=at(obj11, pos1),var0=at(apn1, apt2),}
+11:13:31 140 [INFO ] (GlobalLocalDistributedBestFirstSearch.java:308) - tru1: Reached new minimal global [apn1] /h/: 4
+11:13:31 140 [DEBUG] (LazilyDistributedSAFFReplyHeuristic.java:188) - apn1 send reply to tru1: 8001
+11:13:31 140 [INFO ] (GlobalLocalDistributedBestFirstSearch.java:415) - tru1: Reached new minimal local [apn1] /h/: 4
+11:13:31 140 [DEBUG] (DistributedHeuristicReplyProtocol.java:51) - apn1 send HeuristicReplyWithPublicActionsMessage [requestHash=8001, stateHash=36552, goalHash=0, heuristicValue=1, usedPublicActionIDs=[-1834103775, 461854161, -484983754]] to tru1
+11:13:31 140 [DEBUG] (RelaxationHeuristic.java:330) - tru1 get heuristic: {var2=at(tru1, pos1),var1=at(obj11, pos1),}
+11:13:31 140 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:63) - apn1 handle reply from tru1: HeuristicReplyWithPublicActionsMessage [requestHash=7000, stateHash=36552, goalHash=0, heuristicValue=1, usedPublicActionIDs=[1683453834, -384717190]]
+11:13:31 140 [DEBUG] (RelaxationHeuristic.java:185) - tru1 build goal propositions: [0, 2, 3]:{var2=at(tru1, pos1),var1=at(obj11, apt1),var0=at(apn1, apt2),}
+11:13:31 140 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:214) - apn1 send request: [-384717190]
+11:13:31 140 [DEBUG] (RelaxationHeuristic.java:227) - tru1 setup exploration queue 
+11:13:31 140 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:243) - apn1 send request to apn1: 7000(7000), waiting for: 2
+11:13:31 141 [DEBUG] (RelaxationHeuristic.java:257) - tru1 build goal propositions: {var2=at(tru1, pos1),var1=at(obj11, pos1),}
+11:13:31 141 [DEBUG] (LazilyDistributedSAFFReplyHeuristic.java:43) - apn1 handle request from apn1: HeuristicRequestMessage [
+state=36552, 
+requestedGoal={}(-384717159)]
+11:13:31 141 [DEBUG] (RelaxationHeuristic.java:227) - apn1 setup exploration queue 
+11:13:31 141 [DEBUG] (GlobalLocalDistributedBestFirstSearch.java:123) - tru1 receive state [7, 1, 6]
+11:13:31 141 [DEBUG] (RelaxationHeuristic.java:257) - apn1 build goal propositions: {var1=at(obj11, pos1),var0=at(apn1, apt2),}
+11:13:31 141 [DEBUG] (GlobalLocalDistributedBestFirstSearch.java:123) - tru1 receive state [0, 8, 6]
+11:13:31 141 [DEBUG] (LazilyDistributedSAFFReplyHeuristic.java:188) - apn1 send reply to apn1: 7000
+11:13:31 141 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:63) - tru1 handle reply from apn1: HeuristicReplyWithPublicActionsMessage [requestHash=8001, stateHash=36552, goalHash=0, heuristicValue=1, usedPublicActionIDs=[-1834103775, 461854161, -484983754]]
+11:13:31 141 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:63) - apn1 handle reply from apn1: HeuristicReplyWithPublicActionsMessage [requestHash=7000, stateHash=36552, goalHash=0, heuristicValue=1, usedPublicActionIDs=[-1834103775, 461854161, -484983754]]
+11:13:31 141 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:214) - tru1 send request: [461854161]
+11:13:31 141 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:214) - apn1 send request: [-1834103775, -484983754]
+11:13:31 141 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:243) - tru1 send request to tru1: 8001(8001), waiting for: 2
+11:13:31 141 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:243) - apn1 send request to apn1: 7000(7000), waiting for: 3
+11:13:31 141 [DEBUG] (LazilyDistributedSAFFReplyHeuristic.java:43) - tru1 handle request from tru1: HeuristicRequestMessage [
+state=36552, 
+requestedGoal={}(461854192)]
+11:13:31 141 [DEBUG] (LazilyDistributedSAFFReplyHeuristic.java:43) - apn1 handle request from apn1: HeuristicRequestMessage [
+state=36552, 
+requestedGoal={}(-1507624970)]
+11:13:31 141 [DEBUG] (RelaxationHeuristic.java:227) - tru1 setup exploration queue 
+11:13:31 142 [DEBUG] (RelaxationHeuristic.java:227) - apn1 setup exploration queue 
+11:13:31 142 [DEBUG] (RelaxationHeuristic.java:257) - tru1 build goal propositions: {var2=at(tru1, apt1),var1=at(obj11, pos1),var0=at(apn1, apt2),}
+11:13:31 142 [DEBUG] (RelaxationHeuristic.java:257) - apn1 build goal propositions: {var1=at(obj11, pos1),var0=at(apn1, apt2),}
+11:13:31 142 [DEBUG] (LazilyDistributedSAFFReplyHeuristic.java:188) - tru1 send reply to tru1: 8001
+11:13:31 142 [DEBUG] (LazilyDistributedSAFFReplyHeuristic.java:188) - apn1 send reply to apn1: 7000
+11:13:31 142 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:63) - tru1 handle reply from tru1: HeuristicReplyWithPublicActionsMessage [requestHash=8001, stateHash=36552, goalHash=0, heuristicValue=1, usedPublicActionIDs=[1683453834, -384717190]]
+11:13:31 142 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:63) - apn1 handle reply from apn1: HeuristicReplyWithPublicActionsMessage [requestHash=7000, stateHash=36552, goalHash=0, heuristicValue=1, usedPublicActionIDs=[]]
+11:13:31 142 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:214) - tru1 send request: [1683453834]
+11:13:31 142 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:243) - tru1 send request to tru1: 8001(8001), waiting for: 3
+11:13:31 142 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:123) - apn1 get heuristic: {var2=at(tru1, pos1),var0=at(apn1, apt2),}
+11:13:31 142 [DEBUG] (LazilyDistributedSAFFReplyHeuristic.java:43) - tru1 handle request from tru1: HeuristicRequestMessage [
+state=36552, 
+requestedGoal={}(1683453865)]
+11:13:31 142 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:188) - apn1 get local RP: s:{var2=at(tru1, pos1),var0=at(apn1, apt2),}, goal: {var2=at(tru1, pos1),var1=at(obj11, apt1),var0=at(apn1, apt2),}
+11:13:31 142 [DEBUG] (RelaxationHeuristic.java:227) - tru1 setup exploration queue 
+11:13:31 142 [DEBUG] (RelaxationHeuristic.java:185) - apn1 build goal propositions: [0, 2, 3]:{var2=at(tru1, pos1),var1=at(obj11, apt1),var0=at(apn1, apt2),}
+11:13:31 142 [DEBUG] (RelaxationHeuristic.java:257) - tru1 build goal propositions: {var2=at(tru1, apt1),var1=at(obj11, pos1),var0=at(apn1, apt2),}
+11:13:31 142 [DEBUG] (RelaxationHeuristic.java:227) - apn1 setup exploration queue 
+11:13:31 142 [DEBUG] (LazilyDistributedSAFFReplyHeuristic.java:188) - tru1 send reply to tru1: 8001
+11:13:31 142 [DEBUG] (RelaxationHeuristic.java:257) - apn1 build goal propositions: {var2=at(tru1, pos1),var0=at(apn1, apt2),}
+11:13:31 143 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:63) - tru1 handle reply from tru1: HeuristicReplyWithPublicActionsMessage [requestHash=8001, stateHash=36552, goalHash=0, heuristicValue=1, usedPublicActionIDs=[]]
+11:13:31 143 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:214) - apn1 send request: [461854161]
+11:13:31 143 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:243) - apn1 send request to tru1: 9000(9000), waiting for: 2
+11:13:31 143 [DEBUG] (DistributedSearchProtocol.java:55) - tru1 send state State [[7, 1, 3]]
+11:13:31 143 [DEBUG] (DistributedHeuristicRequestProtocol.java:50) - apn1 send HeuristicRequestMessage [
+state=30042, 
+requestedGoal=[461854161](461854192)] to tru1
+11:13:31 143 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:123) - tru1 get heuristic: {var2=at(tru1, pos1),var1=at(obj11, pos1),}
+11:13:31 143 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:188) - tru1 get local RP: s:{var2=at(tru1, pos1),var1=at(obj11, pos1),}, goal: {var2=at(tru1, pos1),var1=at(obj11, apt1),var0=at(apn1, apt2),}
+11:13:31 143 [DEBUG] (RelaxationHeuristic.java:185) - tru1 build goal propositions: [0, 2, 3]:{var2=at(tru1, pos1),var1=at(obj11, apt1),var0=at(apn1, apt2),}
+11:13:31 143 [DEBUG] (RelaxationHeuristic.java:227) - tru1 setup exploration queue 
+11:13:31 143 [DEBUG] (RelaxationHeuristic.java:257) - tru1 build goal propositions: {var2=at(tru1, pos1),var1=at(obj11, pos1),}
+11:13:31 143 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:214) - tru1 send request: [-384717190, -513612904]
+11:13:31 143 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:243) - tru1 send request to apn1: 10001(10001), waiting for: 2
+11:13:31 143 [DEBUG] (DistributedHeuristicRequestProtocol.java:50) - tru1 send HeuristicRequestMessage [
+state=29828, 
+requestedGoal=[-384717190, -513612904](445057055)] to apn1
+11:13:31 144 [DEBUG] (LazilyDistributedSAFFReplyHeuristic.java:43) - tru1 handle request from apn1: HeuristicRequestMessage [
+state=30042, 
+requestedGoal={}(461854192)]
+11:13:31 144 [DEBUG] (LazilyDistributedSAFFReplyHeuristic.java:43) - apn1 handle request from tru1: HeuristicRequestMessage [
+state=29828, 
+requestedGoal={}(445057055)]
+11:13:31 144 [DEBUG] (RelaxationHeuristic.java:227) - tru1 setup exploration queue 
+11:13:31 144 [DEBUG] (RelaxationHeuristic.java:227) - apn1 setup exploration queue 
+11:13:31 144 [DEBUG] (RelaxationHeuristic.java:257) - tru1 build goal propositions: {var2=at(tru1, pos1),var1=in(obj11, tru1),var0=at(apn1, apt2),}
+11:13:31 144 [DEBUG] (RelaxationHeuristic.java:257) - apn1 build goal propositions: {var2=at(tru1, pos1),var1=at(obj11, pos1),var0=at(apn1, apt1),}
+11:13:31 144 [DEBUG] (LazilyDistributedSAFFReplyHeuristic.java:188) - tru1 send reply to apn1: 9000
+11:13:31 144 [DEBUG] (LazilyDistributedSAFFReplyHeuristic.java:188) - apn1 send reply to tru1: 10001
+11:13:31 144 [DEBUG] (DistributedHeuristicReplyProtocol.java:51) - tru1 send HeuristicReplyWithPublicActionsMessage [requestHash=9000, stateHash=30042, goalHash=0, heuristicValue=1, usedPublicActionIDs=[552113701]] to apn1
+11:13:31 144 [DEBUG] (DistributedHeuristicReplyProtocol.java:51) - apn1 send HeuristicReplyWithPublicActionsMessage [requestHash=10001, stateHash=29828, goalHash=0, heuristicValue=1, usedPublicActionIDs=[-1834103775, 461854161]] to tru1
+11:13:31 144 [INFO ] (GlobalLocalDistributedBestFirstSearch.java:312) - tru1: Reached new maximal [null] /g/: 2
+11:13:31 144 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:63) - apn1 handle reply from tru1: HeuristicReplyWithPublicActionsMessage [requestHash=9000, stateHash=30042, goalHash=0, heuristicValue=1, usedPublicActionIDs=[552113701]]
+11:13:31 144 [DEBUG] (RelaxationHeuristic.java:330) - tru1 get heuristic: {var2=at(tru1, apt1),var1=in(obj11, tru1),var0=at(apn1, apt2),}
+11:13:31 144 [DEBUG] (RelaxationHeuristic.java:185) - tru1 build goal propositions: [0, 2, 3]:{var2=at(tru1, pos1),var1=at(obj11, apt1),var0=at(apn1, apt2),}
+11:13:31 144 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:123) - apn1 get heuristic: {var1=at(obj11, pos1),var0=at(apn1, apt1),}
+11:13:31 144 [DEBUG] (RelaxationHeuristic.java:227) - tru1 setup exploration queue 
+11:13:31 145 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:188) - apn1 get local RP: s:{var1=at(obj11, pos1),var0=at(apn1, apt1),}, goal: {var2=at(tru1, pos1),var1=at(obj11, apt1),var0=at(apn1, apt2),}
+11:13:31 145 [DEBUG] (RelaxationHeuristic.java:257) - tru1 build goal propositions: {var2=at(tru1, apt1),var1=in(obj11, tru1),var0=at(apn1, apt2),}
+11:13:31 145 [DEBUG] (RelaxationHeuristic.java:185) - apn1 build goal propositions: [0, 2, 3]:{var2=at(tru1, pos1),var1=at(obj11, apt1),var0=at(apn1, apt2),}
+11:13:31 145 [DEBUG] (RelaxationHeuristic.java:227) - apn1 setup exploration queue 
+11:13:31 145 [DEBUG] (DistributedSearchProtocol.java:55) - tru1 send state State [[7, 8, 3]]
+11:13:31 145 [DEBUG] (RelaxationHeuristic.java:257) - apn1 build goal propositions: {var1=at(obj11, pos1),var0=at(apn1, apt1),}
+11:13:31 145 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:214) - apn1 send request: [461854161, -296121693]
+11:13:31 145 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:63) - tru1 handle reply from apn1: HeuristicReplyWithPublicActionsMessage [requestHash=10001, stateHash=29828, goalHash=0, heuristicValue=1, usedPublicActionIDs=[-1834103775, 461854161]]
+11:13:31 145 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:243) - apn1 send request to tru1: 11000(11000), waiting for: 2
+11:13:31 145 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:214) - tru1 send request: [461854161]
+11:13:31 145 [DEBUG] (DistributedHeuristicRequestProtocol.java:50) - apn1 send HeuristicRequestMessage [
+state=36555, 
+requestedGoal=[461854161, -296121693](1136456371)] to tru1
+11:13:31 145 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:243) - tru1 send request to tru1: 10001(10001), waiting for: 2
+11:13:31 145 [DEBUG] (GlobalLocalDistributedBestFirstSearch.java:123) - apn1 receive state [7, 8, 3]
+11:13:31 145 [DEBUG] (LazilyDistributedSAFFReplyHeuristic.java:43) - tru1 handle request from tru1: HeuristicRequestMessage [
+state=29828, 
+requestedGoal={}(461854192)]
+11:13:31 145 [DEBUG] (RelaxationHeuristic.java:330) - apn1 get heuristic: {var0=at(apn1, apt2),}
+11:13:31 145 [DEBUG] (RelaxationHeuristic.java:227) - tru1 setup exploration queue 
+11:13:31 145 [DEBUG] (RelaxationHeuristic.java:185) - apn1 build goal propositions: [0, 2, 3]:{var2=at(tru1, pos1),var1=at(obj11, apt1),var0=at(apn1, apt2),}
+11:13:31 146 [DEBUG] (RelaxationHeuristic.java:257) - tru1 build goal propositions: {var2=at(tru1, pos1),var1=at(obj11, pos1),}
+11:13:31 146 [DEBUG] (RelaxationHeuristic.java:227) - apn1 setup exploration queue 
+11:13:31 146 [DEBUG] (RelaxationHeuristic.java:257) - apn1 build goal propositions: {var0=at(apn1, apt2),}
+11:13:31 146 [DEBUG] (LazilyDistributedSAFFReplyHeuristic.java:188) - tru1 send reply to tru1: 10001
+11:13:31 146 [INFO ] (GlobalLocalDistributedBestFirstSearch.java:419) - apn1: Reached new maximal [null] /g/: 2
+11:13:31 146 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:63) - tru1 handle reply from tru1: HeuristicReplyWithPublicActionsMessage [requestHash=10001, stateHash=29828, goalHash=0, heuristicValue=1, usedPublicActionIDs=[1683899707, 552113701]]
+11:13:31 146 [DEBUG] (RelaxationHeuristic.java:330) - apn1 get heuristic: {var0=at(apn1, apt1),}
+11:13:31 146 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:214) - tru1 send request: [1683899707, 552113701]
+11:13:31 146 [DEBUG] (RelaxationHeuristic.java:185) - apn1 build goal propositions: [0, 2, 3]:{var2=at(tru1, pos1),var1=at(obj11, apt1),var0=at(apn1, apt2),}
+11:13:31 146 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:243) - tru1 send request to tru1: 10001(10001), waiting for: 3
+11:13:31 146 [DEBUG] (RelaxationHeuristic.java:227) - apn1 setup exploration queue 
+11:13:31 146 [DEBUG] (LazilyDistributedSAFFReplyHeuristic.java:43) - tru1 handle request from tru1: HeuristicRequestMessage [
+state=29828, 
+requestedGoal={}(1213398027)]
+11:13:31 146 [DEBUG] (RelaxationHeuristic.java:257) - apn1 build goal propositions: {var0=at(apn1, apt1),}
+11:13:31 146 [DEBUG] (RelaxationHeuristic.java:227) - tru1 setup exploration queue 
+11:13:31 146 [DEBUG] (DistributedSearchProtocol.java:55) - apn1 send state State [[7, 8, 6]]
+11:13:31 147 [DEBUG] (RelaxationHeuristic.java:257) - tru1 build goal propositions: {var2=at(tru1, pos1),var1=at(obj11, pos1),}
+11:13:31 147 [DEBUG] (LazilyDistributedSAFFReplyHeuristic.java:188) - tru1 send reply to tru1: 10001
+11:13:31 147 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:63) - tru1 handle reply from tru1: HeuristicReplyWithPublicActionsMessage [requestHash=10001, stateHash=29828, goalHash=0, heuristicValue=1, usedPublicActionIDs=[]]
+11:13:31 147 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:123) - tru1 get heuristic: {var2=at(tru1, apt1),var1=in(obj11, tru1),var0=at(apn1, apt2),}
+11:13:31 147 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:188) - tru1 get local RP: s:{var2=at(tru1, apt1),var1=in(obj11, tru1),var0=at(apn1, apt2),}, goal: {var2=at(tru1, pos1),var1=at(obj11, apt1),var0=at(apn1, apt2),}
+11:13:31 147 [DEBUG] (RelaxationHeuristic.java:185) - tru1 build goal propositions: [0, 2, 3]:{var2=at(tru1, pos1),var1=at(obj11, apt1),var0=at(apn1, apt2),}
+11:13:31 147 [DEBUG] (RelaxationHeuristic.java:227) - tru1 setup exploration queue 
+11:13:31 147 [DEBUG] (RelaxationHeuristic.java:257) - tru1 build goal propositions: {var2=at(tru1, apt1),var1=in(obj11, tru1),var0=at(apn1, apt2),}
+11:13:31 147 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:214) - tru1 send request: [-384717190]
+11:13:31 148 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:243) - tru1 send request to apn1: 12001(12001), waiting for: 2
+11:13:31 148 [DEBUG] (DistributedHeuristicRequestProtocol.java:50) - tru1 send HeuristicRequestMessage [
+state=36769, 
+requestedGoal=[-384717190](-384717159)] to apn1
+11:13:31 148 [DEBUG] (LazilyDistributedSAFFReplyHeuristic.java:43) - tru1 handle request from apn1: HeuristicRequestMessage [
+state=36555, 
+requestedGoal={}(1136456371)]
+11:13:31 148 [DEBUG] (LazilyDistributedSAFFReplyHeuristic.java:43) - apn1 handle request from tru1: HeuristicRequestMessage [
+state=36769, 
+requestedGoal={}(-384717159)]
+11:13:31 148 [DEBUG] (RelaxationHeuristic.java:227) - tru1 setup exploration queue 
+11:13:31 148 [DEBUG] (RelaxationHeuristic.java:227) - apn1 setup exploration queue 
+11:13:31 148 [DEBUG] (RelaxationHeuristic.java:257) - tru1 build goal propositions: {var2=at(tru1, apt1),var1=at(obj11, pos1),}
+11:13:31 148 [DEBUG] (RelaxationHeuristic.java:257) - apn1 build goal propositions: {var0=at(apn1, apt2),}
+11:13:31 148 [DEBUG] (LazilyDistributedSAFFReplyHeuristic.java:188) - tru1 send reply to apn1: 11000
+11:13:31 148 [DEBUG] (LazilyDistributedSAFFReplyHeuristic.java:188) - apn1 send reply to tru1: 12001
+11:13:31 148 [DEBUG] (DistributedHeuristicReplyProtocol.java:51) - tru1 send HeuristicReplyWithPublicActionsMessage [requestHash=11000, stateHash=36555, goalHash=0, heuristicValue=1, usedPublicActionIDs=[1683899707]] to apn1
+11:13:31 148 [DEBUG] (DistributedHeuristicReplyProtocol.java:51) - apn1 send HeuristicReplyWithPublicActionsMessage [requestHash=12001, stateHash=36769, goalHash=0, heuristicValue=1, usedPublicActionIDs=[-1834103775, 461854161, -484983754]] to tru1
+11:13:31 148 [DEBUG] (GlobalLocalDistributedBestFirstSearch.java:123) - tru1 receive state [7, 8, 6]
+11:13:31 148 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:63) - apn1 handle reply from tru1: HeuristicReplyWithPublicActionsMessage [requestHash=11000, stateHash=36555, goalHash=0, heuristicValue=1, usedPublicActionIDs=[1683899707]]
+11:13:31 148 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:63) - tru1 handle reply from apn1: HeuristicReplyWithPublicActionsMessage [requestHash=12001, stateHash=36769, goalHash=0, heuristicValue=1, usedPublicActionIDs=[-1834103775, 461854161, -484983754]]
+11:13:31 148 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:214) - tru1 send request: [461854161]
+11:13:31 148 [DEBUG] (DistributedSearchProtocol.java:55) - apn1 send state State [[7, 1, 6]]
+11:13:31 149 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:243) - tru1 send request to tru1: 12001(12001), waiting for: 2
+11:13:31 149 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:123) - apn1 get heuristic: {var2=at(tru1, pos1),var0=at(apn1, apt1),}
+11:13:31 149 [DEBUG] (LazilyDistributedSAFFReplyHeuristic.java:43) - tru1 handle request from tru1: HeuristicRequestMessage [
+state=36769, 
+requestedGoal={}(461854192)]
+11:13:31 149 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:188) - apn1 get local RP: s:{var2=at(tru1, pos1),var0=at(apn1, apt1),}, goal: {var2=at(tru1, pos1),var1=at(obj11, apt1),var0=at(apn1, apt2),}
+11:13:31 149 [DEBUG] (RelaxationHeuristic.java:227) - tru1 setup exploration queue 
+11:13:31 149 [DEBUG] (RelaxationHeuristic.java:185) - apn1 build goal propositions: [0, 2, 3]:{var2=at(tru1, pos1),var1=at(obj11, apt1),var0=at(apn1, apt2),}
+11:13:31 149 [DEBUG] (RelaxationHeuristic.java:257) - tru1 build goal propositions: {var2=at(tru1, apt1),var1=in(obj11, tru1),var0=at(apn1, apt2),}
+11:13:31 149 [DEBUG] (RelaxationHeuristic.java:227) - apn1 setup exploration queue 
+11:13:31 149 [DEBUG] (LazilyDistributedSAFFReplyHeuristic.java:188) - tru1 send reply to tru1: 12001
+11:13:31 149 [DEBUG] (RelaxationHeuristic.java:257) - apn1 build goal propositions: {var2=at(tru1, pos1),var0=at(apn1, apt1),}
+11:13:31 149 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:63) - tru1 handle reply from tru1: HeuristicReplyWithPublicActionsMessage [requestHash=12001, stateHash=36769, goalHash=0, heuristicValue=1, usedPublicActionIDs=[]]
+11:13:31 149 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:214) - apn1 send request: [461854161]
+11:13:31 149 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:243) - apn1 send request to tru1: 13000(13000), waiting for: 2
+11:13:31 149 [DEBUG] (DistributedSearchProtocol.java:55) - tru1 send state State [[7, 8, 3]]
+11:13:31 149 [DEBUG] (DistributedHeuristicRequestProtocol.java:50) - apn1 send HeuristicRequestMessage [
+state=30045, 
+requestedGoal=[461854161](461854192)] to tru1
+11:13:31 149 [INFO ] (GlobalLocalDistributedBestFirstSearch.java:312) - apn1: Reached new maximal [null] /g/: 3
+11:13:31 149 [INFO ] (GlobalLocalDistributedBestFirstSearch.java:312) - tru1: Reached new maximal [null] /g/: 3
+11:13:31 150 [DEBUG] (GlobalLocalDistributedBestFirstSearch.java:123) - tru1 receive state [7, 1, 6]
+11:13:31 150 [DEBUG] (GlobalLocalDistributedBestFirstSearch.java:123) - apn1 receive state [7, 8, 3]
+11:13:31 150 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:123) - tru1 get heuristic: {var2=at(tru1, apt1),var1=at(obj11, pos1),}
+11:13:31 150 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:188) - tru1 get local RP: s:{var2=at(tru1, apt1),var1=at(obj11, pos1),}, goal: {var2=at(tru1, pos1),var1=at(obj11, apt1),var0=at(apn1, apt2),}
+11:13:31 150 [DEBUG] (RelaxationHeuristic.java:185) - tru1 build goal propositions: [0, 2, 3]:{var2=at(tru1, pos1),var1=at(obj11, apt1),var0=at(apn1, apt2),}
+11:13:31 150 [DEBUG] (RelaxationHeuristic.java:227) - tru1 setup exploration queue 
+11:13:31 150 [DEBUG] (RelaxationHeuristic.java:257) - tru1 build goal propositions: {var2=at(tru1, apt1),var1=at(obj11, pos1),}
+11:13:31 150 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:214) - tru1 send request: [-384717190, -513612904]
+11:13:31 150 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:243) - tru1 send request to apn1: 14001(14001), waiting for: 2
+11:13:31 150 [DEBUG] (DistributedHeuristicRequestProtocol.java:50) - tru1 send HeuristicRequestMessage [
+state=36555, 
+requestedGoal=[-384717190, -513612904](445057055)] to apn1
+11:13:31 150 [DEBUG] (LazilyDistributedSAFFReplyHeuristic.java:43) - tru1 handle request from apn1: HeuristicRequestMessage [
+state=30045, 
+requestedGoal={}(461854192)]
+11:13:31 150 [DEBUG] (LazilyDistributedSAFFReplyHeuristic.java:43) - apn1 handle request from tru1: HeuristicRequestMessage [
+state=36555, 
+requestedGoal={}(445057055)]
+11:13:31 150 [DEBUG] (RelaxationHeuristic.java:227) - tru1 setup exploration queue 
+11:13:31 150 [DEBUG] (RelaxationHeuristic.java:227) - apn1 setup exploration queue 
+11:13:31 150 [DEBUG] (RelaxationHeuristic.java:257) - tru1 build goal propositions: {var2=at(tru1, pos1),var1=in(obj11, tru1),}
+11:13:31 151 [DEBUG] (RelaxationHeuristic.java:257) - apn1 build goal propositions: {var1=at(obj11, pos1),var0=at(apn1, apt1),}
+11:13:31 151 [DEBUG] (LazilyDistributedSAFFReplyHeuristic.java:188) - tru1 send reply to apn1: 13000
+11:13:31 151 [DEBUG] (LazilyDistributedSAFFReplyHeuristic.java:188) - apn1 send reply to tru1: 14001
+11:13:31 151 [DEBUG] (DistributedHeuristicReplyProtocol.java:51) - tru1 send HeuristicReplyWithPublicActionsMessage [requestHash=13000, stateHash=30045, goalHash=0, heuristicValue=1, usedPublicActionIDs=[552113701]] to apn1
+11:13:31 151 [DEBUG] (DistributedHeuristicReplyProtocol.java:51) - apn1 send HeuristicReplyWithPublicActionsMessage [requestHash=14001, stateHash=36555, goalHash=0, heuristicValue=1, usedPublicActionIDs=[-1834103775, 461854161]] to tru1
+11:13:31 151 [DEBUG] (RelaxationHeuristic.java:330) - tru1 get heuristic: {var2=at(tru1, apt1),var1=at(obj11, apt1),var0=at(apn1, apt2),}
+11:13:31 151 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:63) - apn1 handle reply from tru1: HeuristicReplyWithPublicActionsMessage [requestHash=13000, stateHash=30045, goalHash=0, heuristicValue=1, usedPublicActionIDs=[552113701]]
+11:13:31 151 [DEBUG] (RelaxationHeuristic.java:185) - tru1 build goal propositions: [0, 2, 3]:{var2=at(tru1, pos1),var1=at(obj11, apt1),var0=at(apn1, apt2),}
+11:13:31 151 [DEBUG] (RelaxationHeuristic.java:227) - tru1 setup exploration queue 
+11:13:31 151 [DEBUG] (DistributedSearchProtocol.java:55) - apn1 send state State [[0, 8, 6]]
+11:13:31 151 [DEBUG] (RelaxationHeuristic.java:257) - tru1 build goal propositions: {var2=at(tru1, apt1),var1=at(obj11, apt1),var0=at(apn1, apt2),}
+11:13:31 151 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:123) - apn1 get heuristic: {var0=at(apn1, apt2),}
+11:13:31 151 [DEBUG] (DistributedSearchProtocol.java:55) - tru1 send state State [[7, 2, 3]]
+11:13:31 151 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:188) - apn1 get local RP: s:{var0=at(apn1, apt2),}, goal: {var2=at(tru1, pos1),var1=at(obj11, apt1),var0=at(apn1, apt2),}
+11:13:31 151 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:63) - tru1 handle reply from apn1: HeuristicReplyWithPublicActionsMessage [requestHash=14001, stateHash=36555, goalHash=0, heuristicValue=1, usedPublicActionIDs=[-1834103775, 461854161]]
+11:13:31 151 [DEBUG] (RelaxationHeuristic.java:185) - apn1 build goal propositions: [0, 2, 3]:{var2=at(tru1, pos1),var1=at(obj11, apt1),var0=at(apn1, apt2),}
+11:13:31 151 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:214) - tru1 send request: [461854161]
+11:13:31 151 [DEBUG] (RelaxationHeuristic.java:227) - apn1 setup exploration queue 
+11:13:31 152 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:243) - tru1 send request to tru1: 14001(14001), waiting for: 2
+11:13:31 152 [DEBUG] (RelaxationHeuristic.java:257) - apn1 build goal propositions: {var0=at(apn1, apt2),}
+11:13:31 152 [DEBUG] (LazilyDistributedSAFFReplyHeuristic.java:43) - tru1 handle request from tru1: HeuristicRequestMessage [
+state=36555, 
+requestedGoal={}(461854192)]
+11:13:31 152 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:214) - apn1 send request: [461854161, -296121693]
+11:13:31 152 [DEBUG] (RelaxationHeuristic.java:227) - tru1 setup exploration queue 
+11:13:31 152 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:243) - apn1 send request to tru1: 15000(15000), waiting for: 2
+11:13:31 152 [DEBUG] (RelaxationHeuristic.java:257) - tru1 build goal propositions: {var2=at(tru1, apt1),var1=at(obj11, pos1),}
+11:13:31 152 [DEBUG] (DistributedHeuristicRequestProtocol.java:50) - apn1 send HeuristicRequestMessage [
+state=36769, 
+requestedGoal=[461854161, -296121693](1136456371)] to tru1
+11:13:31 152 [DEBUG] (LazilyDistributedSAFFReplyHeuristic.java:188) - tru1 send reply to tru1: 14001
+11:13:31 152 [DEBUG] (GlobalLocalDistributedBestFirstSearch.java:123) - apn1 receive state [7, 2, 3]
+11:13:31 152 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:63) - tru1 handle reply from tru1: HeuristicReplyWithPublicActionsMessage [requestHash=14001, stateHash=36555, goalHash=0, heuristicValue=1, usedPublicActionIDs=[1683899707, -296121693]]
+11:13:31 152 [DEBUG] (RelaxationHeuristic.java:330) - apn1 get heuristic: {var1=at(obj11, apt1),var0=at(apn1, apt2),}
+11:13:31 152 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:214) - tru1 send request: [1683899707]
+11:13:31 152 [DEBUG] (RelaxationHeuristic.java:185) - apn1 build goal propositions: [0, 2, 3]:{var2=at(tru1, pos1),var1=at(obj11, apt1),var0=at(apn1, apt2),}
+11:13:31 152 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:243) - tru1 send request to tru1: 14001(14001), waiting for: 3
+11:13:31 152 [DEBUG] (RelaxationHeuristic.java:227) - apn1 setup exploration queue 
+11:13:31 152 [DEBUG] (LazilyDistributedSAFFReplyHeuristic.java:43) - tru1 handle request from tru1: HeuristicRequestMessage [
+state=36555, 
+requestedGoal={}(1683899738)]
+11:13:31 152 [DEBUG] (RelaxationHeuristic.java:257) - apn1 build goal propositions: {var1=at(obj11, apt1),var0=at(apn1, apt2),}
+11:13:31 153 [DEBUG] (RelaxationHeuristic.java:227) - tru1 setup exploration queue 
+11:13:31 153 [INFO ] (GlobalLocalDistributedBestFirstSearch.java:419) - apn1: Reached new maximal [null] /g/: 3
+11:13:31 153 [DEBUG] (RelaxationHeuristic.java:257) - tru1 build goal propositions: {var2=at(tru1, apt1),var1=at(obj11, pos1),}
+11:13:31 153 [DEBUG] (RelaxationHeuristic.java:330) - apn1 get heuristic: {var1=at(obj11, apt1),var0=at(apn1, apt1),}
+11:13:31 153 [DEBUG] (LazilyDistributedSAFFReplyHeuristic.java:188) - tru1 send reply to tru1: 14001
+11:13:31 153 [DEBUG] (RelaxationHeuristic.java:185) - apn1 build goal propositions: [0, 2, 3]:{var2=at(tru1, pos1),var1=at(obj11, apt1),var0=at(apn1, apt2),}
+11:13:31 153 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:63) - tru1 handle reply from tru1: HeuristicReplyWithPublicActionsMessage [requestHash=14001, stateHash=36555, goalHash=0, heuristicValue=1, usedPublicActionIDs=[]]
+11:13:31 153 [DEBUG] (RelaxationHeuristic.java:227) - apn1 setup exploration queue 
+11:13:31 153 [DEBUG] (RelaxationHeuristic.java:257) - apn1 build goal propositions: {var1=at(obj11, apt1),var0=at(apn1, apt1),}
+11:13:31 153 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:123) - tru1 get heuristic: {var2=at(tru1, apt1),var1=at(obj11, apt1),var0=at(apn1, apt2),}
+11:13:31 153 [DEBUG] (DistributedSearchProtocol.java:55) - apn1 send state State [[7, 2, 6]]
+11:13:31 153 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:188) - tru1 get local RP: s:{var2=at(tru1, apt1),var1=at(obj11, apt1),var0=at(apn1, apt2),}, goal: {var2=at(tru1, pos1),var1=at(obj11, apt1),var0=at(apn1, apt2),}
+11:13:31 153 [DEBUG] (RelaxationHeuristic.java:185) - tru1 build goal propositions: [0, 2, 3]:{var2=at(tru1, pos1),var1=at(obj11, apt1),var0=at(apn1, apt2),}
+11:13:31 153 [INFO ] (GlobalLocalDistributedBestFirstSearch.java:419) - apn1: Reached new maximal [null] /g/: 3
+11:13:31 153 [DEBUG] (RelaxationHeuristic.java:227) - tru1 setup exploration queue 
+11:13:31 153 [DEBUG] (RelaxationHeuristic.java:330) - apn1 get heuristic: {var1=in(obj11, apn1),var0=at(apn1, apt1),}
+11:13:31 153 [DEBUG] (RelaxationHeuristic.java:257) - tru1 build goal propositions: {var2=at(tru1, apt1),var1=at(obj11, apt1),var0=at(apn1, apt2),}
+11:13:31 153 [DEBUG] (RelaxationHeuristic.java:185) - apn1 build goal propositions: [0, 2, 3]:{var2=at(tru1, pos1),var1=at(obj11, apt1),var0=at(apn1, apt2),}
+11:13:31 154 [DEBUG] (RelaxationHeuristic.java:227) - apn1 setup exploration queue 
+11:13:31 154 [DEBUG] (DistributedSearchProtocol.java:55) - tru1 send state State [[7, 2, 3]]
+11:13:31 154 [DEBUG] (RelaxationHeuristic.java:257) - apn1 build goal propositions: {var1=in(obj11, apn1),var0=at(apn1, apt1),}
+11:13:31 154 [DEBUG] (GlobalLocalDistributedBestFirstSearch.java:123) - tru1 receive state [0, 8, 6]
+11:13:31 154 [DEBUG] (DistributedSearchProtocol.java:55) - apn1 send state State [[7, 4, 6]]
+11:13:31 154 [DEBUG] (LazilyDistributedSAFFReplyHeuristic.java:43) - tru1 handle request from apn1: HeuristicRequestMessage [
+state=36769, 
+requestedGoal={}(1136456371)]
+11:13:31 154 [DEBUG] (GlobalLocalDistributedBestFirstSearch.java:123) - apn1 receive state [7, 2, 3]
+11:13:31 154 [DEBUG] (RelaxationHeuristic.java:227) - tru1 setup exploration queue 
+11:13:31 154 [INFO ] (GlobalLocalDistributedBestFirstSearch.java:308) - apn1: Reached new minimal global [tru1] /h/: 1
+11:13:31 154 [DEBUG] (RelaxationHeuristic.java:257) - tru1 build goal propositions: {var2=at(tru1, apt1),var1=in(obj11, tru1),var0=at(apn1, apt2),}
+11:13:31 154 [INFO ] (GlobalLocalDistributedBestFirstSearch.java:419) - apn1: Reached new maximal [tru1] /g/: 3
+11:13:31 154 [DEBUG] (LazilyDistributedSAFFReplyHeuristic.java:188) - tru1 send reply to apn1: 15000
+11:13:31 154 [DEBUG] (RelaxationHeuristic.java:330) - apn1 get heuristic: {var1=in(obj11, apn1),var0=at(apn1, apt2),}
+11:13:31 154 [DEBUG] (DistributedHeuristicReplyProtocol.java:51) - tru1 send HeuristicReplyWithPublicActionsMessage [requestHash=15000, stateHash=36769, goalHash=0, heuristicValue=1, usedPublicActionIDs=[]] to apn1
+11:13:31 154 [DEBUG] (RelaxationHeuristic.java:185) - apn1 build goal propositions: [0, 2, 3]:{var2=at(tru1, pos1),var1=at(obj11, apt1),var0=at(apn1, apt2),}
+11:13:31 154 [INFO ] (GlobalLocalDistributedBestFirstSearch.java:308) - tru1: Reached new minimal global [null] /h/: 1
+11:13:31 154 [DEBUG] (RelaxationHeuristic.java:227) - apn1 setup exploration queue 
+11:13:31 154 [INFO ] (GlobalLocalDistributedBestFirstSearch.java:312) - tru1: Reached new maximal [null] /g/: 4
+11:13:31 154 [DEBUG] (RelaxationHeuristic.java:257) - apn1 build goal propositions: {var1=in(obj11, apn1),var0=at(apn1, apt2),}
+11:13:31 155 [INFO ] (GlobalLocalDistributedBestFirstSearch.java:591) - SOLUTION of cost 4 FOUND[tru1]: [0, 2, 3]
+11:13:31 155 [DEBUG] (DistributedSearchProtocol.java:55) - apn1 send state State [[7, 4, 3]]
+11:13:31 155 [INFO ] (GlobalLocalDistributedBestFirstSearch.java:593) - LOCAL-OPEN-SIZE[tru1]28
+11:13:31 155 [INFO ] (GlobalLocalDistributedBestFirstSearch.java:594) - GLOBAL-OPEN-SIZE[tru1]6
+11:13:31 155 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:63) - apn1 handle reply from tru1: HeuristicReplyWithPublicActionsMessage [requestHash=15000, stateHash=36769, goalHash=0, heuristicValue=1, usedPublicActionIDs=[]]
+11:13:31 155 [INFO ] (GlobalLocalDistributedBestFirstSearch.java:595) - CLOSED-SIZE[tru1]8
+11:13:31 155 [INFO ] (GlobalLocalDistributedBestFirstSearch.java:596) - LOCAL-CLOSED-SIZE[tru1]5
+11:13:31 155 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:123) - apn1 get heuristic: {var1=at(obj11, apt1),var0=at(apn1, apt2),}
+11:13:31 155 [WARN ] (GlobalLocalDistributedBestFirstSearch.java:256) -  by me (tru1) - 157
+11:13:31 155 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:188) - apn1 get local RP: s:{var1=at(obj11, apt1),var0=at(apn1, apt2),}, goal: {var2=at(tru1, pos1),var1=at(obj11, apt1),var0=at(apn1, apt2),}
+11:13:31 155 [INFO ] (GlobalLocalDistributedBestFirstSearch.java:529) - tru1 plan found 29856 - [
+ tru1 load-truck-tru1 tru1 obj11 pos1 1683899707, 
+ tru1 drive-truck-tru1 tru1 pos1 apt1 cit1 552113701, 
+ tru1 unload-truck-tru1 tru1 obj11 apt1 461854161, 
+ tru1 drive-truck-tru1 tru1 apt1 pos1 cit1 -296121693]
+11:13:31 155 [INFO ] (GlobalLocalDistributedBestFirstSearch.java:530) - tru1 send PLANNING_FINISHED!
+11:13:31 155 [DEBUG] (RelaxationHeuristic.java:185) - apn1 build goal propositions: [0, 2, 3]:{var2=at(tru1, pos1),var1=at(obj11, apt1),var0=at(apn1, apt2),}
+11:13:31 155 [DEBUG] (DistributedSearchProtocol.java:69) - tru1 send PlanningFinishedMessage 
+11:13:31 155 [DEBUG] (RelaxationHeuristic.java:227) - apn1 setup exploration queue 
+11:13:31 155 [DEBUG] (RelaxationHeuristic.java:257) - apn1 build goal propositions: {var1=at(obj11, apt1),var0=at(apn1, apt2),}
+11:13:31 155 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:214) - apn1 send request: [-296121693]
+11:13:31 155 [DEBUG] (LazilyDistributedSAFFRequestHeuristic.java:243) - apn1 send request to tru1: 17000(17000), waiting for: 2
+11:13:31 156 [DEBUG] (DistributedHeuristicRequestProtocol.java:50) - apn1 send HeuristicRequestMessage [
+state=36583, 
+requestedGoal=[-296121693](-296121662)] to tru1
+11:13:31 156 [WARN ] (GlobalLocalDistributedBestFirstSearch.java:145) - apn1 receive PLANNING_FINISHED!

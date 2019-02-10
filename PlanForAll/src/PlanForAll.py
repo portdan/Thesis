@@ -38,10 +38,10 @@ def main():
             if filename.endswith(".pddl"):
                 #print(filename)
                 
-                if(filename != domain_name):
-                    
-                    problem_name = os.path.splitext(filename)[0]
-                                    
+                problem_name = os.path.splitext(filename)[0]
+
+                if(problem_name != domain_name):
+                                                        
                     agents_path = str(agents_folder +"/" + problem_name +".addl")  
                     
                     processList = ["./run_local.sh" 
@@ -63,13 +63,29 @@ def main():
     
                     if os.path.exists("out.plan"):
                         print(args.traces + "/" + problem_name + ".plan")
-                        shutil.move('out.plan', args.traces + "/" + problem_name + ".plan")
-    
+                        
+                        old_trace_path = 'out.plan'
+                        new_trace_folder = args.traces + "/" + problem_name
+                        new_trace_path = new_trace_folder + "/" + problem_name + ".plan"
+                        
+                        old_problem_path = os.path.join(args.problems, filename)
+                        new_problem_path = new_trace_folder + "/" + problem_name + ".pddl"
+                        
+                        os.makedirs(new_trace_folder)
+                        shutil.move(old_trace_path, new_trace_path)
+                        shutil.copy(old_problem_path, new_problem_path)
+
     if os.path.exists("output"):
         os.remove("output")
                 
     if os.path.exists("output.sas"):
         os.remove("output.sas")
+        
+    if os.path.exists("out.csv"):
+        os.remove("out.csv")
+        
+    if os.path.exists("temp"):
+        shutil.rmtree("temp")
                                                 
     end = time.time() 
     
