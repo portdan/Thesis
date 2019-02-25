@@ -1,61 +1,23 @@
 (define (domain logistics)
 	(:requirements :typing :multi-agent :unfactored-privacy)
 (:types
+	apn1 - airplane
 	location vehicle package city - object
+	tru1 - truck
 	airport - location
 	truck airplane - vehicle
 )
 (:predicates
-	(at ?obj - object ?loc - location)
 	(in ?obj1 - package ?veh - vehicle)
+	(at ?obj - object ?loc - location)
 
 	(:private ?agent - truck
 		(in-city ?loc - location ?city - city)
 	)
 )
 
-(:action load-airplane
-	:agent ?airplane - airplane
-	:parameters (?obj - package ?loc - airport)
-	:precondition (and
-		(at ?obj ?loc)
-		(at ?airplane ?loc)
-	)
-	:effect (and
-		(not (at ?obj ?loc))
-		(in ?obj ?airplane)
-	)
-)
-
-
-(:action unload-airplane
-	:agent ?airplane - airplane
-	:parameters (?obj - package ?loc - airport)
-	:precondition (and
-		(in ?obj ?airplane)
-		(at ?airplane ?loc)
-	)
-	:effect (and
-		(not (in ?obj ?airplane))
-		(at ?obj ?loc)
-	)
-)
-
-
-(:action fly-airplane
-	:agent ?airplane - airplane
-	:parameters (?loc-from - airport ?loc-to - airport)
-	:precondition 
-		(at ?airplane ?loc-from)
-	:effect (and
-		(not (at ?airplane ?loc-from))
-		(at ?airplane ?loc-to)
-	)
-)
-
-
-(:action load-truck
-	:agent ?truck - truck
+(:action load-truck-tru1
+	:agent ?truck - tru1
 	:parameters (?obj - package ?loc - location)
 	:precondition (and
 		(at ?truck ?loc)
@@ -68,8 +30,8 @@
 )
 
 
-(:action unload-truck
-	:agent ?truck - truck
+(:action unload-truck-tru1
+	:agent ?truck - tru1
 	:parameters (?obj - package ?loc - location)
 	:precondition (and
 		(at ?truck ?loc)
@@ -82,8 +44,8 @@
 )
 
 
-(:action drive-truck
-	:agent ?truck - truck
+(:action drive-truck-tru1
+	:agent ?truck - tru1
 	:parameters (?loc-from - location ?loc-to - location ?city - city)
 	:precondition (and
 		(at ?truck ?loc-from)
@@ -96,4 +58,41 @@
 	)
 )
 
+(:action fly-airplane-apn1-param-apn1-param-apt2-param-apt1
+	:agent ?apn1 - apn1
+	:parameters ()
+	:precondition 
+		(at apn1 apt2)
+	:effect 
+		(at apn1 apt1)
+)
+(:action fly-airplane-apn1-param-apn1-param-apt1-param-apt2
+	:agent ?apn1 - apn1
+	:parameters ()
+	:precondition 
+		(at apn1 apt1)
+	:effect 
+		(at apn1 apt2)
+)
+(:action load-airplane-apn1-param-apn1-param-obj11-param-apt1
+	:agent ?apn1 - apn1
+	:parameters ()
+	:precondition (and
+		(at apn1 apt1)
+		(at obj11 apt1)
+	)
+	:effect 
+		(in obj11 apn1)
+)
+(:action unload-airplane-apn1-param-apn1-param-obj11-param-apt2
+	:agent ?apn1 - apn1
+	:parameters ()
+	:precondition (and
+		(at apn1 apt2)
+		(in obj11 apn1)
+		(at tru1 apt1)
+	)
+	:effect 
+		(at obj11 apt2)
+)
 )
