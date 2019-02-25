@@ -3,7 +3,7 @@
 (:types
 	apn1 - airplane
 	location vehicle package city - object
-	tru1 - truck
+	tru1 tru2 - truck
 	airport - location
 	truck airplane - vehicle
 )

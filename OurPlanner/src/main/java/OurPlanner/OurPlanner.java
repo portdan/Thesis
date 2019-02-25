@@ -200,10 +200,12 @@ public class OurPlanner implements Creator  {
 		String agentADDLPath = Globals.TEMP_PATH + "/" + problemFileName.split("\\.")[0] + ".addl";
 		String heuristic = "saFF-glcl";
 		int recursionLevel = -1;
-		int timeLimitMin = 10;
+		double timeLimitMin = 1;
+
+		//agentDomainPath = groundedFolder + "/" + domainFileName;
 
 		MADLAPlanner planner = new MADLAPlanner(agentDomainPath, agentProblemPath, agentADDLPath,
-				heuristic, recursionLevel, timeLimitMin,agentList, agentName);
+				heuristic, recursionLevel, timeLimitMin, agentList, agentName);
 
 		List<String> result = planner.plan();
 
@@ -234,7 +236,7 @@ public class OurPlanner implements Creator  {
 
 		LOGGER.info("Agents file reading");
 
-		Process pr = null;
+		ExecCommand ec = null;
 
 		try {
 
@@ -245,51 +247,48 @@ public class OurPlanner implements Creator  {
 
 			LOGGER.info("Running: " + cmd);
 
-			pr = Runtime.getRuntime().exec(cmd);
+			//			pr = Runtime.getRuntime().exec(cmd);
+			//			pr.waitFor();
 
-			pr.waitFor();
-
-		} 
+			ec = new ExecCommand(cmd);
+		}
 		catch (Exception e) {
-			LOGGER.fatal(e, e);
+			LOGGER.info(e,e);
 			return false;
 		}
 
-		return agentsReaderValid(pr);
+
+		//		} 
+		//		catch (Exception e) {
+		//			LOGGER.fatal(e, e);
+		//			return false;
+		//		}
+
+		return agentsReaderValid(ec);
 	}
 
-	private boolean agentsReaderValid(Process prc) {
+	private boolean agentsReaderValid(ExecCommand ec) {
 
 		LOGGER.info("Agents reading check");
-
-		if(prc == null) {
+		
+		if(ec == null) {
 			LOGGER.fatal("agent-parser.py script failure");
 			return false;
 		}
 
 		List<String> output = new ArrayList<String>();
 
-		try (BufferedReader br = new BufferedReader(new InputStreamReader(prc.getInputStream()))) {                                
-			String line;                                                                                                         
-			while ((line = br.readLine()) != null)  {                                                                            
-				output.add(line);                                                                                       
-			}                                                                                                                    
-		} catch (Exception e) {
-			LOGGER.fatal(e, e);
-			return false;
-		}
+		String[] split = ec.getOutput().split("\n");
 
-		if(prc.exitValue() == SCRIPT_SUCCESS) {
-			agentList = new ArrayList<>(output);
-			LOGGER.info("Agents are: " + agentList);
-			return true;
+		for (int i = 0; i < split.length; i++) {
+			output.add(split[i]);                                                                                       
 		}
-		else {
-			LOGGER.fatal(output);
-			return false;
-		}
+		
+		agentList = new ArrayList<>(output);
+		LOGGER.info("Agents are: " + agentList);
+		
+		return true;
 	}
-
 
 	private boolean ParseArgs(String[] args) {
 

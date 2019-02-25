@@ -227,16 +227,23 @@ public class PlanVerifier {
 		try {
 			String cmd = CONVERTOR + " " + path + " " + domain + " " + problem + " " + outputFolder;
 			LOGGER.info("RUN: " + cmd);
-			Process pr = Runtime.getRuntime().exec(cmd);
+			//			Process pr = Runtime.getRuntime().exec(cmd);
+			//			pr.waitFor();
 
-			pr.waitFor();
-		} catch (IOException e) {
-			LOGGER.info(e,e);
-			return false;
-		} catch (InterruptedException e) {
+			new ExecCommand(cmd);
+		}
+		catch (Exception e) {
 			LOGGER.info(e,e);
 			return false;
 		}
+
+		//		} catch (IOException e) {
+		//			LOGGER.info(e,e);
+		//			return false;
+		//		} catch (InterruptedException e) {
+		//			LOGGER.info(e,e);
+		//			return false;
+		//		}
 
 		return true;
 	}
@@ -248,14 +255,21 @@ public class PlanVerifier {
 		try {
 			String cmd = TRANSLATOR + " " + domainPath + " " + problemPath + " --ignore_unsolvable";
 			LOGGER.info("RUN: " + cmd);
-			Process pr = Runtime.getRuntime().exec(cmd);
+			//			Process pr = Runtime.getRuntime().exec(cmd);
+			//			pr.waitFor();
 
-			pr.waitFor();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
+			new ExecCommand(cmd);
 		}
+		catch (Exception e) {
+			LOGGER.info(e,e);
+			return false;
+		}
+
+		//		} catch (IOException e) {
+		//			e.printStackTrace();
+		//		} catch (InterruptedException e) {
+		//			e.printStackTrace();
+		//		}
 
 		String sasFileName = "output.sas";
 
@@ -296,13 +310,21 @@ public class PlanVerifier {
 		try {
 			String cmd = PREPROCESSOR;
 			LOGGER.info("RUN: " + cmd);
-			Process pr = Runtime.getRuntime().exec(cmd);
-			pr.waitFor();
-		} catch (Exception e) {
-			LOGGER.info("Preprocess script error");
-			e.printStackTrace();
+			//			Process pr = Runtime.getRuntime().exec(cmd);
+			//			pr.waitFor();
+
+			new ExecCommand(cmd);
+		}
+		catch (Exception e) {
+			LOGGER.info(e,e);
 			return false;
-		} 
+		}
+
+		//		} catch (Exception e) {
+		//			LOGGER.info("Preprocess script error");
+		//			e.printStackTrace();
+		//			return false;
+		//		} 
 
 		return true;
 	}

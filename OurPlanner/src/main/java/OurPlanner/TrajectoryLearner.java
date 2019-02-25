@@ -104,6 +104,9 @@ public class TrajectoryLearner {
 		StateActionStateSequencer sasSequencer = new StateActionStateSequencer(agentList, 
 				problemFiles, domainFileName, problemFileName, trajectoryFiles);
 
+		DeleteEffectGenerator DEGenerator = new DeleteEffectGenerator (problemFiles,
+				domainFileName, problemFileName);
+
 		List<StateActionState> trajectorySequences = sasSequencer.generateSequences();
 
 		while(!trajectorySequences.isEmpty()) {
@@ -121,6 +124,11 @@ public class TrajectoryLearner {
 				Set<String> pre = learnPreconditions(sasList);
 				Set<String> eff = learnEffects(sasList);
 
+				eff.addAll(DEGenerator.generateDeleteEffects(firstValue.action,pre,eff));
+
+				pre = FormatFacts(pre);
+				eff = FormatFacts(eff);
+
 				learnedActions.add(generateLearnedAction(pre,eff,firstValue.action,firstValue.actionOwner));
 			}
 
@@ -128,6 +136,41 @@ public class TrajectoryLearner {
 		}
 
 		return writeNewLearnedProblemFiles(learnedActions);
+	}
+
+	private Set<String> FormatFacts(Set<String> facts) {
+
+		Set<String> formatted = new HashSet<String>();
+
+		for (String fact : facts) {
+
+			int startIndex = 0;
+			int endIndex = fact.length();
+
+			boolean isNegated = false;
+
+			if(fact.startsWith("not")) {
+				isNegated = true;
+				startIndex = fact.indexOf('(');
+				endIndex = fact.lastIndexOf(')');
+			}
+
+			String formattedFact = fact.substring(startIndex,endIndex);
+
+			formattedFact = formattedFact.replace("(", " ");
+			formattedFact = formattedFact.replace(",", "");
+			formattedFact = formattedFact.replace(")", "");
+			
+			formattedFact = formattedFact.trim();
+
+			if (isNegated) {
+				formattedFact = "not (" + formattedFact + ")";
+			}
+
+			formatted.add(formattedFact);
+		}
+
+		return formatted;
 	}
 
 	private boolean writeNewLearnedProblemFiles(List<String> learnedActions) {
@@ -261,7 +304,7 @@ public class TrajectoryLearner {
 
 		String actionName = action.replace(" ",Globals.PARAMETER_INDICATION);
 		//String actionName = action;
-		
+
 		rep += "(:action " + actionName + "\n";
 		rep += "\t:agent ?" + actionOwner + " - " + actionOwner + "\n";
 		rep += "\t:parameters ()\n";
@@ -273,7 +316,7 @@ public class TrajectoryLearner {
 		if(pre.isEmpty())
 			rep += "\t\t()\n";
 		else
-			for (String p : pre) 
+			for (String p : pre)
 				rep += "\t\t(" + p + ")\n";
 		if (pre.size() > 1)
 			rep += "\t)\n";

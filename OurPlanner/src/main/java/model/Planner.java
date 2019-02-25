@@ -524,7 +524,7 @@ public class Planner {
 			@Override
 			public void partialPlanReconstructed(List<String> plan, String initiator, int solutionCost) {
 				//TODO
-				//executor.executePartialPlan(plan,initiator,solutionCost);
+				executor.executePartialPlan(plan,initiator,solutionCost);
 			}
 
 		});

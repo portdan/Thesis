@@ -56,7 +56,7 @@ public class MADLAPlanner {
 
 	private String heuristic = "";
 	private int recursionLevel = -1;
-	private int timeLimitMin = -1;
+	private double timeLimitMin = -1;
 
 	private List<String> agentNames = null;
 
@@ -70,7 +70,7 @@ public class MADLAPlanner {
 	private final Set<Thread> threadSet = new LinkedHashSet<Thread>();
 
 	public MADLAPlanner(String domainFileName, String problemFileName, String agentFileName,
-			String heuristic , int recursionLevel, int timeLimitMin, List<String> agentNames,
+			String heuristic , int recursionLevel, double timeLimitMin, List<String> agentNames,
 			String planninAagentName ) {
 
 		LOGGER.info("MADLAPlanner constructor (not from .sas)");
@@ -90,7 +90,7 @@ public class MADLAPlanner {
 	}
 
 	public MADLAPlanner(String sasFileName, String agentFileName, String heuristic ,
-			int recursionLevel, int timeLimitMin,List<String> agentNames, String planninAagentName ) {
+			int recursionLevel, double timeLimitMin, List<String> agentNames, String planninAagentName ) {
 
 		LOGGER.info("MADLAPlanner constructor (from .sas)");
 
@@ -195,7 +195,7 @@ public class MADLAPlanner {
 		createEntities(addl);
 
 		runEntities();
-		
+
 		executorService.shutdown();
 
 		try {
@@ -223,16 +223,23 @@ public class MADLAPlanner {
 		try {
 			String cmd = CONVERTOR + " " + path + " " + domain + " " + problem + " " + TEMP;
 			LOGGER.info("RUN: " + cmd);
-			Process pr = Runtime.getRuntime().exec(cmd);
+			//			Process pr = Runtime.getRuntime().exec(cmd);
+			//			pr.waitFor();
 
-			pr.waitFor();
-		} catch (IOException e) {
-			LOGGER.info(e,e);
-			return false;
-		} catch (InterruptedException e) {
+			new ExecCommand(cmd);
+		}
+		catch (Exception e) {
 			LOGGER.info(e,e);
 			return false;
 		}
+
+		//		} catch (IOException e) {
+		//			LOGGER.info(e,e);
+		//			return false;
+		//		} catch (InterruptedException e) {
+		//			LOGGER.info(e,e);
+		//			return false;
+		//		}
 
 		domainFileName = TEMP + "/" + domain + ".pddl";
 		problemFileName = TEMP + "/" + problem + ".pddl";
@@ -247,16 +254,24 @@ public class MADLAPlanner {
 		try {
 			String cmd = TRANSLATOR + " " + domainFileName + " " + problemFileName;
 			LOGGER.info("RUN: " + cmd);
-			Process pr = Runtime.getRuntime().exec(cmd);
 
-			pr.waitFor();
-		} catch (IOException e) {
-			LOGGER.info(e,e);
-			return false;
-		} catch (InterruptedException e) {
+			//			Process pr = Runtime.getRuntime().exec(cmd);
+			//			pr.waitFor();
+
+			new ExecCommand(cmd);
+		}
+		catch (Exception e) {
 			LOGGER.info(e,e);
 			return false;
 		}
+
+		//		} catch (IOException e) {
+		//			LOGGER.info(e,e);
+		//			return false;
+		//		} catch (InterruptedException e) {
+		//			LOGGER.info(e,e);
+		//			return false;
+		//		}
 
 		String sasFileName = "output.sas";
 
@@ -297,13 +312,22 @@ public class MADLAPlanner {
 		try {
 			String cmd = PREPROCESSOR;
 			LOGGER.info("RUN: " + cmd);
-			Process pr = Runtime.getRuntime().exec(cmd);
-			pr.waitFor();
-		} catch (Exception e) {
-			LOGGER.info("Preprocess script error");
-			e.printStackTrace();
+			//			Process pr = Runtime.getRuntime().exec(cmd);
+			//			pr.waitFor();
+
+			new ExecCommand(cmd);
+		}
+		catch (Exception e) {
+			LOGGER.info(e,e);
 			return false;
-		} 
+		}
+
+
+		//		} catch (Exception e) {
+		//			LOGGER.info("Preprocess script error");
+		//			e.printStackTrace();
+		//			return false;
+		//		} 
 
 		return true;
 

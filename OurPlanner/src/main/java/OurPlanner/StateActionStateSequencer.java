@@ -139,7 +139,7 @@ public class StateActionStateSequencer {
 
 				String trajectoryPath = trajectory.getPath();
 				String problemPath = problem.getPath();
-				
+
 				String trajectoryName = FilenameUtils.getBaseName(trajectoryPath);
 
 				String ext = FilenameUtils.getExtension(trajectoryPath); 
@@ -342,16 +342,23 @@ public class StateActionStateSequencer {
 		try {
 			String cmd = CONVERTOR + " " + path + " " + domain + " " + problem + " " + TEMP;
 			LOGGER.info("RUN: " + cmd);
-			Process pr = Runtime.getRuntime().exec(cmd);
+			//			Process pr = Runtime.getRuntime().exec(cmd);
+			//			pr.waitFor();
 
-			pr.waitFor();
-		} catch (IOException e) {
-			LOGGER.info(e,e);
-			return false;
-		} catch (InterruptedException e) {
+			new ExecCommand(cmd);
+		}
+		catch (Exception e) {
 			LOGGER.info(e,e);
 			return false;
 		}
+
+		//		} catch (IOException e) {
+		//			LOGGER.info(e,e);
+		//			return false;
+		//		} catch (InterruptedException e) {
+		//			LOGGER.info(e,e);
+		//			return false;
+		//		}
 
 		convertedDomainPath = TEMP + "/" + domain + ".pddl";
 		convertedProblemPath = TEMP + "/" + problem + ".pddl";
@@ -366,16 +373,23 @@ public class StateActionStateSequencer {
 		try {
 			String cmd = TRANSLATOR + " " + convertedDomainPath + " " + convertedProblemPath + " --ignore_unsolvable";
 			LOGGER.info("RUN: " + cmd);
-			Process pr = Runtime.getRuntime().exec(cmd);
+			//			Process pr = Runtime.getRuntime().exec(cmd);
+			//			pr.waitFor();
 
-			pr.waitFor();
-		} catch (IOException e) {
-			LOGGER.info(e,e);
-			return false;
-		} catch (InterruptedException e) {
+			new ExecCommand(cmd);
+		}
+		catch (Exception e) {
 			LOGGER.info(e,e);
 			return false;
 		}
+
+		//		} catch (IOException e) {
+		//			LOGGER.info(e,e);
+		//			return false;
+		//		} catch (InterruptedException e) {
+		//			LOGGER.info(e,e);
+		//			return false;
+		//		}
 
 		String sasFileName = "output.sas";
 
@@ -416,13 +430,21 @@ public class StateActionStateSequencer {
 		try {
 			String cmd = PREPROCESSOR;
 			LOGGER.info("RUN: " + cmd);
-			Process pr = Runtime.getRuntime().exec(cmd);
-			pr.waitFor();
-		} catch (Exception e) {
-			LOGGER.info("Preprocess script error");
-			e.printStackTrace();
+			//			Process pr = Runtime.getRuntime().exec(cmd);
+			//			pr.waitFor();
+
+			new ExecCommand(cmd);
+		}
+		catch (Exception e) {
+			LOGGER.info(e,e);
 			return false;
-		} 
+		}
+
+		//		} catch (Exception e) {
+		//			LOGGER.info("Preprocess script error");
+		//			e.printStackTrace();
+		//			return false;
+		//		} 
 
 		return true;
 
@@ -473,45 +495,42 @@ public class StateActionStateSequencer {
 
 		LOGGER.info("Extracting facts from state " + state);
 
-		Set<String> res = new HashSet<String>();
+		Set<String> out = new HashSet<String>();
 
-		//String str = new String(state.getDomain().humanize(state.getValues()));
-
-		String str = humanizeStateFromDomain(state.getValues());
-
-		int start = str.indexOf('=');
-
-		while(start != -1) {
-
-			int end = str.indexOf(')');
-
-			String var = str.substring(start + 1,end + 1);
-
-			var = var.replace("(", " ");
-			var = var.replace(",", "");
-			var = var.replace(")", "");
-
-			res.add(var);
-
-			str = str.substring(end + 1, str.length());		
-
-			start = str.indexOf('=');
-		}
-
-		return res;
-	}
-
-	private String humanizeStateFromDomain(int[] values) {
-
-		String out = "{";
+		int[] values = state.getValues();
 
 		for(int var = 0; var < values.length; ++var){
 			if(var >= 0){
-				out += Domain.varNames.get(var) + "=" + Domain.valNames.get(values[var]) + ",";
+
+				String newVal = Domain.valNames.get(values[var]).toString();
+
+				out.add(newVal);
 			}
 		}
 
-		return out + "}";
+		/*
+		Map<Integer, Set<Integer>> variableDomains = state.getDomain().getVariableDomains();
+
+		for (int var : variableDomains.keySet())
+		{
+			int stateVal = state.getValues()[var];
+			for (int val : variableDomains.get(var))
+			{
+				String newVal = Domain.valNames.get(val).toString();
+
+				newVal = newVal.replace("(", " ");
+				newVal = newVal.replace(",", "");
+				newVal = newVal.replace(")", "");
+
+				if(stateVal == val)
+					out.add(newVal);
+				else
+					out.add("not ("+ newVal + ")");
+			}
+		}
+		 */
+
+		return out;
 	}
 
 
