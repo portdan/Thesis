@@ -13,19 +13,21 @@ import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
 import cz.agents.alite.creator.Creator;
+import cz.agents.dimaptools.experiment.DataAccumulator;
+import cz.agents.madla.planner.Planner;
 
 public class OurPlanner implements Creator  {
 
 	/* Global variables */
 	private final static Logger LOGGER = Logger.getLogger(OurPlanner.class);
-	private final static int ARGS_NUM = 6;
-	private final static int SCRIPT_SUCCESS = 0;
-	private final static int RANDOM_SEED = 1;
+	private final static int ARGS_NUM = 8;
 
 	private static final String AGENT_PARSER_SCRIPT = "./Scripts/parse-agents.py";
 
 	/* Class variables */
 	private String trajectoriesFolder = "";
+	private String OutputFolder = "";
+	private String OutputTestFolder = "";
 	private String groundedFolder = "";
 	private String localViewFolder = "";
 	private String domainFileName = "";
@@ -33,6 +35,8 @@ public class OurPlanner implements Creator  {
 	private String agentsFilePath = "";
 
 	private File trajectoriesFile = null;
+	private File OutputFile = null;
+	private File OutputTestFile = null;
 	private File groundedFile = null;
 	private File localViewFile = null;
 	private File domainFile = null;
@@ -40,20 +44,27 @@ public class OurPlanner implements Creator  {
 	private File agentsFile = null;
 
 	private List<String> agentList = null;
-	String currentLeaderAgent = "";
+	private	String currentLeaderAgent = "";
 	private List<String> availableLeaders= null;
 
-	Random rnd = new Random(RANDOM_SEED);
+	private	Random rnd = new Random();
+
+	private int numOfTrajectories = 0;
+
+	private int num_agents_solved = 0;
+	private int num_agents_not_solved = 0;
+	private int num_agents_timeout = 0;
 
 	@Override
 	public void create() {
 
-		LOGGER.info("OurPlanner end");
-
+		LOGGER.info("OurPlanner create");
 	}
 
 	@Override
 	public void init(String[] args) {
+
+		long startTime = System.currentTimeMillis();
 
 		LOGGER.info("OurPlanner start");
 
@@ -63,11 +74,19 @@ public class OurPlanner implements Creator  {
 			System.exit(1);
 		}
 
+		TestDataAccumulator.startNewAccumulator(domainFileName, problemFileName);
+		TestDataAccumulator.getAccumulator().startTimeMs = startTime;
+		
+		TestDataAccumulator.getAccumulator().setOutputFile(OutputTestFolder);
+
 		if(!ReadAgentsFile())
 		{
 			LOGGER.fatal("Agents file reading failure");
 			System.exit(1);
 		}
+
+		DataAccumulator.getAccumulator().agents = agentList.size();
+
 
 		if(!deleteLearnedFiles()) {
 			LOGGER.info("Deleting Learned files failure");
@@ -83,12 +102,36 @@ public class OurPlanner implements Creator  {
 			LOGGER.info("Coping original files failure");
 			System.exit(1);
 		}
-
+		/*
 		if(!runPlanningAlgorithm())
 		{
 			LOGGER.fatal("Planning algorithem failure");
 			System.exit(1);
 		}
+		 */
+
+		runPlanningAlgorithm();
+
+		TestDataAccumulator.getAccumulator().numOfAgentsSolved = num_agents_solved;
+		TestDataAccumulator.getAccumulator().numOfAgentsTimeout = num_agents_timeout;
+		TestDataAccumulator.getAccumulator().numOfAgentsNotSolved = num_agents_not_solved;		
+
+		if(!copyOutputFolder()) {
+			LOGGER.info("Coping output folder failure");
+			System.exit(1);
+		}
+
+		if(!deleteOutputFiles()) {
+			LOGGER.info("Deleting Output files failure");
+			System.exit(1);
+		}
+
+		long finishTime = System.currentTimeMillis();
+
+		TestDataAccumulator.getAccumulator().finishTimeMs = finishTime;
+
+		TestDataAccumulator.getAccumulator().writeOutput();
+
 	}
 
 	private boolean runPlanningAlgorithm() {
@@ -120,8 +163,13 @@ public class OurPlanner implements Creator  {
 			if(leaderAgentPlan == null)
 				continue;		
 
-			if(verifyPlan(leaderAgentPlan, isLearning))
+			if(verifyPlan(leaderAgentPlan, isLearning)) {
+
+				TestDataAccumulator.getAccumulator().planVerified = true;
+				TestDataAccumulator.getAccumulator().planLength= leaderAgentPlan.size();
+
 				return true;
+			}
 		}
 
 		return false;
@@ -161,6 +209,22 @@ public class OurPlanner implements Creator  {
 		return true;
 	}
 
+	private boolean copyOutputFolder() {
+
+		LOGGER.info("Copy the output files");
+
+		File srcDir = new File(Globals.OUTPUT_PATH);
+
+		try {
+			FileUtils.copyDirectory(srcDir, OutputFile);
+		} catch (IOException e) {
+			LOGGER.fatal(e, e);
+			return false;
+		}
+
+		return true;
+	}
+
 
 	private boolean verifyPlan(List<String> plan, boolean isLearning) {
 
@@ -176,6 +240,9 @@ public class OurPlanner implements Creator  {
 		PlanVerifier planVerifier = new PlanVerifier(agentList,domainFileName,problemFileName,localViewPath,groundedFolder);		
 
 		boolean isVerified = planVerifier.verifyPlan(plan,0);
+
+		if(isVerified)
+			num_agents_solved++;
 
 		if(!deleteTempFiles()) {
 			LOGGER.info("Deleting Temporary files failure");
@@ -208,6 +275,12 @@ public class OurPlanner implements Creator  {
 				heuristic, recursionLevel, timeLimitMin, agentList, agentName);
 
 		List<String> result = planner.plan();
+
+		if(planner.isTimeout)
+			num_agents_timeout++;
+
+		if(planner.isNotSolved)
+			num_agents_not_solved++;
 
 		if(!deleteTempFiles()) {
 			LOGGER.info("Deleting Temporary files failure");
@@ -270,7 +343,7 @@ public class OurPlanner implements Creator  {
 	private boolean agentsReaderValid(ExecCommand ec) {
 
 		LOGGER.info("Agents reading check");
-		
+
 		if(ec == null) {
 			LOGGER.fatal("agent-parser.py script failure");
 			return false;
@@ -283,10 +356,10 @@ public class OurPlanner implements Creator  {
 		for (int i = 0; i < split.length; i++) {
 			output.add(split[i]);                                                                                       
 		}
-		
+
 		agentList = new ArrayList<>(output);
 		LOGGER.info("Agents are: " + agentList);
-		
+
 		return true;
 	}
 
@@ -324,6 +397,8 @@ public class OurPlanner implements Creator  {
 		LOGGER.info("Args parse check");
 
 		String extension = "";
+		String problemName = "";
+		String domainName = "";
 
 		groundedFolder = args[1];
 		groundedFile = new File(groundedFolder);
@@ -349,7 +424,10 @@ public class OurPlanner implements Creator  {
 			return false;
 		}
 
+		numOfTrajectories = trajectoriesFile.listFiles().length;
+
 		domainFileName = args[4];
+		domainName = domainFileName.substring(0, domainFileName.lastIndexOf("."));
 		extension = domainFileName.substring(domainFileName.lastIndexOf(".") + 1);
 		//Checks if input domain name is of .pddl type
 		if (!extension.equals("pddl")) {
@@ -358,6 +436,7 @@ public class OurPlanner implements Creator  {
 		}
 
 		problemFileName = args[5];
+		problemName = problemFileName.substring(0, problemFileName.lastIndexOf("."));
 		extension = problemFileName.substring(problemFileName.lastIndexOf(".") + 1);
 		//Checks if input problem name is of .pddl type
 		if (!extension.equals("pddl")) {
@@ -371,6 +450,20 @@ public class OurPlanner implements Creator  {
 		if( !agentsFile.exists()) {
 			LOGGER.fatal("provided path to .agents file not existing");
 			return false;
+		}
+
+		OutputFolder = args[7] + "/" + problemName + "/" + numOfTrajectories + "_Trajectories";
+		OutputFile = new File(OutputFolder);
+
+		if( !OutputFile.exists()) {
+			OutputFile.mkdir();
+		}
+
+		OutputTestFolder = args[8];
+		OutputTestFile = new File(OutputTestFolder);
+
+		if( !OutputTestFile.exists()) {
+			OutputTestFile.getParentFile().mkdirs();
 		}
 
 		return true;
@@ -414,6 +507,25 @@ public class OurPlanner implements Creator  {
 		File temp = new File(Globals.LEARNED_PATH);		
 		if(temp.exists()) {
 			LOGGER.info("Deleting 'learned' folder");
+
+			try {
+				FileUtils.deleteDirectory(temp);
+			} catch (IOException e) {
+				LOGGER.fatal(e, e);
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	private boolean deleteOutputFiles() {
+
+		LOGGER.info("Deleting output files");
+
+		File temp = new File(Globals.OUTPUT_PATH);		
+		if(temp.exists()) {
+			LOGGER.info("Deleting 'output' folder");
 
 			try {
 				FileUtils.deleteDirectory(temp);

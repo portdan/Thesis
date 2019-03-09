@@ -27,9 +27,11 @@ def parse_agents_types(agent_file,domain_name,problem_name):
         print 'PARSING ERROR: Expected (define (problem ... at start of agents file'
         sys.exit(1)
     problem = pfile_array[4]
+    '''
     if problem != problem_name:
         print 'ERROR - names don\'t match between problem and agent file.'
         sys.exit(1)
+    '''
     if pfile_array[5:8] != [')', '(', ':domain']:
         print 'PARSING ERROR: Expected (:domain ...) after (define (problem ...)'
         sys.exit(1)

@@ -69,6 +69,9 @@ public class MADLAPlanner {
 	private final Set<Planner> planners = new LinkedHashSet<Planner>();
 	private final Set<Thread> threadSet = new LinkedHashSet<Thread>();
 
+	public boolean isNotSolved = false;
+	public boolean isTimeout = false;
+
 	public MADLAPlanner(String domainFileName, String problemFileName, String agentFileName,
 			String heuristic , int recursionLevel, double timeLimitMin, List<String> agentNames,
 			String planninAagentName ) {
@@ -172,6 +175,9 @@ public class MADLAPlanner {
 				DataAccumulator.getAccumulator().planLength = -1;
 				DataAccumulator.getAccumulator().planValid = false; 
 				DataAccumulator.getAccumulator().writeOutput(Planner.FORCE_EXIT_AFTER_WRITE);
+
+				isNotSolved = true;
+
 				return null;
 			}
 
@@ -208,6 +214,15 @@ public class MADLAPlanner {
 			if (planner.foundPlan != null)
 				return planner.foundPlan;
 		}
+
+		for (final Planner planner : planners) {    
+			if (planner.isTimeout) {
+				isTimeout = true;
+			}
+		}
+
+		if(isTimeout)
+			DataAccumulator.getAccumulator().writeOutput(Planner.FORCE_EXIT_AFTER_WRITE);
 
 		return null;      
 	}

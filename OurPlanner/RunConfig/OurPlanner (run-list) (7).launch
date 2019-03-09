@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<launchConfiguration type="org.python.pydev.debug.regularLaunchConfigurationType">
+    <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
+        <listEntry value="/OurPlanner/Scripts/run-list.py"/>
+    </listAttribute>
+    <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
+        <listEntry value="1"/>
+    </listAttribute>
+    <stringAttribute key="org.eclipse.ui.externaltools.ATTR_LOCATION" value="${workspace_loc:OurPlanner/Scripts/run-list.py}"/>
+    <stringAttribute key="org.eclipse.ui.externaltools.ATTR_OTHER_WORKING_DIRECTORY" value=""/>
+    <stringAttribute key="org.eclipse.ui.externaltools.ATTR_TOOL_ARGUMENTS" value="OurPlanner.OurPlanner ./Input/Grounded ./Input/LocalView ./Input/Trajectories domain.pddl probLOGISTICS-7-0_0.pddl ./Input/Agent/probLOGISTICS-7-0.agents &quot;/home/daniel/Desktop/log/probLOGISTICS-7-0/5. tests/&quot; &quot;/home/daniel/Desktop/log/tests/output.csv&quot; ./target/OurPlanner-0.0.1-SNAPSHOT-jar-with-dependencies.jar &quot;/home/daniel/Desktop/log/probLOGISTICS-7-0/problemlist.txt&quot; &quot;/home/daniel/Desktop/log/probLOGISTICS-7-0/4.2. traces to learn&quot; &quot;/home/daniel/Desktop/log/probLOGISTICS-7-0/testsetup.txt&quot;"/>
+    <stringAttribute key="org.python.pydev.debug.ATTR_INTERPRETER" value="__default"/>
+    <stringAttribute key="org.python.pydev.debug.ATTR_PROJECT" value="OurPlanner"/>
+    <stringAttribute key="process_factory_id" value="org.python.pydev.debug.processfactory.PyProcessFactory"/>
+</launchConfiguration>

@@ -128,6 +128,8 @@ public class StateActionStateSequencer {
 		List<StateActionState> trajectorySequences = new ArrayList<StateActionState>();
 
 		File[] TrajDir = trajectoryFiles.listFiles();
+		
+		TestDataAccumulator.getAccumulator().trainingSize = TrajDir.length;
 
 		if (TrajDir != null)
 			for (File trajectoryFolder : TrajDir) {

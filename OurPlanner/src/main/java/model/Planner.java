@@ -1,5 +1,6 @@
 package model;
 
+import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -82,6 +83,7 @@ public class Planner {
 	private boolean processAllMessagesAtOnce = false;
 
 	public List<String> foundPlan = null;
+	public boolean isTimeout = false;
 
 	public Planner(String useHeuristic, int recursionLevel, DIMAPWorldInterface world, PlanExecutorInterface executor,long timeLimitMs) {
 		this.world = world;
@@ -454,6 +456,9 @@ public class Planner {
 				DataAccumulator.getAccumulator().finished = false;
 				DataAccumulator.getAccumulator().planLength = -1;
 				DataAccumulator.getAccumulator().planValid = false;
+
+				if (DataAccumulator.getAccumulator().finishTimeMs - DataAccumulator.getAccumulator().startTimeMs >= timeLimitMs)
+					isTimeout = true;
 			}
 
 			@Override
