@@ -1,0 +1,10 @@
+2019-03-16 12:54:29 -  INFO [main] - ProblemGrounder.ProblemGrounder.init - ProblemGrounder start
+2019-03-16 12:54:29 -  INFO [main] - ProblemGrounder.ProblemGrounder.ParseArgs - Args validity check
+2019-03-16 12:54:29 -  INFO [main] - ProblemGrounder.ProblemGrounder.ArgsLenghtValid - Args lenght check
+2019-03-16 12:54:29 -  INFO [main] - ProblemGrounder.ProblemGrounder.ArgsParsingValid - Args parse check
+2019-03-16 12:54:29 -  INFO [main] - ProblemGrounder.ProblemGrounder.CreateAgentsFile - Agents file creation
+2019-03-16 12:54:29 -  INFO [main] - ProblemGrounder.ProblemGrounder.CreateAgentsFile - Running: ./PythonScripts/generate-agent-file.py ./Input/domain.pddl ./Input/probLOGISTICS-15-1.pddl ./Output/Agent
+2019-03-16 12:54:29 -  INFO [main] - ProblemGrounder.ProblemGrounder.agentsFileValid - Agents file check
+2019-03-16 12:54:29 -  INFO [main] - ProblemGrounder.ProblemGrounder.GroundProblem - Grounding problem 
+2019-03-16 12:54:29 -  INFO [main] - ProblemGrounder.ProblemGrounder.GroundProblem - Running: ./PythonScripts/ground-problem.py ./Input/domain.pddl ./Input/probLOGISTICS-15-1.pddl ./Output/Agent/probLOGISTICS-15-1.agents ./Output/Grounded ./Output/LocalView
+2019-03-16 12:54:29 -  INFO [main] - ProblemGrounder.ProblemGrounder.create - ProblemGrounder end
