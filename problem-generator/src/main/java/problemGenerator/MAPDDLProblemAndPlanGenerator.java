@@ -6,11 +6,13 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
@@ -32,20 +34,19 @@ import cz.agents.dimaptools.input.sas.SASParser;
 import cz.agents.dimaptools.input.sas.SASPreprocessor;
 import cz.agents.dimaptools.model.State;
 import problemGenerator.FileGenerator.PDDLGenerator;
+import problemGenerator.FileGenerator.PlanGenerator;
 import problemGenerator.RandomWalker.RandomWalker;
 
-public class MAPDDLProblemGenerator implements Creator {
+public class MAPDDLProblemAndPlanGenerator implements Creator {
 
-	private final static Logger LOGGER = Logger.getLogger(MAPDDLProblemGenerator.class);
+	private final static Logger LOGGER = Logger.getLogger(MAPDDLProblemAndPlanGenerator.class);
 
 	private static final String TRANSLATOR = "./Misc/translate/translate.py";
-	private static final String PREPROCESSOR = "./preprocess-runner";
 	private static final String CONVERTOR = "./Misc/convert/ma-pddl/ma-to-pddl.py";
-	private static final String REMOVEDUPLICATOR = "./Misc/removeDuplicates/rmDup.py";
 
 	private static final String TEMP = "./Output/temp";
-	private static final String GEN = "./Output/gen";
-	private static final String OUTPUT = "./Output";
+	private static final String OUTPUT_TRACES = "./Output/traces";
+	private static final String OUTPUT_PROBLEMS = "./Output/problems";
 	private static final String ROOT = "./";
 
 	private String domainFilePath;
@@ -75,6 +76,8 @@ public class MAPDDLProblemGenerator implements Creator {
 	private final ExecutorService executorService = Executors.newFixedThreadPool(1);
 
 	private final List<DIMAPWorldInterface> worlds = new ArrayList<DIMAPWorldInterface>();
+
+	private Map<String, List<String>> newStateAndPlan = new HashMap<String, List<String>>();
 
 	@Override
 	public void init(String[] args) {
@@ -181,42 +184,67 @@ public class MAPDDLProblemGenerator implements Creator {
 	private void runEntities() {
 		LOGGER.info("run entities:");
 
+		PDDLGenerator pddlGenerator = new PDDLGenerator();
+		PlanGenerator planGenerator = new PlanGenerator();
+
+		int problemCounter = 0;
+
+		// get old problem text
+		String problemText = null;
+		try {
+			problemText = new String(Files.readAllBytes(Paths.get(oldProblemFilePath)));
+		} catch (IOException e) {
+			LOGGER.fatal(e, e);
+			System.exit(1);
+		}
+
 		// generate problems
 		for (int i = 0; i < numOfProblemsToGenerate; i++) {
 
+			List<String> plan = new ArrayList<String>();
+
 			// perform random walk
-			State endState = RandomWalker.RandomWalk(preprocessor.getGlobalInit(), maxNumOfExpands, worlds);
+			State endState = RandomWalker.RandomWalk(plan, preprocessor.getGlobalInit(), preprocessor.getGlobalGoal(), maxNumOfExpands, worlds);
+			String humenized = endState.getDomain().humanize(endState.getValues());
 
-			PDDLGenerator pddlGenerator = new PDDLGenerator();
-
-			String newProblemFileName = problemFileName + "_" + i;
-
-			// if problem file created
-			if (pddlGenerator.generateFile(GEN,newProblemFileName)) {
-
-				// get old problem text
-				String problemText = null;
-				try {
-					problemText = new String(Files.readAllBytes(Paths.get(oldProblemFilePath)));
-				} catch (IOException e) {
-					LOGGER.fatal(e, e);
-					System.exit(1);
-				}
-
-				String humenized = endState.getDomain().humanize(endState.getValues());
-
-				// generate new problem
-				pddlGenerator.generateRandomProblem(problemText,newProblemFileName, humenized);
-			}
+			newStateAndPlan.put(humenized, plan);
 		}
 
-		removeDupliacteProblems();
+		Iterator<Entry<String, List<String>>> it = newStateAndPlan.entrySet().iterator();
 
-		//renameProblems();
-		
+		while (it.hasNext()) {
+			Entry<String, List<String>> statePlanPair = (Entry<String, List<String>>)it.next();
+
+			String TracesFolder = OUTPUT_TRACES + "/" + problemFileName + "_" + problemCounter;
+
+			String newProblemFileName = problemFileName + "_" + problemCounter;
+			String newPlanFileName = "out";			
+
+			// if problem file created
+			if (pddlGenerator.generateFile(TracesFolder,newProblemFileName)) {
+				// generate new problem
+				pddlGenerator.generateRandomProblem(problemText,newProblemFileName, statePlanPair.getKey());		
+			}
+
+			// if plan file created
+			if (planGenerator.generateFile(TracesFolder,newPlanFileName)) {
+				// generate plan
+				planGenerator.generatePlan(statePlanPair.getValue());		
+			}
+
+			// if problem file created
+			if (pddlGenerator.generateFile(OUTPUT_PROBLEMS,newProblemFileName)) {
+				// generate new problem
+				pddlGenerator.generateRandomProblem(problemText,newProblemFileName, statePlanPair.getKey());		
+			}
+
+			problemCounter++;
+		}
+
 		delelteTemporaryFiles();
 	}
-	
+
+
 	private void delelteTemporaryFiles() {
 
 		LOGGER.info("Deleting temporary files");
@@ -310,108 +338,6 @@ public class MAPDDLProblemGenerator implements Creator {
 
 		if (!sasFile.exists()) {
 			LOGGER.fatal("SAS file " + ROOT + sasFilePath + " does not exist!");
-			System.exit(1);
-		}
-	}
-
-	private void preprocessSAS() {
-
-		LOGGER.info("preprocess the .sas file (preprocess.exe < output.sas)");
-
-		try {
-			String cmd = PREPROCESSOR;
-			LOGGER.info("RUN: " + cmd);
-			Process pr = Runtime.getRuntime().exec(cmd);
-			pr.waitFor();
-		} catch (Exception e) {
-			LOGGER.fatal(e, e);
-			System.exit(1);
-		}
-
-		LOGGER.info("check the preprocessed .sas file");
-
-		preprocesSASFile = new File(ROOT + preprocessSASFilePath);
-
-		if (!preprocesSASFile.exists()) {
-			LOGGER.fatal("preprocess SAS file " + ROOT + preprocesSASFile + " does not exist!");
-			System.exit(1);
-		}
-
-		LOGGER.info("move the .sas files to output folder (./Output)");
-
-		sasFilePath = OUTPUT + "/" + sasFilePath;
-		sasFile.renameTo(new File(sasFilePath));
-
-		preprocessSASFilePath = OUTPUT + "/" + preprocessSASFilePath + "-preprocess.sas";
-		preprocesSASFile.renameTo(new File(preprocessSASFilePath));
-		preprocesSASFile = new File(preprocessSASFilePath);
-	}
-
-	private void renameProblems() {
-		// rename problems
-		File dir = new File(GEN);
-		File[] directoryListing = dir.listFiles();
-
-		if (directoryListing != null) 
-			for (File child : directoryListing) {
-
-				PDDLGenerator pddlGenerator = new PDDLGenerator();
-
-				String newProblemName = child.getName().substring(0, child.getName().lastIndexOf('.'));
-
-				String newProblemText = renameProblem(child,newProblemName);
-
-				// if problem file created
-				if (pddlGenerator.generateFile(GEN,newProblemName))
-					pddlGenerator.writeToFile(newProblemText);
-			}
-	}
-
-	private String renameProblem(File problemFile, String newProblemName) {
-
-		String problemText = "";
-
-		try {
-			problemText = new String(Files.readAllBytes(problemFile.toPath()));
-		} catch (IOException e) {
-			LOGGER.fatal(e, e);
-			System.exit(1);
-		}
-
-		// this part replaces problem name with new one
-		Pattern ptn = Pattern.compile("problem\\s");
-
-		Matcher mtch = ptn.matcher(problemText);
-
-		int sIndex=0;
-		int eIndex=0;
-
-		if (mtch.find())	
-			sIndex = mtch.end();
-
-		eIndex = sIndex + problemText.substring(sIndex).indexOf(')');
-
-		StringBuilder sb = new StringBuilder();
-
-		sb.append(problemText.substring( 0, sIndex));
-		sb.append(newProblemName);
-		sb.append(problemText.substring(eIndex));
-
-		return sb.toString();
-	}
-
-	private void removeDupliacteProblems() {
-
-		LOGGER.info("remove duplicate .pddl files (rmDup.py)");
-
-		try {
-			String cmd = "python "+ REMOVEDUPLICATOR + " " + GEN ;
-			LOGGER.info("RUN: " + cmd);
-			Process pr = Runtime.getRuntime().exec(cmd);
-
-			pr.waitFor();
-		} catch (Exception e) {
-			LOGGER.fatal(e, e);
 			System.exit(1);
 		}
 	}

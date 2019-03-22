@@ -10,9 +10,9 @@ public class PDDLGenerator extends FileGenerator{
 		return generateFile(folderPath, fileName, FILE_TYPE);
 	}
 
-	public void generateRandomProblem(String problemText, String humanizedState) {	
+	public void generateRandomProblem(String problemText, String newProblemName ,String humanizedState) {	
 
-		String newProblemText = createProblemString(problemText);
+		String newProblemText = createProblemString(problemText, newProblemName);
 		String newProblemGoal = createGoalString(humanizedState);
 
 		writeToFile(newProblemText+newProblemGoal);
@@ -57,7 +57,7 @@ public class PDDLGenerator extends FileGenerator{
 		return res;
 	}
 
-	private String createProblemString(String problemText) {
+	private String createProblemString(String problemText, String newProblemName) {
 
 		//String a = Pattern.quote(oldFileName);
 		//String b = Matcher.quoteReplacement(oldFileName + fileNameIteration)
@@ -86,6 +86,19 @@ public class PDDLGenerator extends FileGenerator{
 		return sb.toString().split(".+?(?=goal)")[0];
 
 		 */
+		
+		String toFind = "(problem ";
+		
+		int startIndex = problemText.indexOf(toFind) + toFind.length();
+		int endIndex = startIndex + problemText.substring(startIndex).indexOf(")");
+		
+		StringBuilder sb = new StringBuilder();
+
+		sb.append(problemText.substring(0, startIndex));
+		sb.append(newProblemName);
+		sb.append(problemText.substring(endIndex));
+		
+		problemText = sb.toString();
 
 		return problemText.split(".+?(?=goal)")[0];
 	}

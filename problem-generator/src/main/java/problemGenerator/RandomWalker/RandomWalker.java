@@ -11,6 +11,7 @@ import org.apache.log4j.Logger;
 import cz.agents.dimaptools.DIMAPWorldInterface;
 import cz.agents.dimaptools.model.Action;
 import cz.agents.dimaptools.model.State;
+import cz.agents.dimaptools.model.SuperState;
 
 public class RandomWalker {
 
@@ -91,6 +92,10 @@ public class RandomWalker {
 	}
 
 	public static State RandomWalk(State startState, int numOfExpands, List<DIMAPWorldInterface> worlds) {
+		return RandomWalk(null, startState, null, numOfExpands, worlds);
+	}
+
+	public static State RandomWalk(List<String> plan, State startState, SuperState goalState, int numOfExpands, List<DIMAPWorldInterface> worlds) {
 
 		// Random rand = new Random(1); // fixed seed
 		Random rand = new Random(); // no seed
@@ -117,6 +122,25 @@ public class RandomWalker {
 				}
 			}
 
+			// removes any action that transforms to the goal state
+			if(goalState != null)
+			{
+				List<Action> goalReachingActions= new ArrayList<Action>();
+
+				for (Action action : applicableActions) {
+
+					State currentCopy = new State(current);
+
+					action.transform(currentCopy);
+
+					if (currentCopy.unifiesWith(goalState)) {
+						goalReachingActions.add(action);
+					}
+				}
+				
+				applicableActions.removeAll(goalReachingActions);
+			}
+
 			// If reached a dead-end, stop the random walk
 			if (applicableActions.isEmpty()) {
 				LOGGER.info(world.getAgentName() + " - no more applicable actions!");
@@ -125,6 +149,9 @@ public class RandomWalker {
 
 			randomActionIndex = rand.nextInt(applicableActions.size());
 			randomAction = applicableActions.get(randomActionIndex);
+
+			if(plan!=null)
+				plan.add(randomAction.getSimpleLabel());
 
 			// LOGGER.info(world.getAgentName() + " applied action " +
 			// randomAction.getLabel());
