@@ -1,9 +1,7 @@
 package OurPlanner;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -13,14 +11,13 @@ import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
 import cz.agents.alite.creator.Creator;
-import cz.agents.dimaptools.experiment.DataAccumulator;
-import cz.agents.madla.planner.Planner;
 
 public class OurPlanner implements Creator  {
 
 	/* Global variables */
 	private final static Logger LOGGER = Logger.getLogger(OurPlanner.class);
 	private final static int ARGS_NUM = 8;
+	private final static int SEED = 1;
 
 	private static final String AGENT_PARSER_SCRIPT = "./Scripts/parse-agents.py";
 
@@ -47,7 +44,8 @@ public class OurPlanner implements Creator  {
 	private	String currentLeaderAgent = "";
 	private List<String> availableLeaders= null;
 
-	private	Random rnd = new Random();
+	// uses seed so agent order is same
+	private	Random rnd = new Random(SEED);
 
 	private int numOfTrajectories = 0;
 
@@ -74,18 +72,15 @@ public class OurPlanner implements Creator  {
 			System.exit(1);
 		}
 
-		TestDataAccumulator.startNewAccumulator(domainFileName, problemFileName);
-		TestDataAccumulator.getAccumulator().startTimeMs = startTime;
-		
-		TestDataAccumulator.getAccumulator().setOutputFile(OutputTestFolder);
-
 		if(!ReadAgentsFile())
 		{
 			LOGGER.fatal("Agents file reading failure");
 			System.exit(1);
 		}
 
-		DataAccumulator.getAccumulator().agents = agentList.size();
+		TestDataAccumulator.startNewAccumulator(domainFileName, problemFileName, agentList);
+
+		TestDataAccumulator.getAccumulator().setOutputFile(OutputTestFolder);
 
 
 		if(!deleteLearnedFiles()) {
@@ -128,10 +123,11 @@ public class OurPlanner implements Creator  {
 
 		long finishTime = System.currentTimeMillis();
 
-		TestDataAccumulator.getAccumulator().finishTimeMs = finishTime;
+		TestDataAccumulator.getAccumulator().totalTimeMs = finishTime-startTime;
 
 		TestDataAccumulator.getAccumulator().writeOutput();
 
+		LOGGER.info(TestDataAccumulator.getAccumulator().toString());
 	}
 
 	private boolean runPlanningAlgorithm() {
@@ -156,16 +152,28 @@ public class OurPlanner implements Creator  {
 
 			currentLeaderAgent = pickLeader();
 
+			long learningStartTime = System.currentTimeMillis();
+
 			boolean isLearning = learnFromTrajectories(currentLeaderAgent);
 
+			long learningFinishTime = System.currentTimeMillis();
+			
+			TestDataAccumulator.getAccumulator().agentLearningTimeMs.put(currentLeaderAgent, learningFinishTime - learningStartTime);
+
+			long planningStartTime = System.currentTimeMillis();
+
 			leaderAgentPlan = planForAgent(currentLeaderAgent, isLearning);
+
+			long planningFinishTime = System.currentTimeMillis();
+			
+			TestDataAccumulator.getAccumulator().agentPlanningTimeMs.put(currentLeaderAgent, planningFinishTime - planningStartTime);
 
 			if(leaderAgentPlan == null)
 				continue;		
 
 			if(verifyPlan(leaderAgentPlan, isLearning)) {
 
-				TestDataAccumulator.getAccumulator().planVerified = true;
+				TestDataAccumulator.getAccumulator().solvingAgent = currentLeaderAgent;
 				TestDataAccumulator.getAccumulator().planLength= leaderAgentPlan.size();
 
 				return true;
