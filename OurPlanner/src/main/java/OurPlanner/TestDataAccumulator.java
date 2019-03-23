@@ -28,6 +28,8 @@ public class TestDataAccumulator {
 	public Map<String,Long> agentPlanningTimeMs = new HashMap<String, Long>();
 
 	public long totalTimeMs = 0;
+	public long totalLearningTimeMs = 0;
+	public long totalPlaningTimeMs = 0;
 	public int trainingSize = 0;
 	public int numOfAgentsSolved = 0;
 	public int numOfAgentsTimeout = 0;
@@ -67,6 +69,8 @@ public class TestDataAccumulator {
 		sb.append("Timeout").append(sep);
 		sb.append("Not Solved").append(sep);
 		sb.append("Total Time").append(sep);
+		sb.append("Total Learning Time").append(sep);
+		sb.append("Total Planning Time").append(sep);
 
 		for (String agentName : agentNames) {
 			sb.append(agentName + " Learning Time").append(sep);
@@ -90,6 +94,8 @@ public class TestDataAccumulator {
 		sb.append(numOfAgentsTimeout).append(sep);
 		sb.append(numOfAgentsNotSolved).append(sep);
 		sb.append(totalTimeMs).append(sep);
+		sb.append(totalLearningTimeMs).append(sep);
+		sb.append(totalPlaningTimeMs).append(sep);
 
 		for (String agentName : agentNames) {
 			sb.append(agentLearningTimeMs.get(agentName)).append(sep);

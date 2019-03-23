@@ -16,7 +16,7 @@ public class OurPlanner implements Creator  {
 
 	/* Global variables */
 	private final static Logger LOGGER = Logger.getLogger(OurPlanner.class);
-	private final static int ARGS_NUM = 8;
+	private final static int ARGS_NUM = 9;
 	private final static int SEED = 1;
 
 	private static final String AGENT_PARSER_SCRIPT = "./Scripts/parse-agents.py";
@@ -157,7 +157,8 @@ public class OurPlanner implements Creator  {
 			boolean isLearning = learnFromTrajectories(currentLeaderAgent);
 
 			long learningFinishTime = System.currentTimeMillis();
-			
+
+			TestDataAccumulator.getAccumulator().totalLearningTimeMs += learningFinishTime - learningStartTime;
 			TestDataAccumulator.getAccumulator().agentLearningTimeMs.put(currentLeaderAgent, learningFinishTime - learningStartTime);
 
 			long planningStartTime = System.currentTimeMillis();
@@ -165,7 +166,8 @@ public class OurPlanner implements Creator  {
 			leaderAgentPlan = planForAgent(currentLeaderAgent, isLearning);
 
 			long planningFinishTime = System.currentTimeMillis();
-			
+
+			TestDataAccumulator.getAccumulator().totalPlaningTimeMs += planningFinishTime - planningStartTime;
 			TestDataAccumulator.getAccumulator().agentPlanningTimeMs.put(currentLeaderAgent, planningFinishTime - planningStartTime);
 
 			if(leaderAgentPlan == null)
@@ -188,7 +190,7 @@ public class OurPlanner implements Creator  {
 		LOGGER.info("Running learning algorithm");
 
 		TrajectoryLearner learner = new TrajectoryLearner(agentList,agentName,trajectoriesFile, 
-				groundedFile, localViewFile, domainFileName, problemFileName);	
+				groundedFile, localViewFile, domainFileName, problemFileName, numOfTrajectories);	
 
 		boolean isLearned = learner.learnNewActions();
 
@@ -432,9 +434,14 @@ public class OurPlanner implements Creator  {
 			return false;
 		}
 
-		numOfTrajectories = trajectoriesFile.listFiles().length;
+		try {
+			numOfTrajectories = Integer.parseInt(args[4]);
+		} catch (Exception e) {
+			LOGGER.fatal("provided num of traces to use not good");
+			return false;
+		}
 
-		domainFileName = args[4];
+		domainFileName = args[5];
 		domainName = domainFileName.substring(0, domainFileName.lastIndexOf("."));
 		extension = domainFileName.substring(domainFileName.lastIndexOf(".") + 1);
 		//Checks if input domain name is of .pddl type
@@ -443,7 +450,7 @@ public class OurPlanner implements Creator  {
 			return false;
 		}
 
-		problemFileName = args[5];
+		problemFileName = args[6];
 		problemName = problemFileName.substring(0, problemFileName.lastIndexOf("."));
 		extension = problemFileName.substring(problemFileName.lastIndexOf(".") + 1);
 		//Checks if input problem name is of .pddl type
@@ -452,7 +459,7 @@ public class OurPlanner implements Creator  {
 			return false;
 		}
 
-		agentsFilePath = args[6];
+		agentsFilePath = args[7];
 		agentsFile = new File(agentsFilePath);
 
 		if( !agentsFile.exists()) {
@@ -460,14 +467,14 @@ public class OurPlanner implements Creator  {
 			return false;
 		}
 
-		OutputFolder = args[7] + "/" + problemName + "/" + numOfTrajectories + "_Trajectories";
+		OutputFolder = args[8] + "/" + problemName + "/" + numOfTrajectories + "_Trajectories";
 		OutputFile = new File(OutputFolder);
 
 		if( !OutputFile.exists()) {
 			OutputFile.mkdir();
 		}
 
-		OutputTestFolder = args[8];
+		OutputTestFolder = args[9];
 		OutputTestFile = new File(OutputTestFolder);
 
 		if( !OutputTestFile.exists()) {

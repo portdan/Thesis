@@ -39,8 +39,8 @@ public class DeleteEffectGenerator {
 	private File problemFiles = null;
 
 	private boolean sasSolvable = false;
-
-	State currentState = null;
+	
+	private Problem problem = null;
 
 	public DeleteEffectGenerator(File problemFiles,String domainFileName, String problemFileName) {
 
@@ -53,6 +53,11 @@ public class DeleteEffectGenerator {
 		this.problemFileName = new String(problemFileName);
 
 		logInput();
+		
+		String domainPath = problemFiles.getPath() + "/" + domainFileName;
+		String problemPath = problemFiles.getPath() + "/" + problemFileName;
+
+		problem = generateProblem(domainPath, problemPath);
 	}
 
 	private void logInput() {
@@ -69,12 +74,7 @@ public class DeleteEffectGenerator {
 
 		LOGGER.info("Generating delete effects for action " + actionName );
 
-		Set<String> res = new HashSet<String>();
-
-		String domainPath = problemFiles.getPath() + "/" + domainFileName;
-		String problemPath = problemFiles.getPath() + "/" + problemFileName;
-
-		Problem problem = generateProblem(domainPath, problemPath);
+		Set<String> res = new HashSet<String>();		
 
 		Action action = getActionFromName(problem, actionName);
 

@@ -74,52 +74,55 @@ public class StateActionStateSequencer {
 		LOGGER.info("problemFiles: " + problemFiles);
 		LOGGER.info("trajectoryFiles: " + trajectoryFiles);
 	}
-	/*
-	public List<StateActionState> generateSequences() {
 
-		LOGGER.info("Generating sequences");
+	public List<StateActionState> generateSequencesFromSASTraces(int numOfTracesToUse) {
+
+		LOGGER.info("Generating sequences from SAS traces");
+
+		String newTraceStart = "trace_";
 
 		List<StateActionState> trajectorySequences = new ArrayList<StateActionState>();
 
 		File[] TrajDir = trajectoryFiles.listFiles();
-		File[] ProbDir = problemFiles.listFiles();
 
-		if (TrajDir != null) 
-			for (File trj : TrajDir) {
+		int traceNumber = 0;
 
-				String trajectoryPath = trj.getPath();
-				String trajectoryName = FilenameUtils.getBaseName(trajectoryPath);
+		if (TrajDir != null) {
 
-				String ext = FilenameUtils.getExtension(trajectoryPath); 
+			File tracesFile = TrajDir[0];
 
-				if(ext.equals(Globals.TRAJECTORY_FILE_EXTENSION)) {
+			try(BufferedReader br = new BufferedReader(new FileReader(tracesFile))) {
 
-					LOGGER.info("Generating sequence for trajectory in " + trajectoryName);
+				for(String line; (line = br.readLine()) != null; ) {
 
-					if (ProbDir != null) 
-						for (File prb : ProbDir) {
-
-							String problemPath = prb.getPath();
-							String problemName = FilenameUtils.getBaseName(problemPath);
-
-							if(problemName.equals(trajectoryName)) {	
-
-								for (String agentName : agentList) {
-
-									List<StateActionState> res = generateSequance(agentName, trajectoryPath);
-									trajectorySequences.addAll(res);
-								}
-
-
-							}
+					if(line.startsWith(newTraceStart)) {
+						if(traceNumber == numOfTracesToUse)
+							break;
+						else {
+							traceNumber++;
+							LOGGER.info("Generating sequence for trajectory number " + traceNumber);
 						}
-				}
+					}
 
+					if(line.startsWith("StateActionState")) {
+
+						StateActionState sas = new StateActionState(line);
+						trajectorySequences.add(sas);
+					}
+				}
 			}
+			catch (Exception e) {
+				trajectorySequences.clear();
+				return trajectorySequences;
+			}
+
+		}
+
+		TestDataAccumulator.getAccumulator().trainingSize = traceNumber;
 
 		return trajectorySequences;
 	}
-	 */
+
 
 	public List<StateActionState> generateSequences() {
 
@@ -128,7 +131,7 @@ public class StateActionStateSequencer {
 		List<StateActionState> trajectorySequences = new ArrayList<StateActionState>();
 
 		File[] TrajDir = trajectoryFiles.listFiles();
-		
+
 		TestDataAccumulator.getAccumulator().trainingSize = TrajDir.length;
 
 		if (TrajDir != null)
@@ -164,44 +167,6 @@ public class StateActionStateSequencer {
 		return trajectorySequences;
 	}
 
-	/*
-	private List<StateActionState> generateSequance(String agentName, String trajectoryPath){
-
-		LOGGER.info("Generating state action state sequence for " + trajectoryPath );
-
-		List<StateActionState> res = new ArrayList<StateActionState>();
-
-		String domainPath = problemFiles.getPath() + "/" + domainFileName;
-		String problemPath = problemFiles.getPath() + "/" + problemFileName;
-		String agentADDLPath = TEMP + "/" + problemFileName.split("\\.")[0] + ".addl";		
-
-		Problem problem = generateProblem(agentName, domainPath, problemPath, agentADDLPath);
-		currentState = problem.initState;
-
-		try (BufferedReader br = new BufferedReader(new FileReader(trajectoryPath))) {
-
-			String line = br.readLine();
-			while (line != null) {
-
-				StateActionState sas = processAction(problem, line);
-
-				if(sas != null)
-					res.add(sas);
-
-				line = br.readLine();
-			}
-
-		} catch (Exception e) {
-			LOGGER.info(e,e);
-			return null;
-		}
-
-		deleteTempFiles();
-
-		return res;
-	}
-	 */
-
 	private List<StateActionState> generateSequance(String trajectoryPath, String problemPath){
 
 		LOGGER.info("Generating state action state sequence for " + trajectoryPath );
@@ -235,60 +200,6 @@ public class StateActionStateSequencer {
 
 		return res;
 	}
-
-
-	/*
-	private Problem generateProblem(String agentName, String groundedDomainPath, 
-			String groundedProblemPath, String agentADDLPath) {
-
-		LOGGER.info("Generating problem");
-
-		if(!runConvert()) {
-			LOGGER.info("Convert failure");
-			return null;
-		}
-
-		File agentFile = new File(agentADDLPath);
-		if (!agentFile.exists()) {
-			LOGGER.info("Agent file " + agentADDLPath + " does not exist!");
-			return null;
-		}
-
-		ADDLObject addl = new ADDLParser().parse(agentFile);
-
-		if(convertedDomainPath == null) convertedDomainPath = sasFileName;
-		if(convertedProblemPath == null) convertedProblemPath = sasFileName;
-
-		if(!runTranslate()) {
-			LOGGER.info("Translate failure");
-			return null;
-		}
-
-		if (!sasSolvable) {
-			LOGGER.info("Sas not Solvable. Plan not found!");
-			return null;
-		}
-
-		if(!runPreprocess()) {
-			LOGGER.info("Preprocess failure");
-			return null;
-		}
-
-		File sasFile = new File(sasFileName);
-		if (!sasFile.exists()) {
-			LOGGER.info("SAS file " + sasFileName + " does not exist!");
-			return null;
-		}
-
-		SASParser parser = new SASParser(sasFile);
-		SASDomain sasDom = parser.getDomain();
-		//SASPreprocessor preprocessor = new SASPreprocessor(sasDom, addl);
-
-		StateActionStateSASPreprocessor preprocessor = new StateActionStateSASPreprocessor(sasDom, addl);
-
-		return preprocessor.getProblemForAgent();
-	}
-	 */
 
 	private Problem generateProblem(String groundedDomainPath, String groundedProblemPath) {
 
@@ -452,27 +363,6 @@ public class StateActionStateSequencer {
 
 	}
 
-	/*
-	private StateActionState processAction(Problem problem, String line) {
-
-		LOGGER.info("Processing action " + line);
-
-		State pre = new State(currentState);
-
-		Action action = getActionFromPlan(problem, line);
-
-		if(action != null) {
-
-			if(action.isApplicableIn(currentState))
-				action.transform(currentState);
-
-			return new StateActionState(pre, action, currentState);
-		}
-		else
-			return null;
-	}
-	 */
-
 	private StateActionState processAction(Problem problem, String line) {
 
 		LOGGER.info("Processing action " + line);
@@ -509,28 +399,6 @@ public class StateActionStateSequencer {
 				out.add(newVal);
 			}
 		}
-
-		/*
-		Map<Integer, Set<Integer>> variableDomains = state.getDomain().getVariableDomains();
-
-		for (int var : variableDomains.keySet())
-		{
-			int stateVal = state.getValues()[var];
-			for (int val : variableDomains.get(var))
-			{
-				String newVal = Domain.valNames.get(val).toString();
-
-				newVal = newVal.replace("(", " ");
-				newVal = newVal.replace(",", "");
-				newVal = newVal.replace(")", "");
-
-				if(stateVal == val)
-					out.add(newVal);
-				else
-					out.add("not ("+ newVal + ")");
-			}
-		}
-		 */
 
 		return out;
 	}

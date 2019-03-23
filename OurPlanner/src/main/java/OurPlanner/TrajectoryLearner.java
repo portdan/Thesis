@@ -29,8 +29,10 @@ public class TrajectoryLearner {
 	private String domainFileName = "";
 	private String problemFileName = "";
 
+	private int numOfTracesToUse = 0;
+
 	public TrajectoryLearner(List<String> agentList, String agentName ,File trajectoryFiles ,
-			File problemFiles , File localViewFiles ,String domainFileName ,String problemFileName) {
+			File problemFiles , File localViewFiles ,String domainFileName ,String problemFileName, int numOfTracesToUse) {
 
 		LOGGER.info("TrajectoryLearner constructor");
 
@@ -41,6 +43,7 @@ public class TrajectoryLearner {
 		this.localViewFiles = localViewFiles;
 		this.domainFileName = new String(domainFileName);
 		this.problemFileName = new String(problemFileName);
+		this.numOfTracesToUse = numOfTracesToUse;
 
 		logInput();
 	}
@@ -56,6 +59,7 @@ public class TrajectoryLearner {
 		LOGGER.info("localViewFiles: " + localViewFiles);
 		LOGGER.info("domainFileName: " + domainFileName);
 		LOGGER.info("problemFileName: " + problemFileName);
+		LOGGER.info("numOfTracesToUse: " + numOfTracesToUse);
 	}
 
 	/*
@@ -107,7 +111,9 @@ public class TrajectoryLearner {
 		DeleteEffectGenerator DEGenerator = new DeleteEffectGenerator (problemFiles,
 				domainFileName, problemFileName);
 
-		List<StateActionState> trajectorySequences = sasSequencer.generateSequences();
+		//List<StateActionState> trajectorySequences = sasSequencer.generateSequences();
+
+		List<StateActionState> trajectorySequences = sasSequencer.generateSequencesFromSASTraces(numOfTracesToUse);
 
 		while(!trajectorySequences.isEmpty()) {
 
@@ -160,7 +166,7 @@ public class TrajectoryLearner {
 			formattedFact = formattedFact.replace("(", " ");
 			formattedFact = formattedFact.replace(",", "");
 			formattedFact = formattedFact.replace(")", "");
-			
+
 			formattedFact = formattedFact.trim();
 
 			if (isNegated) {
