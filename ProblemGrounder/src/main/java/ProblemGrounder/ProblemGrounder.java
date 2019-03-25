@@ -5,6 +5,8 @@ import java.util.Arrays;
 
 import org.apache.log4j.Logger;
 
+import Configuration.ProblemGrounderConfiguration;
+import Configuration.ConfigurationManager;
 import cz.agents.alite.creator.Creator;
 import cz.agents.dimaptools.experiment.Trace;
 
@@ -12,7 +14,7 @@ public class ProblemGrounder implements Creator {
 
 	/* Global variables */
 	private final static Logger LOGGER = Logger.getLogger(ProblemGrounder.class);
-	private final static int ARGS_NUM = 3;
+	private final static int ARGS_NUM = 2;
 
 	private static final String MA_TO_AGENT_FILE_SCRIPT = "./PythonScripts/generate-agent-file.py";
 	private static final String MA_TO_AGENT_FILE_OUTPUT = "./Output/Agent";
@@ -21,10 +23,7 @@ public class ProblemGrounder implements Creator {
 	private static final String LOCAL_VIEW_OUTPUT = "./Output/LocalView";
 
 	/* Class variables */
-	//private String tracePath = "";
-	private String domainPath = "";
-	private String problemPath = "";
-	private String agentsPath = "";
+	private String configurationFilePath = "";
 
 	//private File traceFile = null;
 	private File domainFile = null;
@@ -50,6 +49,18 @@ public class ProblemGrounder implements Creator {
 			System.exit(1);
 		}
 
+		if(!ConfigurationManager.getInstance().loadConfiguration(configurationFilePath))
+		{
+			LOGGER.fatal("Configuration loading failure");
+			System.exit(1);
+		}
+
+		if(!ApplyConfiguration(ConfigurationManager.getInstance().getCurrentConfiguration()))
+		{
+			LOGGER.fatal("Configuration setting failure");
+			System.exit(1);
+		}
+
 		if(!CreateAgentsFile(MA_TO_AGENT_FILE_OUTPUT))
 		{
 			LOGGER.fatal("Agents file creation failure");
@@ -64,13 +75,35 @@ public class ProblemGrounder implements Creator {
 	}
 
 
+	private boolean ApplyConfiguration(ProblemGrounderConfiguration configuration) {
+
+		LOGGER.info("Applying configuration");
+
+		domainFile = new File(configuration.domainPath);
+		if( !domainFile.exists()) {
+			LOGGER.fatal("provided path to domain file not existing");
+			return false;
+		}
+
+		problemFile = new File(configuration.problemPath);
+		if( !problemFile.exists()) {
+			LOGGER.fatal("provided path to problem file not existing");
+			return false;
+		}
+
+		return true;
+	}
+
+
 	private boolean GroundProblem(String outputPath, String localViewOutput) {
 
 		LOGGER.info("Grounding problem ");
 
 		try {
 
-			String cmd = GROUND_PROBLEM_SCRIPT + " " + domainPath + " " + problemPath + " " + agentsPath + " " + outputPath + " " + localViewOutput;
+			ProblemGrounderConfiguration conf = ConfigurationManager.getInstance().getCurrentConfiguration();
+
+			String cmd = GROUND_PROBLEM_SCRIPT + " " + conf.domainPath + " " + conf.problemPath + " " + agentsFile.getPath() + " " + outputPath + " " + localViewOutput;
 
 			LOGGER.info("Running: " + cmd);
 
@@ -92,7 +125,9 @@ public class ProblemGrounder implements Creator {
 
 		try {
 
-			String cmd = MA_TO_AGENT_FILE_SCRIPT + " " + domainPath + " " + problemPath + " " + outputPath;
+			ProblemGrounderConfiguration conf = ConfigurationManager.getInstance().getCurrentConfiguration();
+
+			String cmd = MA_TO_AGENT_FILE_SCRIPT + " " + conf.domainPath + " " + conf.problemPath + " " + outputPath;
 
 			LOGGER.info("Running: " + cmd);
 
@@ -111,13 +146,13 @@ public class ProblemGrounder implements Creator {
 	private boolean agentsFileValid(String outputPath) {
 
 		LOGGER.info("Agents file check");	
-		
+
 		String problemName = problemFile.getName();
-		
+
 		problemName = problemName.substring(0, problemName.lastIndexOf('.'));
 
-		agentsPath = outputPath + "/" + problemName + ".agents";
-		agentsFile = new File(agentsPath);
+		String agentsFilePath = outputPath + "/" + problemName + ".agents";
+		agentsFile = new File(agentsFilePath);
 
 		if( !agentsFile.exists()) {
 			LOGGER.fatal("agents file generation failure");
@@ -135,7 +170,7 @@ public class ProblemGrounder implements Creator {
 		boolean valid = true;
 
 		if ((valid = ArgsLenghtValid(args)) == false) 
-			status = "Usage: <path to .pddl domain file> <path to .pddl problem file> <path to .plan file>";	
+			status = "Usage: <path to .json configuration file>";	
 
 		if ((valid = ArgsParsingValid(args)) == false) 
 			status = "Bad path to one or more provided files";	
@@ -160,31 +195,14 @@ public class ProblemGrounder implements Creator {
 
 		LOGGER.info("Args parse check");
 
-		domainPath = args[1];
-		domainFile = new File(domainPath);
+		configurationFilePath = args[1];
+		File configurationFile = new File(configurationFilePath);
 
-		if( !domainFile.exists()) {
-			LOGGER.fatal("provided path to domain file not existing");
+		if( !configurationFile.exists()) {
+			LOGGER.fatal(".json configuration file not exists");
 			return false;
 		}
 
-		problemPath = args[2];
-		problemFile = new File(problemPath);
-
-		if( !problemFile.exists()) {
-			LOGGER.fatal("provided path to problem file not existing");
-			return false;
-		}
-
-		/*
-		tracePath = args[3];
-		traceFile = new File(tracePath);
-
-		if( !traceFile.exists()) {
-			LOGGER.fatal("provided path to trace file not existing");
-			return false;
-		}		
-		 */
 		return true;
 	}
 }
