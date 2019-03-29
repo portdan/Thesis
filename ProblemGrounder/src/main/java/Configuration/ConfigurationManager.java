@@ -17,6 +17,8 @@ public class ConfigurationManager {
 	private ProblemGrounderConfiguration currentConfiguration = null;
 
 	private ConfigurationManager(){
+		
+		LOGGER.info("Generating ConfigurationManager instance");
 		mapper = new ObjectMapper();
 	}
 
@@ -35,6 +37,8 @@ public class ConfigurationManager {
 	}
 
 	public boolean loadConfiguration(String configurationFilePath) {
+		
+		LOGGER.info("Loading cofiguration from " +configurationFilePath );
 
 		try {
 			File confFile = new File(configurationFilePath);
@@ -68,6 +72,8 @@ public class ConfigurationManager {
 	}
 
 	public boolean writeConfiguration(String configurationFilePath) {
+		
+		LOGGER.info("Writing cofiguration to " +configurationFilePath );
 
 		try {
 

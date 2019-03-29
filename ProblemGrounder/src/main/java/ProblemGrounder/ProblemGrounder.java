@@ -17,10 +17,7 @@ public class ProblemGrounder implements Creator {
 	private final static int ARGS_NUM = 2;
 
 	private static final String MA_TO_AGENT_FILE_SCRIPT = "./PythonScripts/generate-agent-file.py";
-	private static final String MA_TO_AGENT_FILE_OUTPUT = "./Output/Agent";
 	private static final String GROUND_PROBLEM_SCRIPT = "./PythonScripts/ground-problem.py";
-	private static final String GROUND_PROBLEM_OUTPUT = "./Output/Grounded";
-	private static final String LOCAL_VIEW_OUTPUT = "./Output/LocalView";
 
 	/* Class variables */
 	private String configurationFilePath = "";
@@ -29,6 +26,10 @@ public class ProblemGrounder implements Creator {
 	private File domainFile = null;
 	private File problemFile = null;
 	private File agentsFile = null;
+
+	private String agentOutputFilePath = "";
+	private String groundedOutputFilePath = "";
+	private String localViewOutputFilePath = "";
 
 	@Override
 	public void create() {
@@ -61,13 +62,13 @@ public class ProblemGrounder implements Creator {
 			System.exit(1);
 		}
 
-		if(!CreateAgentsFile(MA_TO_AGENT_FILE_OUTPUT))
+		if(!CreateAgentsFile(agentOutputFilePath))
 		{
 			LOGGER.fatal("Agents file creation failure");
 			System.exit(1);
 		}
 
-		if(!GroundProblem(GROUND_PROBLEM_OUTPUT,LOCAL_VIEW_OUTPUT))
+		if(!GroundProblem(groundedOutputFilePath,localViewOutputFilePath))
 		{
 			LOGGER.fatal("Domain file grounding failure");
 			System.exit(1);
@@ -90,6 +91,10 @@ public class ProblemGrounder implements Creator {
 			LOGGER.fatal("provided path to problem file not existing");
 			return false;
 		}
+
+		agentOutputFilePath = configuration.agentsOutputPath;
+		groundedOutputFilePath = configuration.groundedOutputPath;
+		localViewOutputFilePath = configuration.localViewOutputPath;
 
 		return true;
 	}

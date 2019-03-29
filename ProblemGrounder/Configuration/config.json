@@ -1,1 +1,7 @@
-{"domainPath":"./Input/domain.pddl","problemPath":"./Input/probLOGISTICS-4-0.pddl"}
+{
+"domainPath":"./Input/domain.pddl",
+"problemPath":"./Input/probLOGISTICS-11-0.pddl",
+"agentsOutputPath":"./Output/Agent",
+"groundedOutputPath":"./Output/Grounded",
+"localViewOutputPath":"./Output/LocalView"
+}
