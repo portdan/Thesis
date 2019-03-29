@@ -13,6 +13,8 @@ import java.util.Map.Entry;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
+import Configuration.ConfigurationManager;
+import Configuration.ProblemGeneratorConfiguration;
 import cz.agents.alite.creator.Creator;
 import cz.agents.dimaptools.experiment.Trace;
 import cz.agents.dimaptools.input.addl.ADDLObject;
@@ -26,33 +28,37 @@ import problemGenerator.RandomWalker.StateActionStateRandomWalker;
 
 public class StateActionStateGenerator implements Creator {
 
+	/* Global variables */
 	private final static Logger LOGGER = Logger.getLogger(StateActionStateGenerator.class);
+	private final static int ARGS_NUM = 2;
 
 	private static final String TRANSLATOR = "./Misc/translate/translate.py";
 	private static final String CONVERTOR = "./Misc/convert/ma-pddl/ma-to-pddl.py";
 
-	private static final String TEMP = "./Output/temp";
-	private static final String OUTPUT_TRACES = "./Output/traces";
-	private static final String OUTPUT_PROBLEMS = "./Output/problems";
-	private static final String ROOT = "./";
+	private String tempDirPath = "";
+	private String tracesDirPath = "";
 
-	private String domainFilePath;
-	private String problemFilePath;
-	private String oldDomainFilePath;
-	private String oldProblemFilePath;
-	private String agentFilePath;
-	private String sasFilePath;
-	private String preprocessSASFilePath;
+	/* Class variables */
+	private String configurationFilePath = "";
+
+	//private File traceFile = null;
+	private File domainFile = null;
+	private File problemFile = null;
+	private File agentsFile = null;
+
+	private String domainFilePath = "";
+	private String problemFilePath = "";
+	private String agentsFilePath = "";
+
 
 	private String domainFileName;
 	private String problemFileName;
 
-	private File agentFile;
 	private File sasFile;
-	private File preprocesSASFile;
+	private String sasFilePath;
 
-	private int maxNumOfExpands;
-	private int numOfProblemsToGenerate;
+	private int numOfRandomWalkSteps;
+	private int numOfTracesToGenerate;
 
 	private ADDLObject addlParser;
 
@@ -66,30 +72,55 @@ public class StateActionStateGenerator implements Creator {
 	@Override
 	public void init(String[] args) {
 
-		LOGGER.info("init start:");
+		Trace.setFileStream("Log/trace.log");
 
-		sasFilePath = "output.sas";
-		preprocessSASFilePath = "output";
+		LOGGER.info("StateActionStateGenerator start");
 
-		if (args.length != 5) {
-			LOGGER.fatal("provided args: " + Arrays.toString(args));
-			LOGGER.fatal("Usage (from PDDL): <domain>.pddl <problem>.pddl <number of expands> <time limit (sec)>");
+		if(!ParseArgs(args))
+		{
+			LOGGER.fatal("Args not valid");
 			System.exit(1);
 		}
 
-		if (args.length == 5) {
-			domainFilePath = args[1];
-			oldDomainFilePath = args[1];
-			problemFilePath = args[2];
-			oldProblemFilePath = args[2];
-			maxNumOfExpands = Integer.parseInt(args[3]);
-			numOfProblemsToGenerate = Integer.parseInt(args[4]);
+		if(!ConfigurationManager.getInstance().loadConfiguration(configurationFilePath))
+		{
+			LOGGER.fatal("Configuration loading failure");
+			System.exit(1);
 		}
 
-		Trace.setFileStream("Log/trace.log");
+		if(!ApplyConfiguration(ConfigurationManager.getInstance().getCurrentConfiguration()))
+		{
+			LOGGER.fatal("Configuration setting failure");
+			System.exit(1);
+		}
 
-		LOGGER.info("init end");
+	}
 
+	private boolean ApplyConfiguration(ProblemGeneratorConfiguration configuration) {
+
+		LOGGER.info("Applying configuration");
+
+		domainFile = new File(configuration.domainFilePath);
+		if( !domainFile.exists()) {
+			LOGGER.fatal("provided path to domain file not existing");
+			return false;
+		}
+
+		problemFile = new File(configuration.problemFilePath);
+		if( !problemFile.exists()) {
+			LOGGER.fatal("provided path to problem file not existing");
+			return false;
+		}
+
+		numOfRandomWalkSteps = configuration.numOfRandomWalkSteps;
+		numOfTracesToGenerate = configuration.numOfTracesToGenerate;
+
+		sasFilePath = configuration.sasFilePath;
+		tempDirPath = configuration.tempDirPath;
+		tracesDirPath = configuration.tracesDirPath;
+
+
+		return true;
 	}
 
 	@Override
@@ -100,7 +131,7 @@ public class StateActionStateGenerator implements Creator {
 		convertToPDDL();
 
 		LOGGER.info("parse agent file");
-		addlParser = new ADDLParser().parse(agentFile);
+		addlParser = new ADDLParser().parse(agentsFile);
 
 		translateToSAS();
 
@@ -140,17 +171,17 @@ public class StateActionStateGenerator implements Creator {
 
 		SASGenerator sasGenerator = new SASGenerator();
 
-		String TracesFolder = OUTPUT_TRACES + "/" + problemFileName;
+		String TracesFolder = tracesDirPath + "/" + problemFileName;
 
 		sasGenerator.generateFile(TracesFolder,problemFileName);
 
 		// generate problems
-		for (int i = 0; i < numOfProblemsToGenerate; i++) {
+		for (int i = 0; i < numOfTracesToGenerate; i++) {
 
 			List<StateActionState> sasList = new ArrayList<StateActionState>();
 			// perform random walk
 			State endState = StateActionStateRandomWalker.RandomWalk(sasList, preprocessor.getGlobalInit(),
-					preprocessor.getGlobalGoal(), maxNumOfExpands, problems);
+					preprocessor.getGlobalGoal(), numOfRandomWalkSteps, problems);
 
 			String humenized = endState.getDomain().humanize(endState.getValues());
 
@@ -183,7 +214,7 @@ public class StateActionStateGenerator implements Creator {
 
 		LOGGER.info("Deleting temporary files");
 
-		File temp = new File(TEMP);		
+		File temp = new File(tempDirPath);		
 		if(temp.exists()) {
 			LOGGER.info("Deleting 'temp' folder");
 
@@ -200,12 +231,14 @@ public class StateActionStateGenerator implements Creator {
 
 		LOGGER.info("convert ma-pddl to pddl (ma-to-pddl.py)");
 
-		String path = domainFilePath.substring(0, domainFilePath.lastIndexOf("/"));
-		domainFileName = domainFilePath.substring(domainFilePath.lastIndexOf("/") + 1, domainFilePath.indexOf("."));
-		problemFileName = problemFilePath.substring(problemFilePath.lastIndexOf("/") + 1, problemFilePath.indexOf("."));
+		String path = domainFile.getPath().substring(0, domainFile.getPath().lastIndexOf("/"));
+
+		domainFileName = domainFile.getPath().substring(domainFile.getPath().lastIndexOf("/") + 1, domainFile.getPath().lastIndexOf("."));
+		problemFileName = problemFile.getPath().substring(problemFile.getPath().lastIndexOf("/") + 1, problemFile.getPath().lastIndexOf("."));
+
 
 		try {
-			String cmd = CONVERTOR + " " + ROOT + path + " " + domainFileName + " " + problemFileName + " " + TEMP;
+			String cmd = CONVERTOR + " " + path + " " + domainFileName + " " + problemFileName + " " + tempDirPath;
 			LOGGER.info("RUN: " + cmd);
 			Process pr = Runtime.getRuntime().exec(cmd);
 
@@ -217,15 +250,15 @@ public class StateActionStateGenerator implements Creator {
 
 		LOGGER.info("set converted domain, problem and agent file paths");
 
-		domainFilePath = TEMP + "/" + domainFileName + ".pddl";
-		problemFilePath = TEMP + "/" + problemFileName + ".pddl";
-		agentFilePath = TEMP + "/" + problemFileName + ".addl";
+		domainFilePath = tempDirPath + "/" + domainFileName + ".pddl";
+		problemFilePath = tempDirPath + "/" + problemFileName + ".pddl";
+		agentsFilePath = tempDirPath + "/" + problemFileName + ".addl";
 
 		LOGGER.info("check the created agent file (.addl)");
 
-		agentFile = new File(ROOT + agentFilePath);
-		if (!agentFile.exists()) {
-			LOGGER.fatal("Agent file " + ROOT + agentFilePath + " does not exist!");
+		agentsFile = new File(agentsFilePath);
+		if (!agentsFile.exists()) {
+			LOGGER.fatal("Agent file " + agentsFilePath + " does not exist!");
 			System.exit(1);
 		}
 	}
@@ -247,11 +280,56 @@ public class StateActionStateGenerator implements Creator {
 
 		LOGGER.info("check the created .sas file (.sas)");
 
-		sasFile = new File(ROOT + sasFilePath);
+		sasFile = new File(sasFilePath);
 
 		if (!sasFile.exists()) {
-			LOGGER.fatal("SAS file " + ROOT + sasFilePath + " does not exist!");
+			LOGGER.fatal("SAS file " + sasFilePath + " does not exist!");
 			System.exit(1);
 		}
 	}
+
+	private boolean ParseArgs(String[] args) {
+
+		LOGGER.info("Args validity check");
+
+		String status = "";
+		boolean valid = true;
+
+		if ((valid = ArgsLenghtValid(args)) == false) 
+			status = "Usage: <path to .json configuration file>";	
+
+		if ((valid = ArgsParsingValid(args)) == false) 
+			status = "Bad path to one or more provided files";	
+
+		if (!valid) {
+			LOGGER.fatal("provided args: " + Arrays.toString(args));
+			LOGGER.fatal(status);
+			return false;
+		}
+
+		return true;
+	}
+
+	private boolean ArgsLenghtValid(String[] args) {
+
+		LOGGER.info("Args lenght check");
+
+		return args.length == ARGS_NUM;
+	}
+
+	private boolean ArgsParsingValid(String[] args) {
+
+		LOGGER.info("Args parse check");
+
+		configurationFilePath = args[1];
+		File configurationFile = new File(configurationFilePath);
+
+		if( !configurationFile.exists()) {
+			LOGGER.fatal(".json configuration file not exists");
+			return false;
+		}
+
+		return true;
+	}
+
 }
