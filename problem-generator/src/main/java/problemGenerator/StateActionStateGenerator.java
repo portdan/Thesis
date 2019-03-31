@@ -173,7 +173,7 @@ public class StateActionStateGenerator implements Creator {
 
 		String TracesFolder = tracesDirPath + "/" + problemFileName;
 
-		sasGenerator.generateFile(TracesFolder,problemFileName);
+		sasGenerator.generateFile(TracesFolder,problemFileName + "_Traces");
 
 		// generate problems
 		for (int i = 0; i < numOfTracesToGenerate; i++) {

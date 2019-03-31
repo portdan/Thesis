@@ -36,7 +36,7 @@ public class StateActionState {
 		String preStart = "pre[ ";
 
 		int preStartInd = sas.indexOf(preStart) + preStart.length();			
-		int preEndInd = sas.indexOf("]",preStartInd);
+		int preEndInd = sas.indexOf(" ]",preStartInd);
 
 		String[] pre = sas.substring(preStartInd,preEndInd).split(";");
 		this.pre = new HashSet<String>();
@@ -50,7 +50,7 @@ public class StateActionState {
 		String actionStart = "action[ ";
 
 		int actionStartInd = sas.indexOf(actionStart) + actionStart.length();			
-		int actionEndInd = sas.indexOf("]",actionStartInd);
+		int actionEndInd = sas.indexOf(" ]",actionStartInd);
 
 		this.action = sas.substring(actionStartInd,actionEndInd);
 	}
@@ -59,7 +59,7 @@ public class StateActionState {
 		String actionOwnerStart = "actionOwner[ ";
 
 		int actionOwnerStartInd = sas.indexOf(actionOwnerStart) + actionOwnerStart.length();			
-		int actionOwnerEndInd = sas.indexOf("]",actionOwnerStartInd);
+		int actionOwnerEndInd = sas.indexOf(" ]",actionOwnerStartInd);
 
 		this.actionOwner = sas.substring(actionOwnerStartInd,actionOwnerEndInd);
 	}
@@ -68,7 +68,7 @@ public class StateActionState {
 		String postStart = "post[ ";
 
 		int postStartInd = sas.indexOf(postStart) + postStart.length();			
-		int postEndInd = sas.indexOf("]",postStartInd);
+		int postEndInd = sas.indexOf(" ]",postStartInd);
 
 		String[] post = sas.substring(postStartInd,postEndInd).split(";");
 		this.post = new HashSet<String>();

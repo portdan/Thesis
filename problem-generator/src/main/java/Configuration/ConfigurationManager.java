@@ -73,7 +73,7 @@ public class ConfigurationManager {
 
 	public boolean writeConfiguration(String configurationFilePath) {
 		
-		LOGGER.info("Writing cofiguration to " +configurationFilePath );
+		LOGGER.info("Writing cofiguration to " + configurationFilePath );
 
 		try {
 
