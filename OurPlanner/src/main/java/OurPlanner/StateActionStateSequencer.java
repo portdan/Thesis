@@ -14,13 +14,13 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
 
+import Model.SASDomain;
+import Model.SASParser;
+import Model.StateActionStateSASPreprocessor;
 import cz.agents.dimaptools.model.Action;
 import cz.agents.dimaptools.model.Domain;
 import cz.agents.dimaptools.model.Problem;
 import cz.agents.dimaptools.model.State;
-import model.StateActionStateSASPreprocessor;
-import model.SASDomain;
-import model.SASParser;
 
 
 public class StateActionStateSequencer {
@@ -31,8 +31,8 @@ public class StateActionStateSequencer {
 	private static final String PREPROCESSOR = "./Scripts/preprocess/preprocess-runner";
 	private static final String CONVERTOR = "./Scripts/ma-pddl/ma-to-pddl.py";
 
-	private static final String TEMP = Globals.TEMP_PATH;
-	private static final String SAS_FILE_NAME = "output.sas";
+	private static final String SAS_FILE_PATH = Globals.SAS_OUTPUT_FILE_PATH;
+	private static final String TEMP_DIR_PATH = Globals.TEMP_PATH;
 
 	private List<String> agentList = null;
 	private String domainFileName = "";
@@ -52,7 +52,7 @@ public class StateActionStateSequencer {
 
 		LOGGER.info("StateActionStateSequencer constructor");
 
-		sasFileName = SAS_FILE_NAME;
+		sasFileName = SAS_FILE_PATH;
 
 		this.agentList = agentList;
 		this.problemFiles = problemFiles;
@@ -251,9 +251,8 @@ public class StateActionStateSequencer {
 		String domain = domainFileName.substring(0, domainFileName.lastIndexOf("."));
 		String problem = problemFileName.substring(0, problemFileName.lastIndexOf("."));
 
-
 		try {
-			String cmd = CONVERTOR + " " + path + " " + domain + " " + problem + " " + TEMP;
+			String cmd = CONVERTOR + " " + path + " " + domain + " " + problem + " " + TEMP_DIR_PATH;
 			LOGGER.info("RUN: " + cmd);
 			//			Process pr = Runtime.getRuntime().exec(cmd);
 			//			pr.waitFor();
@@ -273,8 +272,8 @@ public class StateActionStateSequencer {
 		//			return false;
 		//		}
 
-		convertedDomainPath = TEMP + "/" + domain + ".pddl";
-		convertedProblemPath = TEMP + "/" + problem + ".pddl";
+		convertedDomainPath = TEMP_DIR_PATH + "/" + domain + ".pddl";
+		convertedProblemPath = TEMP_DIR_PATH + "/" + problem + ".pddl";
 
 		return true;
 	}
@@ -444,7 +443,7 @@ public class StateActionStateSequencer {
 
 		LOGGER.info("Deleting temporary files");
 
-		File temp = new File(Globals.TEMP_PATH);		
+		File temp = new File(TEMP_DIR_PATH);		
 		if(temp.exists()) {
 			LOGGER.info("Deleting 'temp' folder");
 

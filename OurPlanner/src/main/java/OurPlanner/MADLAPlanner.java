@@ -16,6 +16,8 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 
+import Model.IPCOutputExecutor;
+import Model.Planner;
 import cz.agents.alite.communication.PerformerCommunicator;
 import cz.agents.alite.communication.QueuedCommunicator;
 import cz.agents.alite.communication.channel.CommunicationChannelException;
@@ -30,8 +32,6 @@ import cz.agents.dimaptools.input.addl.ADDLObject;
 import cz.agents.dimaptools.input.addl.ADDLParser;
 import cz.agents.dimaptools.input.sas.SASParser;
 import cz.agents.dimaptools.input.sas.SASPreprocessor;
-import model.IPCOutputExecutor;
-import model.Planner;
 
 public class MADLAPlanner {
 
@@ -41,8 +41,11 @@ public class MADLAPlanner {
 	private static final String PREPROCESSOR = "./Scripts/preprocess/preprocess-runner";
 	private static final String CONVERTOR = "./Scripts/ma-pddl/ma-to-pddl.py";
 
-	private static final String TEMP = Globals.TEMP_PATH;
-	private static final String OUTPUT = Globals.OUTPUT_PATH + "/out.csv";
+	private static final String OUTPUT_CSV_PATH = Globals.OUTPUT_PATH + "/out.csv";
+	private static final String OUTPUT_PLAN_PATH = Globals.OUTPUT_PATH + "/out.plan";
+
+	private static final String SAS_FILE_PATH = Globals.SAS_OUTPUT_FILE_PATH;
+	private static final String TEMP_DIR_PATH = Globals.TEMP_PATH;
 
 	private final ReceiverTable receiverTable = new DefaultReceiverTable();
 	private final ExecutorService executorService = Executors.newFixedThreadPool(1);
@@ -72,14 +75,14 @@ public class MADLAPlanner {
 	public boolean isNotSolved = false;
 	public boolean isTimeout = false;
 
-	public MADLAPlanner(String domainFileName, String problemFileName, String agentFileName,
+	public MADLAPlanner(String domainFileName, String problemFileName, String agentFileName, 
 			String heuristic , int recursionLevel, double timeLimitMin, List<String> agentNames,
 			String planninAagentName ) {
 
 		LOGGER.info("MADLAPlanner constructor (not from .sas)");
 
 		fromSAS = false;
-		sasFileName = "output.sas";
+		this.sasFileName = SAS_FILE_PATH;
 		this.domainFileName = domainFileName;
 		this.problemFileName = problemFileName;
 		this.agentFileName = agentFileName;
@@ -137,7 +140,7 @@ public class MADLAPlanner {
 		for (String agent : agentNames)
 			DataAccumulator.getAccumulator().startCPUTimeMs.put(agent, tCPU);
 
-		DataAccumulator.getAccumulator().setOutputFile(OUTPUT);
+		DataAccumulator.getAccumulator().setOutputFile(OUTPUT_CSV_PATH);
 
 		if(!runConvert()) {
 			LOGGER.info("Convert failure");
@@ -236,7 +239,7 @@ public class MADLAPlanner {
 		String problem = problemFileName.substring(problemFileName.lastIndexOf("/")+1, problemFileName.lastIndexOf("."));
 
 		try {
-			String cmd = CONVERTOR + " " + path + " " + domain + " " + problem + " " + TEMP;
+			String cmd = CONVERTOR + " " + path + " " + domain + " " + problem + " " + TEMP_DIR_PATH;
 			LOGGER.info("RUN: " + cmd);
 			//			Process pr = Runtime.getRuntime().exec(cmd);
 			//			pr.waitFor();
@@ -256,8 +259,8 @@ public class MADLAPlanner {
 		//			return false;
 		//		}
 
-		domainFileName = TEMP + "/" + domain + ".pddl";
-		problemFileName = TEMP + "/" + problem + ".pddl";
+		domainFileName = TEMP_DIR_PATH + "/" + domain + ".pddl";
+		problemFileName = TEMP_DIR_PATH + "/" + problem + ".pddl";
 
 		return true;
 	}
@@ -287,8 +290,6 @@ public class MADLAPlanner {
 		//			LOGGER.info(e,e);
 		//			return false;
 		//		}
-
-		String sasFileName = "output.sas";
 
 		try (FileReader fr = new FileReader(sasFileName)) {
 
@@ -351,9 +352,7 @@ public class MADLAPlanner {
 	private void createEntities(ADDLObject addl) {
 		LOGGER.info(">>> ENTITIES CREATION");
 
-		String planOutputFileName = Globals.OUTPUT_PATH + "/out.plan";
-
-		IPCOutputExecutor executor = new IPCOutputExecutor(planOutputFileName);
+		IPCOutputExecutor executor = new IPCOutputExecutor(OUTPUT_PLAN_PATH);
 
 		for (String agentName: addl.getAgentList()) {
 

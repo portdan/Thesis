@@ -11,13 +11,12 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 
+import Model.SASDomain;
+import Model.SASParser;
+import Model.StateActionStateSASPreprocessor;
 import cz.agents.dimaptools.model.Action;
 import cz.agents.dimaptools.model.Domain;
 import cz.agents.dimaptools.model.Problem;
-import cz.agents.dimaptools.model.State;
-import model.StateActionStateSASPreprocessor;
-import model.SASDomain;
-import model.SASParser;
 
 
 public class DeleteEffectGenerator {
@@ -28,14 +27,13 @@ public class DeleteEffectGenerator {
 	private static final String PREPROCESSOR = "./Scripts/preprocess/preprocess-runner";
 	private static final String CONVERTOR = "./Scripts/ma-pddl/ma-to-pddl.py";
 
-	private static final String TEMP = Globals.TEMP_PATH;
-	private static final String SAS_FILE_NAME = "output.sas";
+	private static final String TEMP_DIR_PATH = Globals.TEMP_PATH;
+	private static final String SAS_FILE_PATH = Globals.SAS_OUTPUT_FILE_PATH;
 
 	private String domainFileName = "";
 	private String problemFileName = "";
 	private String convertedDomainPath = "";
 	private String convertedProblemPath = "";
-	private String sasFileName = "";
 	private File problemFiles = null;
 
 	private boolean sasSolvable = false;
@@ -45,8 +43,6 @@ public class DeleteEffectGenerator {
 	public DeleteEffectGenerator(File problemFiles,String domainFileName, String problemFileName) {
 
 		LOGGER.info("DeleteEffectGenerator constructor");
-
-		sasFileName = SAS_FILE_NAME;
 
 		this.problemFiles = problemFiles;
 		this.domainFileName = new String(domainFileName);
@@ -64,7 +60,6 @@ public class DeleteEffectGenerator {
 
 		LOGGER.info("Logging input");
 
-		LOGGER.info("sasFileName: " + sasFileName);
 		LOGGER.info("domainFileName: " + domainFileName);
 		LOGGER.info("problemFileName: " + problemFileName);
 		LOGGER.info("problemFiles: " + problemFiles);
@@ -160,8 +155,8 @@ public class DeleteEffectGenerator {
 			return null;
 		}
 
-		if(convertedDomainPath == null) convertedDomainPath = sasFileName;
-		if(convertedProblemPath == null) convertedProblemPath = sasFileName;
+		if(convertedDomainPath == null) convertedDomainPath = SAS_FILE_PATH;
+		if(convertedProblemPath == null) convertedProblemPath = SAS_FILE_PATH;
 
 		if(!runTranslate()) {
 			LOGGER.info("Translate failure");
@@ -178,9 +173,9 @@ public class DeleteEffectGenerator {
 			return null;
 		}
 
-		File sasFile = new File(sasFileName);
+		File sasFile = new File(SAS_FILE_PATH);
 		if (!sasFile.exists()) {
-			LOGGER.info("SAS file " + sasFileName + " does not exist!");
+			LOGGER.info("SAS file " + SAS_FILE_PATH + " does not exist!");
 			return null;
 		}
 
@@ -201,9 +196,8 @@ public class DeleteEffectGenerator {
 		String domain = domainFileName.substring(0, domainFileName.lastIndexOf("."));
 		String problem = problemFileName.substring(0, problemFileName.lastIndexOf("."));
 
-
 		try {
-			String cmd = CONVERTOR + " " + path + " " + domain + " " + problem + " " + TEMP;
+			String cmd = CONVERTOR + " " + path + " " + domain + " " + problem + " " + TEMP_DIR_PATH;
 			LOGGER.info("RUN: " + cmd);
 			//			Process pr = Runtime.getRuntime().exec(cmd);
 			//			pr.waitFor();
@@ -223,8 +217,8 @@ public class DeleteEffectGenerator {
 		//			return false;
 		//		}
 
-		convertedDomainPath = TEMP + "/" + domain + ".pddl";
-		convertedProblemPath = TEMP + "/" + problem + ".pddl";
+		convertedDomainPath = TEMP_DIR_PATH + "/" + domain + ".pddl";
+		convertedProblemPath = TEMP_DIR_PATH + "/" + problem + ".pddl";
 
 		return true;
 	}
@@ -254,11 +248,10 @@ public class DeleteEffectGenerator {
 		//			return false;
 		//		}
 
-		String sasFileName = "output.sas";
 
-		try (FileReader fr = new FileReader(sasFileName)) {
+		try (FileReader fr = new FileReader(SAS_FILE_PATH)) {
 
-			File f = new File(sasFileName);
+			File f = new File(SAS_FILE_PATH);
 
 			BufferedReader br = new BufferedReader(fr);
 
@@ -275,10 +268,10 @@ public class DeleteEffectGenerator {
 			}
 
 		} catch (FileNotFoundException e) {
-			LOGGER.info("SAS file " + sasFileName + " does not exist!");
+			LOGGER.info("SAS file " + SAS_FILE_PATH + " does not exist!");
 			return false;
 		} catch (IOException e) {
-			LOGGER.info("SAS file " + sasFileName + " bad!");
+			LOGGER.info("SAS file " + SAS_FILE_PATH + " bad!");
 			return false;
 		}
 

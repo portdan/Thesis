@@ -15,10 +15,10 @@ import java.util.Map.Entry;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
+import Model.*;
 import cz.agents.dimaptools.input.addl.ADDLObject;
 import cz.agents.dimaptools.input.addl.ADDLParser;
 import cz.agents.dimaptools.model.*;
-import model.*;
 
 
 public class PlanVerifier {
@@ -29,14 +29,13 @@ public class PlanVerifier {
 	private static final String PREPROCESSOR = "./Scripts/preprocess/preprocess-runner";
 	private static final String CONVERTOR = "./Scripts/ma-pddl/ma-to-pddl.py";
 
-	private static final String TEMP = Globals.TEMP_PATH;
-	private static final String SAS_FILE_NAME = "output.sas";
-
+	private static final String OUTPUT_FILE_NAME = Globals.PROCESSED_SAS_OUTPUT_FILE_PATH;
+	private static final String SAS_FILE_PATH = Globals.SAS_OUTPUT_FILE_PATH;
+	private static final String TEMP_DIR_PATH = Globals.TEMP_PATH;
+	
 	private String domainFileName = "";
 	private String problemFileName = "";
-	private String sasFileName = "";
 	private String localViewPath = "";
-	private String problemsPath = "";
 
 	private List<String> agentList = null;
 
@@ -50,16 +49,14 @@ public class PlanVerifier {
 	Map<String,String> agentProblemPDDL = new HashMap<String,String>();
 
 	public PlanVerifier(List<String> agentList, String domainFileName,
-			String problemFileName,	String localViewPath, String grounedPath) {
+			String problemFileName,	String localViewPath) {
 
 		LOGGER.info("PlanVerifier constructor");
 
-		sasFileName = SAS_FILE_NAME;
 		this.agentList = agentList;
 		this.domainFileName = domainFileName;
 		this.problemFileName = problemFileName;
 		this.localViewPath = localViewPath;
-		this.problemsPath = grounedPath;
 
 		logInput();
 
@@ -79,11 +76,9 @@ public class PlanVerifier {
 		LOGGER.info("Logging input");
 
 		LOGGER.info("agentList: " + agentList);
-		LOGGER.info("sasFileName: " + sasFileName);
 		LOGGER.info("domainFileName: " + domainFileName);
 		LOGGER.info("problemFileName: " + problemFileName);
 		LOGGER.info("localViewPath: " + localViewPath);
-		LOGGER.info("grounedPath: " + problemsPath);
 	}
 
 	private boolean preparePDDls() {
@@ -94,7 +89,7 @@ public class PlanVerifier {
 
 			String groundedDomainPath = localViewPath + "/"  + agentName + "/" + domainFileName;
 			String groundedProblemPath = localViewPath + "/" + agentName + "/" + problemFileName;
-			String outputFolder = TEMP + "/" + agentName;
+			String outputFolder = TEMP_DIR_PATH + "/" + agentName;
 
 			LOGGER.info("Generating problem for agent: " + agentName);
 
@@ -145,7 +140,7 @@ public class PlanVerifier {
 
 			LOGGER.info("Reading problem for agent: " + agentName);
 
-			String ProblemPath = TEMP + "/" + agentName + "/" + problemFileName;
+			String ProblemPath = TEMP_DIR_PATH + "/" + agentName + "/" + problemFileName;
 			String fileStr = "";
 
 			try {
@@ -180,8 +175,8 @@ public class PlanVerifier {
 
 		ADDLObject addl = new ADDLParser().parse(agentFile);
 
-		if(domainFileName == null) domainFileName = sasFileName;
-		if(problemFileName == null) problemFileName = sasFileName;
+		if(domainFileName == null) domainFileName = SAS_FILE_PATH;
+		if(problemFileName == null) problemFileName = SAS_FILE_PATH;
 
 		if(!runTranslate(domainPath, problemPath)) {
 			LOGGER.info("Translate failure");
@@ -198,9 +193,9 @@ public class PlanVerifier {
 			return null;
 		}
 
-		File sasFile = new File(sasFileName);
+		File sasFile = new File(SAS_FILE_PATH);
 		if (!sasFile.exists()) {
-			LOGGER.info("SAS file " + sasFileName + " does not exist!");
+			LOGGER.info("SAS file " + SAS_FILE_PATH + " does not exist!");
 			return null;
 		}
 
@@ -271,11 +266,9 @@ public class PlanVerifier {
 		//			e.printStackTrace();
 		//		}
 
-		String sasFileName = "output.sas";
+		try (FileReader fr = new FileReader(SAS_FILE_PATH)) {
 
-		try (FileReader fr = new FileReader(sasFileName)) {
-
-			File f = new File(sasFileName);
+			File f = new File(SAS_FILE_PATH);
 
 			BufferedReader br = new BufferedReader(fr);
 
@@ -292,10 +285,10 @@ public class PlanVerifier {
 			}
 
 		} catch (FileNotFoundException e) {
-			LOGGER.info("SAS file " + sasFileName + " does not exist!");
+			LOGGER.info("SAS file " + SAS_FILE_PATH + " does not exist!");
 			return false;
 		} catch (IOException e) {
-			LOGGER.info("SAS file " + sasFileName + " bad!");
+			LOGGER.info("SAS file " + SAS_FILE_PATH + " bad!");
 			return false;
 		}
 
@@ -337,9 +330,9 @@ public class PlanVerifier {
 
 		String agentName = getAgentFromAction(actionStr);
 
-		String domainPath = TEMP + "/"  + agentName + "/" + domainFileName;
-		String problemPath = TEMP + "/" + agentName + "/" + problemFileName;
-		String agentADDLPath = TEMP + "/" + agentName + "/" + problemFileName.split("\\.")[0] + ".addl";		
+		String domainPath = TEMP_DIR_PATH + "/"  + agentName + "/" + domainFileName;
+		String problemPath = TEMP_DIR_PATH + "/" + agentName + "/" + problemFileName;
+		String agentADDLPath = TEMP_DIR_PATH + "/" + agentName + "/" + problemFileName.split("\\.")[0] + ".addl";		
 
 		Problem agentProblem = generateProblem(agentName, domainPath, problemPath, agentADDLPath);
 
@@ -406,7 +399,7 @@ public class PlanVerifier {
 		Action action = null;//agentPoblem.getAction(hash);
 
 		//String label = split[2];
-		String label = GetLabelFormated(split);	
+		String label = GetLabelFormated(split).trim();	
 
 		for (Action act : agentPoblem.getAllActions()) {
 			if(act.getSimpleLabel().equals(label))
@@ -480,7 +473,7 @@ public class PlanVerifier {
 
 				agentProblemPDDL.put(agentName, newPDDL);
 
-				String ProblemPath = TEMP + "/" + agentName + "/" + problemFileName;
+				String ProblemPath = TEMP_DIR_PATH + "/" + agentName + "/" + problemFileName;
 
 				FileUtils.writeStringToFile(new File(ProblemPath), newPDDL, Charset.defaultCharset());
 
@@ -543,15 +536,15 @@ public class PlanVerifier {
 
 		LOGGER.info("Deleting sas files");
 
-		File output = new File("output");		
+		File output = new File(OUTPUT_FILE_NAME);		
 		if(output.exists()) {
-			LOGGER.info("Deleting 'output' file");
+			LOGGER.info("Deleting " + OUTPUT_FILE_NAME + " file");
 			output.delete();
 		}
 
-		File outputSAS = new File("output.sas");		
+		File outputSAS = new File(SAS_FILE_PATH);		
 		if(outputSAS.exists()) {
-			LOGGER.info("Deleting 'output.sas' file");
+			LOGGER.info("Deleting " + SAS_FILE_PATH + " file");
 			outputSAS.delete();
 		}
 	}

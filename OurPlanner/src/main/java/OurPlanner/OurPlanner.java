@@ -10,34 +10,39 @@ import java.util.Random;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
+import Configuration.ConfigurationManager;
+import Configuration.OurPlannerConfiguration;
 import cz.agents.alite.creator.Creator;
 
 public class OurPlanner implements Creator  {
 
 	/* Global variables */
 	private final static Logger LOGGER = Logger.getLogger(OurPlanner.class);
-	private final static int ARGS_NUM = 9;
+	private final static int ARGS_NUM = 2;
 	private final static int SEED = 1;
 
 	private static final String AGENT_PARSER_SCRIPT = "./Scripts/parse-agents.py";
 
+	private static final String SAS_FILE_PATH = Globals.SAS_OUTPUT_FILE_PATH;
+	private static final String TEMP_DIR_PATH = Globals.TEMP_PATH;
+
 	/* Class variables */
-	private String trajectoriesFolder = "";
-	private String OutputFolder = "";
-	private String OutputTestFolder = "";
+	private String configurationFilePath = "";
+
+	private String tracesFolder = "";
+	private String outputCopyDirPath = "";
+	private String outputTestDirPath = "";
 	private String groundedFolder = "";
 	private String localViewFolder = "";
 	private String domainFileName = "";
 	private String problemFileName = "";
 	private String agentsFilePath = "";
 
-	private File trajectoriesFile = null;
-	private File OutputFile = null;
-	private File OutputTestFile = null;
+	private File tracesFile = null;
+	private File outputTestFile = null;
+	private File outputCopyDir = null;
 	private File groundedFile = null;
 	private File localViewFile = null;
-	private File domainFile = null;
-	private File problemFile = null;
 	private File agentsFile = null;
 
 	private List<String> agentList = null;
@@ -47,7 +52,7 @@ public class OurPlanner implements Creator  {
 	// uses seed so agent order is same
 	private	Random rnd = new Random(SEED);
 
-	private int numOfTrajectories = 0;
+	private int numOftraces = 0;
 
 	private int num_agents_solved = 0;
 	private int num_agents_not_solved = 0;
@@ -72,6 +77,18 @@ public class OurPlanner implements Creator  {
 			System.exit(1);
 		}
 
+		if(!ConfigurationManager.getInstance().loadConfiguration(configurationFilePath))
+		{
+			LOGGER.fatal("Configuration loading failure");
+			System.exit(1);
+		}
+
+		if(!ApplyConfiguration(ConfigurationManager.getInstance().getCurrentConfiguration()))
+		{
+			LOGGER.fatal("Configuration setting failure");
+			System.exit(1);
+		}
+
 		if(!ReadAgentsFile())
 		{
 			LOGGER.fatal("Agents file reading failure");
@@ -80,7 +97,7 @@ public class OurPlanner implements Creator  {
 
 		TestDataAccumulator.startNewAccumulator(domainFileName, problemFileName, agentList);
 
-		TestDataAccumulator.getAccumulator().setOutputFile(OutputTestFolder);
+		TestDataAccumulator.getAccumulator().setOutputFile(outputTestDirPath);
 
 
 		if(!deleteLearnedFiles()) {
@@ -130,6 +147,77 @@ public class OurPlanner implements Creator  {
 		LOGGER.info(TestDataAccumulator.getAccumulator().toString());
 	}
 
+	private boolean ApplyConfiguration(OurPlannerConfiguration configuration) {
+		LOGGER.info("Applying configuration");
+
+		String extension = "";
+
+		groundedFolder = configuration.groundedDirPath;
+		groundedFile = new File(groundedFolder);
+
+		if( !groundedFile.exists()) {
+			LOGGER.fatal("provided path to grounded folder not existing");
+			return false;
+		}
+
+		localViewFolder = configuration.localViewDirPath;
+		localViewFile = new File(localViewFolder);
+
+		if( !localViewFile.exists()) {
+			LOGGER.fatal("provided path to local view folder not existing");
+			return false;
+		}
+
+		tracesFolder = configuration.tracesDirPath;
+		tracesFile = new File(tracesFolder);
+
+		if( !tracesFile.exists()) {
+			LOGGER.fatal("provided path to traces folder not existing");
+			return false;
+		}
+
+		numOftraces = configuration.numOfTracesToUse;
+
+		domainFileName = configuration.domainFileName;
+		extension = domainFileName.substring(domainFileName.lastIndexOf(".") + 1);
+		//Checks if input domain name is of .pddl type
+		if (!extension.equals("pddl")) {
+			LOGGER.fatal("provided domain file name not existing");
+			return false;
+		}
+
+		problemFileName = configuration.problemFileName;
+		extension = problemFileName.substring(problemFileName.lastIndexOf(".") + 1);
+		//Checks if input problem name is of .pddl type
+		if (!extension.equals("pddl")) {
+			LOGGER.fatal("provided problem file name not existing");
+			return false;
+		}
+
+		agentsFilePath = configuration.agentsFilePath;
+		agentsFile = new File(agentsFilePath);
+		if( !agentsFile.exists()) {
+			LOGGER.fatal("provided path to .agents file not existing");
+			return false;
+		}
+
+		outputCopyDirPath = configuration.outputCopyDirPath + "/" + problemFileName + "/" + numOftraces + "_traces";
+		outputCopyDir = new File(outputCopyDirPath);
+
+		if( !outputCopyDir.exists()) {
+			outputCopyDir.getParentFile().mkdirs();
+		}
+
+		outputTestDirPath = configuration.testOutputCSVFilePath;
+		outputTestFile = new File(outputTestDirPath);
+
+		if( !outputTestFile.exists()) {
+			outputTestFile.getParentFile().mkdirs();
+		}
+
+		return true;
+	}
+
 	private boolean runPlanningAlgorithm() {
 
 		LOGGER.info("Running planning algorithm");
@@ -154,7 +242,7 @@ public class OurPlanner implements Creator  {
 
 			long learningStartTime = System.currentTimeMillis();
 
-			boolean isLearning = learnFromTrajectories(currentLeaderAgent);
+			boolean isLearning = learnFromtraces(currentLeaderAgent);
 
 			long learningFinishTime = System.currentTimeMillis();
 
@@ -185,12 +273,12 @@ public class OurPlanner implements Creator  {
 		return false;
 	}
 
-	private boolean learnFromTrajectories(String agentName) {
+	private boolean learnFromtraces(String agentName) {
 
 		LOGGER.info("Running learning algorithm");
 
-		TrajectoryLearner learner = new TrajectoryLearner(agentList,agentName,trajectoriesFile, 
-				groundedFile, localViewFile, domainFileName, problemFileName, numOfTrajectories);	
+		TraceLearner learner = new TraceLearner(agentList,agentName,tracesFile, 
+				groundedFile, localViewFile, domainFileName, problemFileName, numOftraces);	
 
 		boolean isLearned = learner.learnNewActions();
 
@@ -226,7 +314,7 @@ public class OurPlanner implements Creator  {
 		File srcDir = new File(Globals.OUTPUT_PATH);
 
 		try {
-			FileUtils.copyDirectory(srcDir, OutputFile);
+			FileUtils.copyDirectory(srcDir, outputCopyDir);
 		} catch (IOException e) {
 			LOGGER.fatal(e, e);
 			return false;
@@ -247,7 +335,7 @@ public class OurPlanner implements Creator  {
 		else 
 			localViewPath = this.localViewFolder;
 
-		PlanVerifier planVerifier = new PlanVerifier(agentList,domainFileName,problemFileName,localViewPath,groundedFolder);		
+		PlanVerifier planVerifier = new PlanVerifier(agentList,domainFileName,problemFileName,localViewPath);		
 
 		boolean isVerified = planVerifier.verifyPlan(plan,0);
 
@@ -274,7 +362,7 @@ public class OurPlanner implements Creator  {
 			agentDomainPath = localViewFolder + "/" + agentName + "/" + domainFileName;
 
 		String agentProblemPath = localViewFolder + "/" + agentName + "/" + problemFileName;
-		String agentADDLPath = Globals.TEMP_PATH + "/" + problemFileName.split("\\.")[0] + ".addl";
+		String agentADDLPath = TEMP_DIR_PATH + "/" + problemFileName.split("\\.")[0] + ".addl";
 		String heuristic = "saFF-glcl";
 		int recursionLevel = -1;
 		double timeLimitMin = 1;
@@ -381,7 +469,7 @@ public class OurPlanner implements Creator  {
 		boolean valid = true;
 
 		if ((valid = ArgsLenghtValid(args)) == false) 
-			status = "Usage: <grounded folder> <localview folder> <trajectories folder> <domain name> <problem name> <addl name>";	
+			status = "Usage: <grounded folder> <localview folder> <traces folder> <domain name> <problem name> <addl name>";	
 
 		if ((valid = ArgsParsingValid(args)) == false) 
 			status = "Bad path to one or more provided files";	
@@ -406,79 +494,12 @@ public class OurPlanner implements Creator  {
 
 		LOGGER.info("Args parse check");
 
-		String extension = "";
-		String problemName = "";
-		String domainName = "";
+		configurationFilePath = args[1];
+		File configurationFile = new File(configurationFilePath);
 
-		groundedFolder = args[1];
-		groundedFile = new File(groundedFolder);
-
-		if( !groundedFile.exists()) {
-			LOGGER.fatal("provided path to grounded folder not existing");
+		if( !configurationFile.exists()) {
+			LOGGER.fatal(".json configuration file not exists");
 			return false;
-		}
-
-		localViewFolder = args[2];
-		localViewFile = new File(localViewFolder);
-
-		if( !localViewFile.exists()) {
-			LOGGER.fatal("provided path to local view folder not existing");
-			return false;
-		}
-
-		trajectoriesFolder = args[3];
-		trajectoriesFile = new File(trajectoriesFolder);
-
-		if( !trajectoriesFile.exists()) {
-			LOGGER.fatal("provided path to trajectories folder not existing");
-			return false;
-		}
-
-		try {
-			numOfTrajectories = Integer.parseInt(args[4]);
-		} catch (Exception e) {
-			LOGGER.fatal("provided num of traces to use not good");
-			return false;
-		}
-
-		domainFileName = args[5];
-		domainName = domainFileName.substring(0, domainFileName.lastIndexOf("."));
-		extension = domainFileName.substring(domainFileName.lastIndexOf(".") + 1);
-		//Checks if input domain name is of .pddl type
-		if (!extension.equals("pddl")) {
-			LOGGER.fatal("provided domain file name not existing");
-			return false;
-		}
-
-		problemFileName = args[6];
-		problemName = problemFileName.substring(0, problemFileName.lastIndexOf("."));
-		extension = problemFileName.substring(problemFileName.lastIndexOf(".") + 1);
-		//Checks if input problem name is of .pddl type
-		if (!extension.equals("pddl")) {
-			LOGGER.fatal("provided problem file name not existing");
-			return false;
-		}
-
-		agentsFilePath = args[7];
-		agentsFile = new File(agentsFilePath);
-
-		if( !agentsFile.exists()) {
-			LOGGER.fatal("provided path to .agents file not existing");
-			return false;
-		}
-
-		OutputFolder = args[8] + "/" + problemName + "/" + numOfTrajectories + "_Trajectories";
-		OutputFile = new File(OutputFolder);
-
-		if( !OutputFile.exists()) {
-			OutputFile.mkdir();
-		}
-
-		OutputTestFolder = args[9];
-		OutputTestFile = new File(OutputTestFolder);
-
-		if( !OutputTestFile.exists()) {
-			OutputTestFile.getParentFile().mkdirs();
 		}
 
 		return true;
@@ -488,7 +509,7 @@ public class OurPlanner implements Creator  {
 
 		LOGGER.info("Deleting temporary files");
 
-		File temp = new File(Globals.TEMP_PATH);		
+		File temp = new File(TEMP_DIR_PATH);		
 		if(temp.exists()) {
 			LOGGER.info("Deleting 'temp' folder");
 
@@ -506,9 +527,9 @@ public class OurPlanner implements Creator  {
 			output.delete();
 		}
 
-		File outputSAS = new File("output.sas");		
+		File outputSAS = new File(SAS_FILE_PATH);		
 		if(outputSAS.exists()) {
-			LOGGER.info("Deleting 'output.sas' file");
+			LOGGER.info("Deleting "+ SAS_FILE_PATH +" file");
 			outputSAS.delete();
 		}
 
