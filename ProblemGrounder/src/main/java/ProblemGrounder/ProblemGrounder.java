@@ -1,23 +1,25 @@
 package ProblemGrounder;
 
 import java.io.File;
+import java.lang.ProcessBuilder.Redirect;
 import java.util.Arrays;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 import Configuration.ProblemGrounderConfiguration;
 import Configuration.ConfigurationManager;
 import cz.agents.alite.creator.Creator;
-import cz.agents.dimaptools.experiment.Trace;
 
 public class ProblemGrounder implements Creator {
 
 	/* Global variables */
 	private final static Logger LOGGER = Logger.getLogger(ProblemGrounder.class);
+
 	private final static int ARGS_NUM = 2;
 
-	private static final String MA_TO_AGENT_FILE_SCRIPT = "./PythonScripts/generate-agent-file.py";
-	private static final String GROUND_PROBLEM_SCRIPT = "./PythonScripts/ground-problem.py";
+	private static final String MA_TO_AGENT_FILE_SCRIPT = "generate-agent-file.py";
+	private static final String GROUND_PROBLEM_SCRIPT = "ground-problem.py";
 
 	/* Class variables */
 	private String configurationFilePath = "";
@@ -30,6 +32,7 @@ public class ProblemGrounder implements Creator {
 	private String agentOutputFilePath = "";
 	private String groundedOutputFilePath = "";
 	private String localViewOutputFilePath = "";
+	private String pythonScriptsPath = "";
 
 	@Override
 	public void create() {
@@ -40,7 +43,8 @@ public class ProblemGrounder implements Creator {
 	@Override
 	public void init(String[] args) {
 
-		Trace.setFileStream("Log/trace.log");
+		//Trace.setFileStream("Log/trace.log");
+		LOGGER.setLevel(Level.INFO);
 
 		LOGGER.info("ProblemGrounder start");
 
@@ -96,6 +100,8 @@ public class ProblemGrounder implements Creator {
 		groundedOutputFilePath = configuration.groundedOutputPath;
 		localViewOutputFilePath = configuration.localViewOutputPath;
 
+		pythonScriptsPath = configuration.pythonScriptsPath;
+
 		return true;
 	}
 
@@ -108,11 +114,16 @@ public class ProblemGrounder implements Creator {
 
 			ProblemGrounderConfiguration conf = ConfigurationManager.getInstance().getCurrentConfiguration();
 
-			String cmd = GROUND_PROBLEM_SCRIPT + " " + conf.domainPath + " " + conf.problemPath + " " + agentsFile.getPath() + " " + outputPath + " " + localViewOutput;
+			String scriptPath = pythonScriptsPath + "/" + GROUND_PROBLEM_SCRIPT;
+
+			String cmd = scriptPath + " " + conf.domainPath + " " + conf.problemPath + " " + agentsFile.getPath() + " " + outputPath + " " + localViewOutput;
 
 			LOGGER.info("Running: " + cmd);
 
-			Process pr = Runtime.getRuntime().exec(cmd);
+			ProcessBuilder pb = new ProcessBuilder(scriptPath, conf.domainPath, conf.problemPath, agentsFile.getPath(), outputPath, localViewOutput);
+            pb.redirectOutput(Redirect.INHERIT);
+            
+            Process pr = pb.start();
 
 			pr.waitFor();
 
@@ -132,14 +143,18 @@ public class ProblemGrounder implements Creator {
 
 			ProblemGrounderConfiguration conf = ConfigurationManager.getInstance().getCurrentConfiguration();
 
-			String cmd = MA_TO_AGENT_FILE_SCRIPT + " " + conf.domainPath + " " + conf.problemPath + " " + outputPath;
+			String scriptPath = pythonScriptsPath + "/" + MA_TO_AGENT_FILE_SCRIPT;
+
+			String cmd = "python " + scriptPath + " " + conf.domainPath + " " + conf.problemPath + " " + outputPath;
 
 			LOGGER.info("Running: " + cmd);
-
-			Process pr = Runtime.getRuntime().exec(cmd);
+			
+			ProcessBuilder pb = new ProcessBuilder(scriptPath, conf.domainPath, conf.problemPath, outputPath);
+            pb.redirectOutput(Redirect.INHERIT);
+            
+            Process pr = pb.start();
 
 			pr.waitFor();
-
 		} 
 		catch (Exception e) {
 			LOGGER.fatal(e, e);
@@ -157,6 +172,9 @@ public class ProblemGrounder implements Creator {
 		problemName = problemName.substring(0, problemName.lastIndexOf('.'));
 
 		String agentsFilePath = outputPath + "/" + problemName + ".agents";
+
+		LOGGER.info("agents file path :" + agentsFilePath);
+
 		agentsFile = new File(agentsFilePath);
 
 		if( !agentsFile.exists()) {

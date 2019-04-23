@@ -1,7 +1,1 @@
-{
-"domainPath":"./Input/domain.pddl",
-"problemPath":"./Input/probLOGISTICS-11-0.pddl",
-"agentsOutputPath":"./Output/Agent",
-"groundedOutputPath":"./Output/Grounded",
-"localViewOutputPath":"./Output/LocalView"
-}
+{"pythonScriptsPath": "/home/daniel/Work/WorkSpace/Thesis/ProblemGrounder/PythonScripts", "localViewOutputPath": "/home/daniel/Work/WorkSpace/Thesis/ProblemGrounder/Output/LocalView", "agentsOutputPath": "/home/daniel/Work/WorkSpace/Thesis/ProblemGrounder/Output/Agent", "problemPath": "/home/daniel/Work/WorkSpace/Thesis/ProblemGrounder/Input/probLOGISTICS-6-0.pddl", "domainPath": "/home/daniel/Work/WorkSpace/Thesis/ProblemGrounder/Input/domain.pddl", "groundedOutputPath": "/home/daniel/Work/WorkSpace/Thesis/ProblemGrounder/Output/Grounded"}

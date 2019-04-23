@@ -7,5 +7,6 @@ public class ProblemGrounderConfiguration {
 	public String agentsOutputPath;
 	public String localViewOutputPath;
 	public String groundedOutputPath;
+	public String pythonScriptsPath;
 
 }

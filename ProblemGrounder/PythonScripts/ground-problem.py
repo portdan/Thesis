@@ -1,4 +1,4 @@
-#!/usr/bin/python2.7
+#!/usr/bin/python3.5
 
 import sys
 import os
@@ -229,7 +229,7 @@ class Grounder(object):
             dfile_array = self._get_file_as_array(dfile)
         # Deal with front/end define, problem, :domain
         if dfile_array[0:4] != ['(', 'define', '(', 'domain']:
-            print 'PARSING ERROR: Expected (define (domain ... at start of domain file'
+            print('PARSING ERROR: Expected (define (domain ... at start of domain file')
             sys.exit()
         self.domain = dfile_array[4]
 
@@ -266,10 +266,10 @@ class Grounder(object):
             if keyword == 'requirements':  # Requirements list
                 if word != ':requirements':
                     if not word.startswith(':'):
-                        print 'PARSING ERROR: Expected requirement to start with :'
+                        print('PARSING ERROR: Expected requirement to start with :')
                         sys.exit()
                     elif word[1:] not in DFILE_REQ_KEYWORDS:
-                        print 'WARNING: Unknown Rquierement ' + word[1:]
+                        print('WARNING: Unknown Rquierement ' + word[1:])
                         # print 'Requirements must only be: ' + str(DFILE_REQ_KEYWORDS)
                         # sys.exit()
                     else:
@@ -307,8 +307,8 @@ class Grounder(object):
                                 self.constants.setdefault(word, []).append(element)
                                 # self.object_list.add(element)
                             else:
-                                print self.type_list
-                                print "ERROR unknown type " + word
+                                print(self.type_list)
+                                print("ERROR unknown type " + word)
                                 sys.exit()
                         is_obj_list = True
                         obj_list = []
@@ -333,7 +333,7 @@ class Grounder(object):
                         self.predicates.append(Predicate(p_name, pred_list, True, False))
                         
                         # add public/agent predicates to list
-                        if not agent_pred in self.agent_predicates.keys():
+                        if not agent_pred in list(self.agent_predicates.keys()):
                             self.agent_predicates[agent_pred] = set()
                         self.agent_predicates[agent_pred].add(Predicate(p_name, pred_list, True, False))
                         
@@ -383,17 +383,17 @@ class Grounder(object):
             pfile_array = self._get_file_as_array(pfile)
         # Deal with front/end define, problem, :domain
         if pfile_array[0:4] != ['(', 'define', '(', 'problem']:
-            print 'PARSING ERROR: Expected (define (problem ... at start of problem file'
+            print('PARSING ERROR: Expected (define (problem ... at start of problem file')
             sys.exit()
         self.problem = pfile_array[4]
         if pfile_array[5:8] != [')', '(', ':domain']:
-            print 'PARSING ERROR: Expected (:domain ...) after (define (problem ...)'
+            print('PARSING ERROR: Expected (:domain ...) after (define (problem ...)')
             sys.exit()
         if self.domain != pfile_array[8]:
-            print 'ERROR - names don\'t match between domain and problem file.'
+            print('ERROR - names don\'t match between domain and problem file.')
             # sys.exit()
         if pfile_array[9] != ')':
-            print 'PARSING ERROR: Expected end of domain declaration'
+            print('PARSING ERROR: Expected end of domain declaration')
             sys.exit()
         pfile_array = pfile_array[10:-1]
 
@@ -419,8 +419,8 @@ class Grounder(object):
                 opencounter -= 1
             elif word.startswith(':'):
                 if word[1:] not in PFILE_KEYWORDS:
-                    print 'PARSING ERROR: Unknown keyword: ' + word[1:]
-                    print 'Known keywords: ' + str(PFILE_KEYWORDS)
+                    print('PARSING ERROR: Unknown keyword: ' + word[1:])
+                    print('Known keywords: ' + str(PFILE_KEYWORDS))
                 else:
                     keyword = word[1:]
             if opencounter == 0:
@@ -438,7 +438,7 @@ class Grounder(object):
                             agent = word
                             
                             # create agent private objects list
-                            if not agent in self.agent_to_objects.keys():
+                            if not agent in list(self.agent_to_objects.keys()):
                                 self.agent_to_objects[agent] = {}
                 
                             continue
@@ -460,8 +460,8 @@ class Grounder(object):
                                 self.agent_to_objects[agent].setdefault(word, []).append(element)
 
                             else:
-                                print self.type_list
-                                print "ERROR unknown type " + word
+                                print(self.type_list)
+                                print("ERROR unknown type " + word)
                                 sys.exit()
                         is_obj_list = True
                         obj_list = []
@@ -541,7 +541,7 @@ class Grounder(object):
                     return val
             return None       
         else:
-            for k, v in obj.items():
+            for k, v in list(obj.items()):
                 if k == val or v == val:
                     return k
                 if isinstance(v, collections.Iterable):
@@ -556,17 +556,17 @@ class Grounder(object):
             pfile_array = self._get_file_as_array(afile)
         # Deal with front/end define, problem, :domain
         if pfile_array[0:4] != ['(', 'define', '(', 'problem']:
-            print 'PARSING ERROR: Expected (define (problem ... at start of problem file'
+            print('PARSING ERROR: Expected (define (problem ... at start of problem file')
             sys.exit()
         self.problem = pfile_array[4]
         if pfile_array[5:8] != [')', '(', ':domain']:
-            print 'PARSING ERROR: Expected (:domain ...) after (define (problem ...)'
+            print('PARSING ERROR: Expected (:domain ...) after (define (problem ...)')
             sys.exit()
         if self.domain != pfile_array[8]:
-            print 'ERROR - names don\'t match between domain and agent file.'
+            print('ERROR - names don\'t match between domain and agent file.')
             # sys.exit()
         if pfile_array[9] != ')':
-            print 'PARSING ERROR: Expected end of domain declaration'
+            print('PARSING ERROR: Expected end of domain declaration')
             sys.exit()
         
         pfile_array = pfile_array[10:-1]
@@ -587,8 +587,8 @@ class Grounder(object):
                 opencounter -= 1
             elif word.startswith(':'):
                 if word[1:] not in AFILE_KEYWORDS:
-                    print 'PARSING ERROR: Unknown keyword: ' + word[1:]
-                    print 'Known keywords: ' + str(AFILE_KEYWORDS)
+                    print('PARSING ERROR: Unknown keyword: ' + word[1:])
+                    print('Known keywords: ' + str(AFILE_KEYWORDS))
                 else:
                     keyword = word[1:]
     
@@ -637,18 +637,18 @@ class Grounder(object):
         """
         pred_list = []
         if len(array) % 3 != 0:
-            print "Expected predicate to be typed " + str(array)
+            print("Expected predicate to be typed " + str(array))
             sys.exit()
             
-        for i in range(0, len(array) / 3):
+        for i in range(0, len(array) // 3):
             if array[3 * i + 1] != '-':
-                print "Expected predicate to be typed"
+                print("Expected predicate to be typed")
                 sys.exit()
             if array[3 * i + 2] in types:
                 pred_list.append((array[3 * i], array[3 * i + 2]))
             else:
-                print "PARSING ERROR {} not in types list".format(array[3 * i + 2])
-                print "Types list: {}".format(self.type_list)
+                print("PARSING ERROR {} not in types list".format(array[3 * i + 2]))
+                print("Types list: {}".format(self.type_list))
                 sys.exit()
                     
         return pred_list
@@ -694,7 +694,7 @@ class Grounder(object):
         new_types = copy.deepcopy(self.types)  # {new types to add}
         new_types_list = copy.deepcopy(self.type_list)  # {new type_list to add}
 
-        for type, agents in self.types_to_agents.iteritems():
+        for type, agents in self.types_to_agents.items():
             for agent in agents:
                 # Add spesific agents types
                 new_types.setdefault(type, []).append(agent)
@@ -743,7 +743,7 @@ class Grounder(object):
         # Constants
         if len(self.constants) > 0:
             to_write += "(:constants\n"
-            for t in self.constants.iterkeys():
+            for t in self.constants.keys():
                 to_write += "\t"
                 for c in self.constants[t]:
                     to_write += c + " "
@@ -753,7 +753,7 @@ class Grounder(object):
         to_write += "(:predicates\n"
         for predicate in self.agent_predicates[PUBLIC]:
             to_write += "\t{}\n".format(predicate.pddl_rep())
-        for agent_type in self.agent_predicates.iterkeys():
+        for agent_type in self.agent_predicates.keys():
             if agent_type != PUBLIC and len(self.agent_predicates[agent_type]) > 0:
                 to_write += "\n\t{}\n".format("(:private ?agent - " + agent_type)
                 for predicate in self.agent_predicates[agent_type]:
@@ -780,7 +780,7 @@ class Grounder(object):
         
         new_agent_to_objects = {}  # key = agent/public, value = Object = []
 
-        for agent_name, object_type_to_name in self.agent_to_objects.iteritems():
+        for agent_name, object_type_to_name in self.agent_to_objects.items():
             new_object_type_to_name = copy.deepcopy(object_type_to_name) 
             for object_name in new_object_type_to_name:
                 if object_name in self.types_to_agents:
@@ -795,8 +795,8 @@ class Grounder(object):
         new_agent_to_objects = {}  # key = agent/public, value = Object = []
         new_agent_to_objects[PUBLIC] = {}
 
-        for agent_name, object_type_to_name in self.agent_to_objects.iteritems():
-            for object_type, object_names in object_type_to_name.iteritems():
+        for agent_name, object_type_to_name in self.agent_to_objects.items():
+            for object_type, object_names in object_type_to_name.items():
                 for obj_name in object_names:
                     new_agent_to_objects[PUBLIC].setdefault(object_type, []).append(obj_name)
             
@@ -814,17 +814,17 @@ class Grounder(object):
         
         # writing objects. first public than private (per agent)
         
-        for t, objects in self.agent_to_objects[PUBLIC].iteritems():
+        for t, objects in self.agent_to_objects[PUBLIC].items():
             for obj in objects:
-                if not t in self.constants.iterkeys() or not obj in self.constants[t]:
+                if not t in iter(self.constants.keys()) or not obj in self.constants[t]:
                     to_write += "\t" + obj + " - " + t + "\n"
                     
         for agent in self.agent_to_objects:
             if not agent == PUBLIC:
                 to_write += "\n\t(:private " + agent + "\n"
-                for t, objects in self.agent_to_objects[agent].iteritems():
+                for t, objects in self.agent_to_objects[agent].items():
                     for obj in objects:
-                        if not t in self.constants.iterkeys() or not obj in self.constants[t]:
+                        if not t in iter(self.constants.keys()) or not obj in self.constants[t]:
                             to_write += "\t\t" + obj + " - " + t + "\n"
                 to_write += "\t)\n"         
         to_write += ")\n"

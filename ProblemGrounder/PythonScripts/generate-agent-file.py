@@ -1,4 +1,4 @@
-#!/usr/bin/python2.7
+#!/usr/bin/python3.5
 
 import sys
 import os
@@ -210,7 +210,7 @@ class PlanningProblem(object):
             print ('PARSING ERROR: Expected requirement to start with :')
             sys.exit()
           elif word[1:] not in DFILE_REQ_KEYWORDS:
-            print ('WARNING: Unknown Rquierement ' + word[1:])
+            print(('WARNING: Unknown Rquierement ' + word[1:]))
             # print ('Requirements must only be: ' + str(DFILE_REQ_KEYWORDS)
             # sys.exit()
           else:
@@ -248,8 +248,8 @@ class PlanningProblem(object):
                 self.constants.setdefault(word, []).append(element)
                 # self.object_list.add(element)
               else:
-                print (self.type_list)
-                print ("ERROR unknown type " + word)
+                print((self.type_list))
+                print(("ERROR unknown type " + word))
                 sys.exit()
             is_obj_list = True
             obj_list = []
@@ -342,8 +342,8 @@ class PlanningProblem(object):
         opencounter -= 1
       elif word.startswith(':'):
         if word[1:] not in PFILE_KEYWORDS:
-          print ('PARSING ERROR: Unknown keyword: ' + word[1:])
-          print ('Known keywords: ' + str(PFILE_KEYWORDS))
+          print(('PARSING ERROR: Unknown keyword: ' + word[1:]))
+          print(('Known keywords: ' + str(PFILE_KEYWORDS)))
         else:
           keyword = word[1:]
       if opencounter == 0:
@@ -370,8 +370,8 @@ class PlanningProblem(object):
                 self.objects.setdefault(word, []).append(element)
                 self.object_list.add(element)
               else:
-                print (self.type_list)
-                print ("ERROR unknown type " + word)
+                print((self.type_list))
+                print(("ERROR unknown type " + word))
                 sys.exit()
             is_obj_list = True
             obj_list = []
@@ -404,10 +404,10 @@ class PlanningProblem(object):
           obj_list = []
 
   def get_type_of_object(self, obj):
-    for t in self.objects.keys():
+    for t in list(self.objects.keys()):
       if obj in self.objects[t]:
         return t
-    for t in self.constants.keys():
+    for t in list(self.constants.keys()):
       if obj in self.constants[t]:
         return t
 
@@ -451,7 +451,7 @@ class PlanningProblem(object):
     Expects array such as [?a, -, agent, ...]."""
     pred_list = []
     if len(array) % 3 != 0:
-      print ("Expected predicate to be typed " + str(array))
+      print(("Expected predicate to be typed " + str(array)))
       sys.exit()
     for i in range(0, len(array) // 3):
       if array[3 * i + 1] != '-':
@@ -460,8 +460,8 @@ class PlanningProblem(object):
       if array[3 * i + 2] in types:
         pred_list.append((array[3 * i], array[3 * i + 2]))
       else:
-        print ("PARSING ERROR {} not in types list".format(array[3 * i + 2]))
-        print ("Types list: {}".format(self.type_list))
+        print(("PARSING ERROR {} not in types list".format(array[3 * i + 2])))
+        print(("Types list: {}".format(self.type_list)))
         sys.exit()
     return pred_list
 
@@ -542,7 +542,7 @@ def main():
 
     end = time.time() 
     
-    print("Done! (time - %0.4f" % (end - start) + ")")    
+    print(("Done! (time - %0.4f" % (end - start) + ")"))    
 
 
 def parse_args():
