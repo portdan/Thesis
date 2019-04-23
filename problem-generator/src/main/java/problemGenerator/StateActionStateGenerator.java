@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 import Configuration.ConfigurationManager;
@@ -72,8 +73,9 @@ public class StateActionStateGenerator implements Creator {
 	@Override
 	public void init(String[] args) {
 
-		Trace.setFileStream("Log/trace.log");
-
+		//Trace.setFileStream("Log/trace.log");
+		LOGGER.setLevel(Level.INFO);
+		
 		LOGGER.info("StateActionStateGenerator start");
 
 		if(!ParseArgs(args))

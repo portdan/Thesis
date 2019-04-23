@@ -13,6 +13,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 import cz.agents.alite.communication.PerformerCommunicator;
@@ -99,8 +100,9 @@ public class MAPDDLProblemGenerator implements Creator {
 			numOfProblemsToGenerate = Integer.parseInt(args[4]);
 		}
 
-		Trace.setFileStream("Log/trace.log");
-
+		//Trace.setFileStream("Log/trace.log");
+		LOGGER.setLevel(Level.INFO);
+		
 		LOGGER.info("init end");
 
 	}

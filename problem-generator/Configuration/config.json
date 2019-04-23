@@ -1,6 +1,6 @@
 {
   "domainFilePath" : "./Input/domain.pddl",
-  "problemFilePath": "./Input/probLOGISTICS-11-0.pddl",
+  "problemFilePath": "./Input/probLOGISTICS-4-0.pddl",
   "numOfRandomWalkSteps": 100,
   "numOfTracesToGenerate": 1000,
   "sasFilePath": "./output.sas",
