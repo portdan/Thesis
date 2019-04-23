@@ -1,0 +1,40 @@
+{
+  "domainPath": "/home/daniel/Work/WorkSpace/Thesis/OurPlannerTester/mapddl-benchmarks/logistics00",
+  "problemsPath": "/home/daniel/Work/WorkSpace/Thesis/OurPlannerTester/mapddl-benchmarks/logistics00",
+  "domainName": "domain.pddl",
+
+  "outputDestination": "/home/daniel/Work/WorkSpace/Thesis/OurPlannerTester/Output",
+  "originDestination": "Origin",
+
+  "problemGrounderInput": "/home/daniel/Work/WorkSpace/Thesis/ProblemGrounder/Input",
+  "problemGrounderOutput": "/home/daniel/Work/WorkSpace/Thesis/ProblemGrounder/Output",
+  "problemGrounderConfig": "/home/daniel/Work/WorkSpace/Thesis/ProblemGrounder/Configuration/config.json",
+  "problemGrounderJAR": "/home/daniel/Work/WorkSpace/Thesis/ProblemGrounder/target/ProblemGrounder-0.0.1-SNAPSHOT-jar-with-dependencies.jar",
+  "problemGrounderCreator": "ProblemGrounder.ProblemGrounder",
+  "problemGrounderOutputDestination": "ProblemGrounder",
+
+  "problemGeneratorInput": "/home/daniel/Work/WorkSpace/Thesis/problem-generator/Input",
+  "problemGeneratorOutput": "/home/daniel/Work/WorkSpace/Thesis/problem-generator/Output",
+  "problemGeneratorConfig": "/home/daniel/Work/WorkSpace/Thesis/problem-generator/Configuration/config.json",
+  "problemGeneratorJAR": "/home/daniel/Work/WorkSpace/Thesis/problem-generator/target/problem-generator-0.0.1-SNAPSHOT-jar-with-dependencies.jar",
+  "problemGeneratorCreator": "problemGenerator.StateActionStateGenerator",
+  "problemGeneratorOutputDestination": "ProblemGenerator",
+
+  "problems": [
+    {
+      "problemName": "probLOGISTICS-4-0.pddl",
+      "maxTracesToUse": 1000,
+      "minTracesToUse": 0
+    },
+    {
+      "problemName": "probLOGISTICS-5-0.pddl",
+      "maxTracesToUse": 1000,
+      "minTracesToUse": 0
+    },
+    {
+      "problemName": "probLOGISTICS-6-0.pddl",
+      "maxTracesToUse": 1000,
+      "minTracesToUse": 0
+    }
+  ]
+}
