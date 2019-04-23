@@ -1,0 +1,11 @@
+{
+  "tracesDirPath": "./Input/Traces",
+  "domainFileName": "domain.pddl",
+  "problemFileName": "probLOGISTICS-4-0.pddl",
+  "groundedDirPath": "./Input/Grounded",
+  "localViewDirPath": "./Input/LocalView",
+  "numOfTracesToUse": 1000,
+  "agentsFilePath": "./Input/Agent/probLOGISTICS-4-0.agents",
+  "outputCopyDirPath": "/home/daniel/Desktop/log/probLOGISTICS-4-0/5. tests",
+  "testOutputCSVFilePath": "/home/daniel/Desktop/log/tests/output.csv"
+}
