@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 import cz.agents.alite.creator.Creator;
@@ -38,8 +39,9 @@ public class StateActionStateSequencer implements Creator {
 	@Override
 	public void init(String[] args) {
 
-		Trace.setFileStream("Log/trace.log");
-
+		//Trace.setFileStream("Log/trace.log");
+		LOGGER.setLevel(Level.INFO);
+		
 		LOGGER.info("StateActionStateSequencer Start");
 
 		if(!ParseArgs(args))
