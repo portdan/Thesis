@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<testsuite tests="1" failures="0" name="cz.agents.dimaptools.util.TestSharedProblemInfoProvider" time="0" errors="0" skipped="0">
+<testsuite tests="1" failures="0" name="cz.agents.dimaptools.util.TestSharedProblemInfoProvider" time="0.001" errors="0" skipped="0">
   <properties>
     <property name="java.runtime.name" value="Java(TM) SE Runtime Environment"/>
     <property name="java.vm.version" value="10.0.1+10"/>
     <property name="sun.boot.library.path" value="/usr/lib/jvm/jdk-10.0.1/lib"/>
-    <property name="maven.multiModuleProjectDirectory" value="/home/daniel/Work/WorkSpace/Thesis/madla-planner/madla-planner"/>
+    <property name="maven.multiModuleProjectDirectory" value="/home/daniel/Work/WorkSpace/Thesis/madla-planner"/>
     <property name="java.vm.vendor" value="&quot;Oracle Corporation&quot;"/>
     <property name="java.vendor.url" value="http://java.oracle.com/"/>
     <property name="guice.disable.misplaced.annotation.check" value="true"/>
@@ -15,7 +15,7 @@
     <property name="user.country" value="US"/>
     <property name="sun.java.launcher" value="SUN_STANDARD"/>
     <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
-    <property name="user.dir" value="/home/daniel/Work/WorkSpace/Thesis/madla-planner/madla-planner"/>
+    <property name="user.dir" value="/home/daniel/Work/WorkSpace/Thesis/madla-planner"/>
     <property name="java.vm.compressedOopsMode" value="Zero based"/>
     <property name="java.runtime.version" value="10.0.1+10"/>
     <property name="java.awt.graphicsenv" value="sun.awt.X11GraphicsEnvironment"/>
@@ -25,14 +25,14 @@
 "/>
     <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
     <property name="os.name" value="Linux"/>
-    <property name="classworlds.conf" value="/home/daniel/Work/WorkSpace/.metadata/.plugins/org.eclipse.m2e.launching/launches/m2conf12169054437595064528.tmp"/>
+    <property name="classworlds.conf" value="/home/daniel/Work/WorkSpace/.metadata/.plugins/org.eclipse.m2e.launching/launches/m2conf1749941957911773485.tmp"/>
     <property name="sun.jnu.encoding" value="UTF-8"/>
     <property name="java.library.path" value="/usr/java/packages/lib:/usr/lib64:/lib64:/lib:/usr/lib"/>
     <property name="jdk.debug" value="release"/>
     <property name="java.class.version" value="54.0"/>
     <property name="java.specification.name" value="Java Platform API Specification"/>
     <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
-    <property name="os.version" value="4.13.0-43-generic"/>
+    <property name="os.version" value="4.15.0-47-generic"/>
     <property name="user.home" value="/home/daniel"/>
     <property name="user.timezone" value="Asia/Jerusalem"/>
     <property name="java.awt.printerjob" value="sun.print.PSPrinterJob"/>
@@ -51,7 +51,7 @@
     <property name="java.version" value="10.0.1"/>
     <property name="securerandom.source" value="file:/dev/./urandom"/>
     <property name="java.vendor" value="Oracle Corporation"/>
-    <property name="maven.home" value="/home/daniel/Work/WorkSpace/Thesis/madla-planner/madla-planner/EMBEDDED"/>
+    <property name="maven.home" value="/home/daniel/Work/WorkSpace/Thesis/madla-planner/EMBEDDED"/>
     <property name="file.separator" value="/"/>
     <property name="java.version.date" value="2018-04-17"/>
     <property name="java.vendor.url.bug" value="http://bugreport.java.com/bugreport/"/>
@@ -61,5 +61,5 @@
     <property name="sun.desktop" value="gnome"/>
     <property name="sun.cpu.isalist" value=""/>
   </properties>
-  <testcase classname="cz.agents.dimaptools.util.TestSharedProblemInfoProvider" name="test" time="0"/>
+  <testcase classname="cz.agents.dimaptools.util.TestSharedProblemInfoProvider" name="test" time="0.001"/>
 </testsuite>
