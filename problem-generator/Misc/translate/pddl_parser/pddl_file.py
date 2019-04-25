@@ -3,7 +3,7 @@ try:
     import builtins
 except ImportError:
     # Python 2.x
-    import __builtin__ as builtins
+    import builtins as builtins
 
 import os.path
 import re

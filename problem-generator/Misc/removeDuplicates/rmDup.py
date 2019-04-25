@@ -28,7 +28,7 @@ def main():
         
     end = time.time() 
     
-    print("Done! (time - %0.4f" %(end - start)+")")
+    print(("Done! (time - %0.4f" %(end - start)+")"))
     
 def chunk_reader(fobj, chunk_size=1024):
     """Generator that reads a file in chunks of bytes"""
@@ -79,7 +79,7 @@ def check_for_duplicates(folderPath, hash=hashlib.sha1):
                 hashes_by_size[file_size].append(full_path)
 
     # For all files with the same file size, get their hash on the 1st 1024 bytes
-    for __, files in hashes_by_size.items():
+    for __, files in list(hashes_by_size.items()):
         if len(files) < 2:
             continue    # this file size is unique, no need to spend cpy cycles on it
 
@@ -94,7 +94,7 @@ def check_for_duplicates(folderPath, hash=hashlib.sha1):
                 hashes_on_1k[small_hash].append(filename)
 
     # For all files with the hash on the 1st 1024 bytes, get their hash on the full file - collisions will be duplicates
-    for __, files in hashes_on_1k.items():
+    for __, files in list(hashes_on_1k.items()):
         if len(files) < 2:
             continue    # this hash of fist 1k file bytes is unique, no need to spend cpy cycles on it
 
@@ -104,7 +104,7 @@ def check_for_duplicates(folderPath, hash=hashlib.sha1):
 
             duplicate = hashes_full.get(full_hash)
             if duplicate:
-                print ("Duplicate found: %s and %s" % (filename, duplicate))
+                print(("Duplicate found: %s and %s" % (filename, duplicate)))
                 duplicateFileNames.append(filename)
             else:
                 hashes_full[full_hash] = filename

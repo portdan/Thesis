@@ -1,8 +1,8 @@
-#!/usr/bin/python2.7
+#!/usr/bin/python3.5
 
 import sys
 import os
-from sets import Set
+# from sets import Set
 
 DFILE_KEYWORDS = ["requirements", "types", "predicates", "action", "private","functions","constants"]
 DFILE_REQ_KEYWORDS = ["typing","strips","multi-agent","unfactored-privacy"]
@@ -133,7 +133,7 @@ class PlanningProblem(object):
   def __init__(self, domainfile, problemfile):
     self.domain = '' #String
     self.requirements = set() #[String]
-    self.type_list = Set() #{String}
+    self.type_list = set() #{String}
     self.type_list.add('object')
     self.types = {} #Key = supertype_name, Value = type
     self.predicates = [] #[Predicate]
@@ -143,7 +143,7 @@ class PlanningProblem(object):
     self.agent_types = set()
     self.agents = set()
     self.problem = '' #String
-    self.object_list = Set() #{String}
+    self.object_list = set() #{String}
     self.objects = {} #Key = type, Value = object_name
     self.constants = {} #Key = type, Value = object_name
     self.init = [] #List of Predicates
@@ -165,7 +165,7 @@ class PlanningProblem(object):
       dfile_array = self._get_file_as_array(dfile)
     #Deal with front/end define, problem, :domain
     if dfile_array[0:4] != ['(', 'define', '(', 'domain']:
-      print 'PARSING ERROR: Expected (define (domain ... at start of domain file'
+      print('PARSING ERROR: Expected (define (domain ... at start of domain file')
       sys.exit()
     self.domain = dfile_array[4]
 
@@ -199,10 +199,10 @@ class PlanningProblem(object):
       if keyword == 'requirements': #Requirements list
         if word != ':requirements':
           if not word.startswith(':'):
-            print 'PARSING ERROR: Expected requirement to start with :'
+            print('PARSING ERROR: Expected requirement to start with :')
             sys.exit()
           elif word[1:] not in DFILE_REQ_KEYWORDS:
-            print 'WARNING: Unknown Rquierement ' + word[1:]
+            print('WARNING: Unknown Rquierement ' + word[1:])
             #print 'Requirements must only be: ' + str(DFILE_REQ_KEYWORDS)
             #sys.exit()
           else:
@@ -240,8 +240,8 @@ class PlanningProblem(object):
                 self.constants.setdefault(word, []).append(element)
                 #self.object_list.add(element)
               else:
-                print self.type_list
-                print "ERROR unknown type " + word
+                print(self.type_list)
+                print("ERROR unknown type " + word)
                 sys.exit()
             is_obj_list = True
             obj_list = []
@@ -304,17 +304,17 @@ class PlanningProblem(object):
       pfile_array = self._get_file_as_array(pfile)
     #Deal with front/end define, problem, :domain
     if pfile_array[0:4] != ['(', 'define', '(', 'problem']:
-      print 'PARSING ERROR: Expected (define (problem ... at start of problem file'
+      print('PARSING ERROR: Expected (define (problem ... at start of problem file')
       sys.exit()
     self.problem = pfile_array[4]
     if pfile_array[5:8] != [')', '(', ':domain']:
-      print 'PARSING ERROR: Expected (:domain ...) after (define (problem ...)'
+      print('PARSING ERROR: Expected (:domain ...) after (define (problem ...)')
       sys.exit()
     if self.domain != pfile_array[8]:
-      print 'ERROR - names don\'t match between domain and problem file.'
+      print('ERROR - names don\'t match between domain and problem file.')
       #sys.exit()
     if pfile_array[9] != ')':
-      print 'PARSING ERROR: Expected end of domain declaration'
+      print('PARSING ERROR: Expected end of domain declaration')
       sys.exit()
     pfile_array = pfile_array[10:-1]
 
@@ -334,8 +334,8 @@ class PlanningProblem(object):
         opencounter -= 1
       elif word.startswith(':'):
         if word[1:] not in PFILE_KEYWORDS:
-          print 'PARSING ERROR: Unknown keyword: ' + word[1:]
-          print 'Known keywords: ' + str(PFILE_KEYWORDS)
+          print('PARSING ERROR: Unknown keyword: ' + word[1:])
+          print('Known keywords: ' + str(PFILE_KEYWORDS))
         else:
           keyword = word[1:]
       if opencounter == 0:
@@ -362,8 +362,8 @@ class PlanningProblem(object):
                 self.objects.setdefault(word, []).append(element)
                 self.object_list.add(element)
               else:
-                print self.type_list
-                print "ERROR unknown type " + word
+                print(self.type_list)
+                print("ERROR unknown type " + word)
                 sys.exit()
             is_obj_list = True
             obj_list = []
@@ -396,10 +396,10 @@ class PlanningProblem(object):
           obj_list = []
 
   def get_type_of_object(self,obj):
-    for t in self.objects.iterkeys():
+    for t in self.objects.keys():
       if obj in self.objects[t]:
         return t
-    for t in self.constants.iterkeys():
+    for t in self.constants.keys():
       if obj in self.constants[t]:
         return t
 
@@ -423,25 +423,25 @@ class PlanningProblem(object):
 
   def print_domain(self):
     """Prints out the planning problem in (semi-)readable format."""
-    print '\n*****************'
-    print 'DOMAIN: ' + self.domain
-    print 'REQUIREMENTS: ' + str(self.requirements)
-    print 'TYPES: ' + str(self.types)
-    print 'PREDICATES: ' + str(self.predicates)
-    print 'ACTIONS: ' + str(self.actions)
-    print 'FUNCTIONS: ' + str(self.functions)
-    print 'CONSTANTS: ' + str(self.constants)
-    print '****************'
+    print('\n*****************')
+    print('DOMAIN: ' + self.domain)
+    print('REQUIREMENTS: ' + str(self.requirements))
+    print('TYPES: ' + str(self.types))
+    print('PREDICATES: ' + str(self.predicates))
+    print('ACTIONS: ' + str(self.actions))
+    print('FUNCTIONS: ' + str(self.functions))
+    print('CONSTANTS: ' + str(self.constants))
+    print('****************')
 
   def print_problem(self):
     """Prints out the planning problem in (semi-)readable format."""
-    print '\n*****************'
-    print 'PROBLEM: ' + self.problem
-    print 'OBJECTS: ' + str(self.objects)
-    print 'INIT: ' + str(self.init)
-    print 'GOAL: ' + str(self.goal)
-    print 'AGENTS: ' + str(self.agents)
-    print '****************'
+    print('\n*****************')
+    print('PROBLEM: ' + self.problem)
+    print('OBJECTS: ' + str(self.objects))
+    print('INIT: ' + str(self.init))
+    print('GOAL: ' + str(self.goal))
+    print('AGENTS: ' + str(self.agents))
+    print('****************')
   
  
 
@@ -469,17 +469,17 @@ class PlanningProblem(object):
     Expects array such as [?a, -, agent, ...]."""
     pred_list = []
     if len(array)%3 != 0:
-      print "Expected predicate to be typed " + str(array)
+      print("Expected predicate to be typed " + str(array))
       sys.exit()
-    for i in range(0, len(array)/3):
+    for i in range(0, len(array)//3):
       if array[3*i+1] != '-':
-        print "Expected predicate to be typed"
+        print("Expected predicate to be typed")
         sys.exit()
       if array[3*i+2] in types:
         pred_list.append((array[3*i], array[3*i+2]))
       else:
-        print "PARSING ERROR {} not in types list".format(array[3*i+2])
-        print "Types list: {}".format(self.type_list)
+        print("PARSING ERROR {} not in types list".format(array[3*i+2]))
+        print("Types list: {}".format(self.type_list))
         sys.exit()
     return pred_list
 
@@ -535,7 +535,7 @@ class PlanningProblem(object):
     #Constants
     if len(self.constants) > 0:
       to_write += "(:constants\n"
-      for t in self.constants.iterkeys():
+      for t in self.constants.keys():
         to_write += "\t"
         for c in self.constants[t]:
           to_write += c + " "
@@ -613,11 +613,11 @@ class PlanningProblem(object):
 
 if __name__ == "__main__":
   if len(sys.argv) < 4:
-    print 'Requires 2 args'
-    print 'arg1: folder'
-    print 'arg2: domain'
-    print 'arg3: problem'
-    print 'arg4: output folder'
+    print('Requires 2 args')
+    print('arg1: folder')
+    print('arg2: domain')
+    print('arg3: problem')
+    print('arg4: output folder')
   else:
     pp = PlanningProblem(sys.argv[1] + "/" + sys.argv[2] + ".pddl", sys.argv[1] + "/" + sys.argv[3] + ".pddl")
     

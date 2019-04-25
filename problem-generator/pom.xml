@@ -60,7 +60,7 @@
 					<!-- Build an executable JAR -->
 					<archive>
 						<manifest>
-							<mainClass>ProblemGenerator.Main</mainClass>
+							<mainClass>problemGenerator.Main</mainClass>
 						</manifest>
 					</archive>
 					<descriptorRefs>

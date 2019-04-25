@@ -9,4 +9,5 @@ public class ProblemGeneratorConfiguration {
 	public String sasFilePath;
 	public String tempDirPath;
 	public String tracesDirPath;
+	public String pythonScriptsPath;
 }

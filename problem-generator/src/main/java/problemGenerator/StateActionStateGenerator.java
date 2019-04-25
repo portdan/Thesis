@@ -2,6 +2,7 @@ package problemGenerator;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.ProcessBuilder.Redirect;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -33,8 +34,8 @@ public class StateActionStateGenerator implements Creator {
 	private final static Logger LOGGER = Logger.getLogger(StateActionStateGenerator.class);
 	private final static int ARGS_NUM = 2;
 
-	private static final String TRANSLATOR = "./Misc/translate/translate.py";
-	private static final String CONVERTOR = "./Misc/convert/ma-pddl/ma-to-pddl.py";
+	private static final String TRANSLATOR = "translate/translate.py";
+	private static final String CONVERTOR = "convert/ma-pddl/ma-to-pddl.py";
 
 	private String tempDirPath = "";
 	private String tracesDirPath = "";
@@ -50,6 +51,7 @@ public class StateActionStateGenerator implements Creator {
 	private String domainFilePath = "";
 	private String problemFilePath = "";
 	private String agentsFilePath = "";
+	private String pythonScriptsPath = "";
 
 
 	private String domainFileName;
@@ -121,6 +123,7 @@ public class StateActionStateGenerator implements Creator {
 		tempDirPath = configuration.tempDirPath;
 		tracesDirPath = configuration.tracesDirPath;
 
+		pythonScriptsPath = configuration.pythonScriptsPath;
 
 		return true;
 	}
@@ -240,11 +243,19 @@ public class StateActionStateGenerator implements Creator {
 
 
 		try {
-			String cmd = CONVERTOR + " " + path + " " + domainFileName + " " + problemFileName + " " + tempDirPath;
-			LOGGER.info("RUN: " + cmd);
-			Process pr = Runtime.getRuntime().exec(cmd);
+			
+			String scriptPath = pythonScriptsPath + "/" + CONVERTOR;
 
-			pr.waitFor();
+			String cmd = scriptPath + " " + path + " " + domainFileName + " " + problemFileName + " " + tempDirPath;
+			
+			LOGGER.info("RUN: " + cmd);
+			
+			ProcessBuilder pb = new ProcessBuilder(scriptPath, path, domainFileName, problemFileName, tempDirPath);
+            pb.redirectOutput(Redirect.INHERIT);
+            
+            Process pr = pb.start();
+
+			pr.waitFor();			
 		} catch (Exception e) {
 			LOGGER.fatal(e, e);
 			System.exit(1);
@@ -270,11 +281,20 @@ public class StateActionStateGenerator implements Creator {
 		LOGGER.info("translate pddl to .sas file (translate.py)");
 
 		try {
-			String cmd = TRANSLATOR + " " + domainFilePath + " " + problemFilePath;
-			LOGGER.info("RUN: " + cmd);
-			Process pr = Runtime.getRuntime().exec(cmd);
 
-			pr.waitFor();
+			String scriptPath = pythonScriptsPath + "/" + TRANSLATOR;
+
+			String cmd = scriptPath + " " + domainFilePath + " " + problemFilePath;
+			
+			LOGGER.info("RUN: " + cmd);
+			
+			ProcessBuilder pb = new ProcessBuilder(scriptPath, domainFilePath, problemFilePath);
+            pb.redirectOutput(Redirect.INHERIT);
+            
+            Process pr = pb.start();
+
+			pr.waitFor();			
+
 		} catch (Exception e) {
 			LOGGER.fatal(e, e);
 			System.exit(1);

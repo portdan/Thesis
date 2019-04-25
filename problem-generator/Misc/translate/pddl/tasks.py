@@ -1,4 +1,4 @@
-from __future__ import print_function
+
 
 from . import axioms
 from . import predicates

@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function
+
 
 import sys
 import itertools
@@ -273,7 +273,7 @@ class MatchGenerator:
             print("%sargs[%s] == %s:" % (indent, self.index, key))
             self.match_generator[key].dump(indent + "    ")
         if not self.next.empty():
-            assert isinstance(self.next, MatchGenerator)
+            assert isinstance(self.__next__, MatchGenerator)
             print("%s[*]" % indent)
             self.next.dump(indent + "    ")
 
