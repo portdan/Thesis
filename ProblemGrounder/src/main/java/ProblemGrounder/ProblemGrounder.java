@@ -145,7 +145,7 @@ public class ProblemGrounder implements Creator {
 
 			String scriptPath = pythonScriptsPath + "/" + MA_TO_AGENT_FILE_SCRIPT;
 
-			String cmd = "python " + scriptPath + " " + conf.domainPath + " " + conf.problemPath + " " + outputPath;
+			String cmd = scriptPath + " " + conf.domainPath + " " + conf.problemPath + " " + outputPath;
 
 			LOGGER.info("Running: " + cmd);
 			

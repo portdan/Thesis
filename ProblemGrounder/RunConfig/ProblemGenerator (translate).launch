@@ -8,7 +8,7 @@
     </listAttribute>
     <stringAttribute key="org.eclipse.ui.externaltools.ATTR_LOCATION" value="${workspace_loc:problem-generator/Misc/translate/translate.py}"/>
     <stringAttribute key="org.eclipse.ui.externaltools.ATTR_OTHER_WORKING_DIRECTORY" value=""/>
-    <stringAttribute key="org.eclipse.ui.externaltools.ATTR_TOOL_ARGUMENTS" value="/home/daniel/Work/WorkSpace/Thesis/problem-generator/Output/Temp/domain.pddl /home/daniel/Work/WorkSpace/Thesis/problem-generator/Output/Temp/probLOGISTICS-6-0.pddl"/>
+    <stringAttribute key="org.eclipse.ui.externaltools.ATTR_TOOL_ARGUMENTS" value="/home/daniel/Work/WorkSpace/Thesis/problem-generator/Output/Temp/domain.pddl /home/daniel/Work/WorkSpace/Thesis/problem-generator/Output/Temp/probLOGISTICS-4-0.pddl /home/daniel/Work/WorkSpace/Thesis/problem-generator/output.sas"/>
     <stringAttribute key="org.python.pydev.debug.ATTR_INTERPRETER" value="__default"/>
     <stringAttribute key="org.python.pydev.debug.ATTR_PROJECT" value="problem-generator"/>
     <stringAttribute key="process_factory_id" value="org.python.pydev.debug.processfactory.PyProcessFactory"/>

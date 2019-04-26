@@ -1,1 +1,9 @@
-{"domainPath": "/home/daniel/Work/WorkSpace/Thesis/ProblemGrounder/Input/domain.pddl", "agentsOutputPath": "/home/daniel/Work/WorkSpace/Thesis/ProblemGrounder/Output/Agent", "groundedOutputPath": "/home/daniel/Work/WorkSpace/Thesis/ProblemGrounder/Output/Grounded", "pythonScriptsPath": "/home/daniel/Work/WorkSpace/Thesis/ProblemGrounder/PythonScripts", "problemPath": "/home/daniel/Work/WorkSpace/Thesis/ProblemGrounder/Input/probLOGISTICS-6-0.pddl", "localViewOutputPath": "/home/daniel/Work/WorkSpace/Thesis/ProblemGrounder/Output/LocalView"}
+{
+  "agentsOutputPath": "/home/daniel/Work/WorkSpace/Thesis/ProblemGrounder/Output/Agent", 
+  "domainPath": "/home/daniel/Work/WorkSpace/Thesis/ProblemGrounder/Input/domain.pddl", 
+  "groundedOutputPath": "/home/daniel/Work/WorkSpace/Thesis/ProblemGrounder/Output/Grounded", 
+  "localViewOutputPath": "/home/daniel/Work/WorkSpace/Thesis/ProblemGrounder/Output/LocalView", 
+  "problemPath": "/home/daniel/Work/WorkSpace/Thesis/ProblemGrounder/Input/probLOGISTICS-6-0.pddl", 
+  "pythonScriptsPath": "/home/daniel/Work/WorkSpace/Thesis/ProblemGrounder/PythonScripts"
+}
+
