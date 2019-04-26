@@ -12,9 +12,11 @@ import os
 import shutil
 
 from utils.Utils import clear_directory
+
 from configuration import TesterConfig
 from grounding import Grounder
 from generating import Generator
+from planning import Planner
 
 
 logging.config.fileConfig("Configuration/logger_config.conf", disable_existing_loggers=False)
@@ -100,13 +102,22 @@ def run_tests(config, origin_domain_file_path, origin_problem_path_list):
     
     grounder = Grounder(config)
     generator = Generator(config)
+    planner = Planner(config)
 
     for problem_name, problem_file_path in origin_problem_path_list:
+        num_of_traces_to_use = 1000
         generate_test_output_folder(origin_domain_file_path, problem_name, problem_file_path, config)
+        
         grounder.ground_problem(origin_domain_file_path, problem_name ,problem_file_path)
+        
         generator.generate_problems_and_traces(grounder.grounded_output_path, problem_name)
         
-
+        planner.plan(problem_name, num_of_traces_to_use)
+        
+        grounder.delete_output()
+        generator.delete_output()
+        planner.delete_output()
+      
 def main():
     
     start = time.time()

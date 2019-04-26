@@ -91,6 +91,10 @@ class Grounder(object):
     
         shutil.copytree(self.config.problemGrounderOutput, dst)
         
+    
+    def delete_output(self):
+        clear_directory(self.config.problemGrounderInput)
+        clear_directory(self.config.problemGrounderOutput)
        
     def ground_problem(self, domain_file_path, problem_name, problem_file_path):
         

@@ -10,11 +10,14 @@ class PlannerConfig(object):
     '''
     def __init__(self, domainFileName: str, problemFileName: str, groundedDirPath: str, 
                  localViewDirPath: str, tracesDirPath : str, numOfTracesToUse : int,
-                 agentsFilePath: str, outputCopyDirPath: str, testOutputCSVFilePath: str, ):
+                 agentsFilePath: str, outputCopyDirPath: str, testOutputCSVFilePath: str,
+                 agentsFileName: str, pythonScriptsPath : str, sasFilePath : str, outputDirPath : str, 
+                 outputLearningDirPath: str, outputTempDirPath : str ):
         '''
         Constructor
         '''
         self.domainFileName = domainFileName
+        self.agentsFileName = agentsFileName
         self.problemFileName = problemFileName
         self.groundedDirPath = groundedDirPath
         self.localViewDirPath = localViewDirPath
@@ -23,3 +26,8 @@ class PlannerConfig(object):
         self.agentsFilePath = agentsFilePath
         self.outputCopyDirPath = outputCopyDirPath
         self.testOutputCSVFilePath = testOutputCSVFilePath
+        self.pythonScriptsPath = pythonScriptsPath
+        self.sasFilePath = sasFilePath
+        self.outputDirPath = outputDirPath
+        self.outputLearningDirPath = outputLearningDirPath
+        self.outputTempDirPath = outputTempDirPath

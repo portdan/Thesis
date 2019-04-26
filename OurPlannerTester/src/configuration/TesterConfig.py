@@ -16,7 +16,9 @@ class TesterConfig(object):
                  problemGeneratorOutput: str, problemGrounderConfig: str, problemGeneratorConfig: str ,
                  problemGrounderJAR: str, problemGeneratorJAR: str, problemGrounderCreator: str, 
                  problemGeneratorCreator: str, outputDestination: str, originDestination: str,
-                 problemGrounderOutputDestination : str, problemGeneratorOutputDestination : str ):
+                 problemGrounderOutputDestination : str, problemGeneratorOutputDestination : str,
+                 problemPlannerConfig : str, problemPlannerCreator : str, problemPlannerInput :str, 
+        problemPlannerJAR : str, problemPlannerOutput : str, problemPlannerOutputDestination : str):
         '''
         Constructor
         '''
@@ -42,6 +44,13 @@ class TesterConfig(object):
         self.problemGeneratorCreator = problemGeneratorCreator
         self.problemGeneratorOutputDestination = problemGeneratorOutputDestination
         
+        self.problemPlannerConfig = problemPlannerConfig
+        self.problemPlannerCreator = problemPlannerCreator
+        self.problemPlannerInput = problemPlannerInput
+        self.problemPlannerJAR = problemPlannerJAR
+        self.problemPlannerOutput = problemPlannerOutput
+        self.problemPlannerOutputDestination = problemPlannerOutputDestination
+            
         
     def __str__(self):
         
@@ -69,7 +78,14 @@ class TesterConfig(object):
         phrases.append("Generator JAR File Path: " + str(self.problemGeneratorJAR) + "\n" )
         phrases.append("Generator Creator Name: " + str(self.problemGeneratorCreator) + "\n" ) 
         phrases.append("Grounder Destination Path: " + str(self.problemGeneratorOutputDestination) + "\n" )
-
+        
+        phrases.append("Planner Input Folder Path: " + str(self.problemPlannerInput) + "\n" )
+        phrases.append("Planner Output Folder Path: " + str(self.problemPlannerOutput) + "\n" )
+        phrases.append("Planner Config File Path: " + str(self.problemPlannerConfig) + "\n" )
+        phrases.append("Planner JAR File Path: " + str(self.problemPlannerJAR) + "\n" )
+        phrases.append("Planner Creator Name: " + str(self.problemPlannerCreator) + "\n" ) 
+        phrases.append("Planner Destination Path: " + str(self.problemPlannerOutputDestination) + "\n" )
+        
         phrases.append("Problems To Test List: " + "\n" )
         
         for tcp in self.problems:

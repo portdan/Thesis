@@ -18,3 +18,15 @@ def clear_directory(dirpath, delete=False):
         shutil.rmtree(dirpath)
     if not delete:
         os.makedirs(dirpath)
+        
+def copy_tree(src, dst, symlinks=False, ignore=None):
+    
+    logger.info("copy_treedirectory : " + src + " to " + dst)
+
+    for item in os.listdir(src):
+        s = os.path.join(src, item)
+        d = os.path.join(dst, item)
+        if os.path.isdir(s):
+            shutil.copytree(s, d, symlinks, ignore)
+        else:
+            shutil.copy2(s, d)

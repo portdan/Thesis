@@ -87,7 +87,10 @@ class Generator(object):
     
         shutil.copytree(self.config.problemGeneratorOutput, dst)
             
-            
+    def delete_output(self):
+        clear_directory(self.config.problemGeneratorInput)
+        clear_directory(self.config.problemGeneratorOutput)
+        
     def generate_problems_and_traces(self, grounded_output_path, problem_name):
         
         logger.info("generate_problems_and_traces")
