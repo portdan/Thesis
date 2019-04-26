@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Random;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 import Configuration.ConfigurationManager;
@@ -21,10 +22,11 @@ public class OurPlanner implements Creator  {
 	private final static int ARGS_NUM = 2;
 	private final static int SEED = 1;
 
-	private static final String AGENT_PARSER_SCRIPT = "./Scripts/parse-agents.py";
+	private static final String AGENT_PARSER_SCRIPT = "parse-agents.py";
 
-	private static final String SAS_FILE_PATH = Globals.SAS_OUTPUT_FILE_PATH;
-	private static final String TEMP_DIR_PATH = Globals.TEMP_PATH;
+	private static String SAS_FILE_PATH;
+	private static String OUTPUT_FILE_NAME;
+	private static String TEMP_DIR_PATH;
 
 	/* Class variables */
 	private String configurationFilePath = "";
@@ -37,7 +39,13 @@ public class OurPlanner implements Creator  {
 	private String domainFileName = "";
 	private String problemFileName = "";
 	private String agentsFilePath = "";
+	private String pythonScriptsPath = "";
+	private String sasFilePath = "";
+	private String outputDirPath = "";
+	private String outputLearningDirPath = "";
+	private String outputTempDirPath = "";
 
+	
 	private File tracesFile = null;
 	private File outputTestFile = null;
 	private File outputCopyDir = null;
@@ -66,6 +74,8 @@ public class OurPlanner implements Creator  {
 
 	@Override
 	public void init(String[] args) {
+		
+		LOGGER.setLevel(Level.INFO);
 
 		long startTime = System.currentTimeMillis();
 
@@ -133,11 +143,13 @@ public class OurPlanner implements Creator  {
 			System.exit(1);
 		}
 
+		/*
 		if(!deleteOutputFiles()) {
 			LOGGER.info("Deleting Output files failure");
 			System.exit(1);
 		}
-
+		 */
+		
 		long finishTime = System.currentTimeMillis();
 
 		TestDataAccumulator.getAccumulator().totalTimeMs = finishTime-startTime;
@@ -194,14 +206,14 @@ public class OurPlanner implements Creator  {
 			return false;
 		}
 
-		agentsFilePath = configuration.agentsFilePath;
+		agentsFilePath = configuration.agentsFilePath + "/" + configuration.agentsFileName;
 		agentsFile = new File(agentsFilePath);
 		if( !agentsFile.exists()) {
 			LOGGER.fatal("provided path to .agents file not existing");
 			return false;
 		}
 
-		outputCopyDirPath = configuration.outputCopyDirPath + "/" + problemFileName + "/" + numOftraces + "_traces";
+		outputCopyDirPath = configuration.outputCopyDirPath + "/" + numOftraces + "_traces";
 		outputCopyDir = new File(outputCopyDirPath);
 
 		if( !outputCopyDir.exists()) {
@@ -214,7 +226,38 @@ public class OurPlanner implements Creator  {
 		if( !outputTestFile.exists()) {
 			outputTestFile.getParentFile().mkdirs();
 		}
+		
+		/*OUTPUT DIR PATH*/
+		outputDirPath = configuration.outputDirPath;
+		Globals.OUTPUT_PATH = outputDirPath;
+		/*OUTPUT DIR PATH*/
+		
+		/*OUTPUT LEARNING DIR PATH*/
+		outputLearningDirPath = configuration.outputLearningDirPath;
+		Globals.LEARNED_PATH = outputLearningDirPath;
+		/*OUTPUT LEARNING DIR PATH*/
 
+		/*OUTPUT TEMP DIR PATH*/
+		outputTempDirPath = configuration.outputTempDirPath;
+		Globals.TEMP_PATH = outputTempDirPath;
+		TEMP_DIR_PATH = outputTempDirPath;
+		/*OUTPUT TEMP DIR PATH*/
+
+		/*SAS FILE NAME */
+		sasFilePath = configuration.sasFilePath;
+		
+		Globals.SAS_OUTPUT_FILE_PATH = sasFilePath;
+		SAS_FILE_PATH = Globals.SAS_OUTPUT_FILE_PATH;
+		
+		Globals.PROCESSED_SAS_OUTPUT_FILE_PATH = sasFilePath.split("\\.")[0];
+		OUTPUT_FILE_NAME = Globals.PROCESSED_SAS_OUTPUT_FILE_PATH;
+		/*SAS FILE NAME */
+		
+		/*PYTHON SCRIPTS*/
+		pythonScriptsPath = configuration.pythonScriptsPath;
+		Globals.PYTHON_SCRIPTS_FOLDER = pythonScriptsPath;
+		/*PYTHON SCRIPTS*/
+		
 		return true;
 	}
 
@@ -242,7 +285,7 @@ public class OurPlanner implements Creator  {
 
 			long learningStartTime = System.currentTimeMillis();
 
-			boolean isLearning = learnFromtraces(currentLeaderAgent);
+			boolean isLearning = learnFromTraces(currentLeaderAgent);
 
 			long learningFinishTime = System.currentTimeMillis();
 
@@ -273,7 +316,7 @@ public class OurPlanner implements Creator  {
 		return false;
 	}
 
-	private boolean learnFromtraces(String agentName) {
+	private boolean learnFromTraces(String agentName) {
 
 		LOGGER.info("Running learning algorithm");
 
@@ -414,7 +457,9 @@ public class OurPlanner implements Creator  {
 			String domainName = domainFileName.substring(0,domainFileName.lastIndexOf(".") );
 			String problemName = problemFileName.substring(0,problemFileName.lastIndexOf(".") );
 
-			String cmd = AGENT_PARSER_SCRIPT + " " + agentsFilePath + " " + domainName + " " + problemName;
+			String scriptPath = pythonScriptsPath + "/" + AGENT_PARSER_SCRIPT;
+
+			String cmd = scriptPath + " " + agentsFilePath + " " + domainName + " " + problemName;
 
 			LOGGER.info("Running: " + cmd);
 
@@ -521,9 +566,9 @@ public class OurPlanner implements Creator  {
 			}
 		}
 
-		File output = new File("output");		
+		File output = new File(OUTPUT_FILE_NAME);		
 		if(output.exists()) {
-			LOGGER.info("Deleting 'output' file");
+			LOGGER.info("Deleting " + OUTPUT_FILE_NAME + " file");
 			output.delete();
 		}
 

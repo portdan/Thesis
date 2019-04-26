@@ -1,11 +1,11 @@
-#! /usr/bin/env python
+#!/usr/bin/python3.5
 
 try:
     # Python 3.x
     import builtins
 except ImportError:
     # Python 2.x
-    import __builtin__ as builtins
+    import builtins as builtins
 
 import sys
 import os.path

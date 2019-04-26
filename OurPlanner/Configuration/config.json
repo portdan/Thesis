@@ -1,11 +1,18 @@
 {
-  "tracesDirPath": "./Input/Traces",
-  "domainFileName": "domain.pddl",
-  "problemFileName": "probLOGISTICS-4-0.pddl",
-  "groundedDirPath": "./Input/Grounded",
-  "localViewDirPath": "./Input/LocalView",
-  "numOfTracesToUse": 1000,
-  "agentsFilePath": "./Input/Agent/probLOGISTICS-4-0.agents",
-  "outputCopyDirPath": "/home/daniel/Desktop/log/probLOGISTICS-4-0/5. tests",
-  "testOutputCSVFilePath": "/home/daniel/Desktop/log/tests/output.csv"
+  "agentsFileName": "probLOGISTICS-6-0.agents", 
+  "agentsFilePath": "/home/daniel/Work/WorkSpace/Thesis/OurPlanner/Input/Agent", 
+  "domainFileName": "domain.pddl", 
+  "groundedDirPath": "/home/daniel/Work/WorkSpace/Thesis/OurPlanner/Input/Grounded", 
+  "localViewDirPath": "/home/daniel/Work/WorkSpace/Thesis/OurPlanner/Input/LocalView", 
+  "numOfTracesToUse": 1000, 
+  "outputCopyDirPath": "/home/daniel/Work/WorkSpace/Thesis/OurPlannerTester/Output/probLOGISTICS-6-0.pddl/OurPlanner", 
+  "outputDirPath": "/home/daniel/Work/WorkSpace/Thesis/OurPlanner/Output", 
+  "outputLearningDirPath": "/home/daniel/Work/WorkSpace/Thesis/OurPlanner/Output/Learning", 
+  "outputTempDirPath": "/home/daniel/Work/WorkSpace/Thesis/OurPlanner/Output/temp", 
+  "problemFileName": "probLOGISTICS-6-0.pddl", 
+  "pythonScriptsPath": "/home/daniel/Work/WorkSpace/Thesis/OurPlanner/Scripts", 
+  "sasFilePath": "/home/daniel/Work/WorkSpace/Thesis/OurPlanner/Output/output.sas", 
+  "testOutputCSVFilePath": "/home/daniel/Work/WorkSpace/Thesis/OurPlannerTester/Output/output.csv", 
+  "tracesDirPath": "/home/daniel/Work/WorkSpace/Thesis/OurPlanner/Input/Traces"
 }
+

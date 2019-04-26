@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 import cz.agents.dimaptools.model.Action;
@@ -34,7 +35,9 @@ public class TraceLearner {
 	public TraceLearner(List<String> agentList, String agentName ,File trajectoryFiles ,
 			File problemFiles , File localViewFiles ,String domainFileName ,String problemFileName, int numOfTracesToUse) {
 
-		LOGGER.info("TrajectoryLearner constructor");
+		LOGGER.setLevel(Level.INFO);
+
+		LOGGER.info("TraceLearner constructor");
 
 		this.agentName = new String(agentName);
 		this.agentList = agentList;

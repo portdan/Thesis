@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 import Model.*;
@@ -25,14 +26,14 @@ public class PlanVerifier {
 
 	private final static Logger LOGGER = Logger.getLogger(PlanVerifier.class);
 
-	private static final String TRANSLATOR = "./Scripts/translate/translate.py";
-	private static final String PREPROCESSOR = "./Scripts/preprocess/preprocess-runner";
-	private static final String CONVERTOR = "./Scripts/ma-pddl/ma-to-pddl.py";
+	private static final String TRANSLATOR = Globals.PYTHON_SCRIPTS_FOLDER + "/translate/translate.py";
+	private static final String PREPROCESSOR = Globals.PYTHON_SCRIPTS_FOLDER + "/preprocess/preprocess-runner";
+	private static final String CONVERTOR = Globals.PYTHON_SCRIPTS_FOLDER + "/ma-pddl/ma-to-pddl.py";
 
 	private static final String OUTPUT_FILE_NAME = Globals.PROCESSED_SAS_OUTPUT_FILE_PATH;
 	private static final String SAS_FILE_PATH = Globals.SAS_OUTPUT_FILE_PATH;
 	private static final String TEMP_DIR_PATH = Globals.TEMP_PATH;
-	
+
 	private String domainFileName = "";
 	private String problemFileName = "";
 	private String localViewPath = "";
@@ -50,6 +51,8 @@ public class PlanVerifier {
 
 	public PlanVerifier(List<String> agentList, String domainFileName,
 			String problemFileName,	String localViewPath) {
+
+		LOGGER.setLevel(Level.INFO);
 
 		LOGGER.info("PlanVerifier constructor");
 
@@ -188,10 +191,12 @@ public class PlanVerifier {
 			return null;
 		}
 
+		/* PREPROCESS NOT NEEDED
 		if(!runPreprocess()) {
 			LOGGER.info("Preprocess failure");
 			return null;
 		}
+		 */
 
 		File sasFile = new File(SAS_FILE_PATH);
 		if (!sasFile.exists()) {
@@ -248,7 +253,8 @@ public class PlanVerifier {
 		LOGGER.info("Translating to sas");
 
 		try {
-			String cmd = TRANSLATOR + " " + domainPath + " " + problemPath + " --ignore_unsolvable";
+			String cmd = TRANSLATOR + " " + domainPath + " " + problemPath + " " + SAS_FILE_PATH + " --ignore_unsolvable";			
+
 			LOGGER.info("RUN: " + cmd);
 			//			Process pr = Runtime.getRuntime().exec(cmd);
 			//			pr.waitFor();

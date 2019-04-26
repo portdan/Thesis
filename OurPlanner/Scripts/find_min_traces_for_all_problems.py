@@ -113,7 +113,7 @@ def test_range_traces(args, testing_traces, problemlist, range_start, range_end,
     else:
         range_step = (range_end-range_start) // range_split 
         
-    range_splited = range(range_start, range_end, range_step)
+    range_splited = list(range(range_start, range_end, range_step))
     
     if range_end not in range_splited:
         range_splited.append(range_end)
@@ -166,7 +166,7 @@ def main():
                                                 
     end = time.time() 
     
-    print("Done! (time - %0.4f" %(end - start)+")")
+    print(("Done! (time - %0.4f" %(end - start)+")"))
     
 
 def parse_args():

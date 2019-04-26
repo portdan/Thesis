@@ -1,7 +1,7 @@
-#! /usr/bin/env python
+#!/usr/bin/python3.5
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function
+
 
 import axiom_rules
 import instantiate
@@ -29,7 +29,7 @@ def strips_to_sas_dictionary(groups):
             dictionary.setdefault(atom, []).append((var_no, val_no))
     if USE_PARTIAL_ENCODING:
         assert all(len(sas_pairs) == 1
-                   for sas_pairs in dictionary.values())
+                   for sas_pairs in list(dictionary.values()))
     return [len(group) + 1 for group in groups], dictionary
 
 def translate_strips_conditions(conditions, dictionary, ranges):
@@ -144,13 +144,13 @@ def translate_strips_operator(operator, dictionary, ranges):
     assert not possible_add_conflict, "Conflicting add effects?"
 
     pre_post = []
-    for var, (post, eff_condition_lists) in effect.items():
+    for var, (post, eff_condition_lists) in list(effect.items()):
         pre = condition.get(var, -1)
         if pre != -1:
             del condition[var]
         for eff_condition in eff_condition_lists:
             pre_post.append((var, pre, post, eff_condition))
-    prevail = condition.items()
+    prevail = list(condition.items())
 
     return sas_tasks.SASOperator(operator.name, prevail, pre_post, operator.cost)
 
@@ -163,7 +163,7 @@ def translate_strips_axiom(axiom, dictionary, ranges):
         effect = (var, ranges[var] - 1)
     else:
         [effect] = dictionary[axiom.effect]
-    return sas_tasks.SASAxiom(condition.items(), effect)
+    return sas_tasks.SASAxiom(list(condition.items()), effect)
 
 def translate_strips_operators(actions, strips_to_sas, ranges):
     result = []
@@ -206,7 +206,7 @@ def translate_task(strips_to_sas, ranges, translation_key, mutex_key,
     axioms = translate_strips_axioms(axioms, strips_to_sas, ranges)
 
     axiom_layers = [-1] * len(ranges)
-    for atom, layer in axiom_layer_dict.items():
+    for atom, layer in list(axiom_layer_dict.items()):
         assert layer >= 0
         [(var, val)] = strips_to_sas[atom]
         axiom_layers[var] = layer

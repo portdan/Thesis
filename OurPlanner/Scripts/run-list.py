@@ -65,14 +65,14 @@ def main():
                                args.outputtest
                                ]
                 
-                print(', '.join(processList))
+                print((', '.join(processList)))
                     
                 process = subprocess.Popen(processList)
                 process.wait()                
                                                 
     end = time.time() 
     
-    print("Done! (time - %0.4f" %(end - start)+")")
+    print(("Done! (time - %0.4f" %(end - start)+")"))
     
 
 def parse_args():

@@ -1,7 +1,7 @@
-#! /usr/bin/env python
+#!/usr/bin/python3.5
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function
+
 
 import sys
 import itertools
@@ -273,7 +273,7 @@ class MatchGenerator:
             print("%sargs[%s] == %s:" % (indent, self.index, key))
             self.match_generator[key].dump(indent + "    ")
         if not self.next.empty():
-            assert isinstance(self.next, MatchGenerator)
+            assert isinstance(self.__next__, MatchGenerator)
             print("%s[*]" % indent)
             self.next.dump(indent + "    ")
 
@@ -304,7 +304,7 @@ def compute_model(prog):
     with timers.timing("Preparing model"):
         rules = convert_rules(prog)
         unifier = Unifier(rules)
-        unifier.dump()
+        # unifier.dump()
         fact_atoms = sorted(fact.atom for fact in prog.facts)
         queue = Queue(fact_atoms)
 

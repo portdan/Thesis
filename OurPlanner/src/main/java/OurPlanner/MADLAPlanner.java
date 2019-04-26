@@ -14,6 +14,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 import Model.IPCOutputExecutor;
@@ -37,9 +38,9 @@ public class MADLAPlanner {
 
 	private final static Logger LOGGER = Logger.getLogger(MADLAPlanner.class);
 
-	private static final String TRANSLATOR = "./Scripts/translate/translate.py";
-	private static final String PREPROCESSOR = "./Scripts/preprocess/preprocess-runner";
-	private static final String CONVERTOR = "./Scripts/ma-pddl/ma-to-pddl.py";
+	private static final String TRANSLATOR = Globals.PYTHON_SCRIPTS_FOLDER + "/translate/translate.py";
+	private static final String PREPROCESSOR = Globals.PYTHON_SCRIPTS_FOLDER + "/preprocess/preprocess-runner";
+	private static final String CONVERTOR = Globals.PYTHON_SCRIPTS_FOLDER + "/ma-pddl/ma-to-pddl.py";
 
 	private static final String OUTPUT_CSV_PATH = Globals.OUTPUT_PATH + "/out.csv";
 	private static final String OUTPUT_PLAN_PATH = Globals.OUTPUT_PATH + "/out.plan";
@@ -78,6 +79,8 @@ public class MADLAPlanner {
 	public MADLAPlanner(String domainFileName, String problemFileName, String agentFileName, 
 			String heuristic , int recursionLevel, double timeLimitMin, List<String> agentNames,
 			String planninAagentName ) {
+
+		LOGGER.setLevel(Level.INFO);
 
 		LOGGER.info("MADLAPlanner constructor (not from .sas)");
 
@@ -184,10 +187,12 @@ public class MADLAPlanner {
 				return null;
 			}
 
+			/* PREPROCESS NOT NEEDED
 			if(!runPreprocess()) {
 				LOGGER.info("Preprocess failure");
 				return null;
 			}
+			 */
 		}
 
 		File sasFile = new File(sasFileName);
@@ -270,7 +275,8 @@ public class MADLAPlanner {
 		LOGGER.info("Translating to sas");
 
 		try {
-			String cmd = TRANSLATOR + " " + domainFileName + " " + problemFileName;
+			String cmd = TRANSLATOR + " " + domainFileName + " " + problemFileName + " " + SAS_FILE_PATH;
+
 			LOGGER.info("RUN: " + cmd);
 
 			//			Process pr = Runtime.getRuntime().exec(cmd);

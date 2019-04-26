@@ -1,7 +1,7 @@
-#! /usr/bin/env python
+#!/usr/bin/python3.5
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function
+
 
 import sys
 
@@ -17,6 +17,7 @@ import argparse
 from collections import defaultdict
 from copy import deepcopy
 from itertools import product
+import os
 
 import axiom_rules
 import fact_groups
@@ -60,7 +61,7 @@ def strips_to_sas_dictionary(groups, assert_partial):
             dictionary.setdefault(atom, []).append((var_no, val_no))
     if assert_partial:
         assert all(len(sas_pairs) == 1
-                   for sas_pairs in dictionary.values())
+                   for sas_pairs in list(dictionary.values()))
     return [len(group) + 1 for group in groups], dictionary
 
 
@@ -134,12 +135,12 @@ def translate_strips_conditions_aux(conditions, dictionary, ranges):
                 # this atom. So we need to introduce a new condition:
                 # We can select any from new_condition and currently prefer the
                 # smallest one.
-                candidates = sorted(new_condition.items(), key=number_of_values)
+                candidates = sorted(list(new_condition.items()), key=number_of_values)
                 var, vals = candidates[0]
                 condition[var] = vals
 
         def multiply_out(condition):  # destroys the input
-            sorted_conds = sorted(condition.items(), key=number_of_values)
+            sorted_conds = sorted(list(condition.items()), key=number_of_values)
             flat_conds = [{}]
             for var, vals in sorted_conds:
                 if len(vals) == 1:
@@ -242,7 +243,7 @@ def translate_strips_operator_aux(operator, dictionary, ranges, mutex_dict,
         if no_add_effect_condition is None:  # there is always an add effect
             continue
         none_of_those = ranges[var] - 1
-        for val, conds in del_effects_by_variable[var].items():
+        for val, conds in list(del_effects_by_variable[var].items()):
             for cond in conds:
                 # add guard
                 if var in cond and cond[var] != val:
@@ -261,7 +262,7 @@ def translate_strips_operator_aux(operator, dictionary, ranges, mutex_dict,
                     # to re-compute no_add_effect_condition for every delete
                     # effect and to unfold the product(*condition) in
                     # negate_and_translate_condition to allow an early break.
-                    for cvar, cval in no_add_cond.items():
+                    for cvar, cval in list(no_add_cond.items()):
                         if cvar in new_cond and new_cond[cvar] != cval:
                             # the del effect condition plus the deleted atom
                             # imply that some add effect on the variable
@@ -279,13 +280,13 @@ def build_sas_operator(name, condition, effects_by_variable, cost, ranges,
                        implied_facts):
     if ADD_IMPLIED_PRECONDITIONS:
         implied_precondition = set()
-        for fact in condition.items():
+        for fact in list(condition.items()):
             implied_precondition.update(implied_facts[fact])
 
     pre_post = []
     for var in effects_by_variable:
         orig_pre = condition.get(var, -1)
-        for post, eff_conditions in effects_by_variable[var].items():
+        for post, eff_conditions in list(effects_by_variable[var].items()):
             pre = orig_pre
             # if the effect does not change the variable value, we ignore it
             if pre == post:
@@ -362,7 +363,7 @@ def translate_strips_axiom(axiom, dictionary, ranges, mutex_dict, mutex_ranges):
         [effect] = dictionary[axiom.effect]
     axioms = []
     for condition in conditions:
-        axioms.append(sas_tasks.SASAxiom(condition.items(), effect))
+        axioms.append(sas_tasks.SASAxiom(list(condition.items()), effect))
     return axioms
 
 
@@ -408,7 +409,7 @@ def dump_task(init, goals, actions, axioms, axiom_layer_dict):
             axiom.dump()
         print()
         print("Axiom layers")
-        for atom, layer in axiom_layer_dict.items():
+        for atom, layer in list(axiom_layer_dict.items()):
             print("%s: layer %d" % (atom, layer))
     sys.stdout = old_stdout
 
@@ -427,7 +428,7 @@ def translate_task(strips_to_sas, ranges, translation_key,
 
     if DUMP_TASK:
         # Remove init facts that don't occur in strips_to_sas: they're constant.
-        nonconstant_init = filter(strips_to_sas.get, init)
+        nonconstant_init = list(filter(strips_to_sas.get, init))
         dump_task(nonconstant_init, goals, actions, axioms, axiom_layer_dict)
 
     init_values = [rang - 1 for rang in ranges]
@@ -465,7 +466,7 @@ def translate_task(strips_to_sas, ranges, translation_key,
                                      mutex_ranges)
 
     axiom_layers = [-1] * len(ranges)
-    for atom, layer in axiom_layer_dict.items():
+    for atom, layer in list(axiom_layer_dict.items()):
         assert layer >= 0
         [(var, val)] = strips_to_sas[atom]
         axiom_layers[var] = layer
@@ -643,6 +644,8 @@ def parse_args():
     argparser.add_argument(
         "task", help="path to task pddl file")
     argparser.add_argument(
+        "output", help="path to output file")
+    argparser.add_argument(
         "--relaxed", dest="generate_relaxed_task", action="store_true",
         help="output relaxed task (no delete effects)")
     argparser.add_argument(
@@ -671,10 +674,11 @@ def main():
     sas_task = pddl_to_sas(task, args.ignore_unsolvable_solution)
     dump_statistics(sas_task)
 
-    output_file_name = "output.sas";
+    output_file_name = args.output #"output.sas";
 
     with timers.timing("Writing output"):
         with open(output_file_name, "w") as output_file:
+            print("output file location: %s" % output_file.name)
             if sas_task.solvable:
                 sas_task.output(output_file)
             else:

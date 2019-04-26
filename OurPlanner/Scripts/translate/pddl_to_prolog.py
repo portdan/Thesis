@@ -1,6 +1,6 @@
-#! /usr/bin/env python
+#!/usr/bin/python3.5
 
-from __future__ import print_function
+
 
 import itertools
 

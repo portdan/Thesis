@@ -1,4 +1,4 @@
-#!/usr/bin/python2.7
+#!/usr/bin/python3.5
 
 import sys
 import os
@@ -24,7 +24,7 @@ def parse_agents_types(agent_file,domain_name,problem_name):
         pfile_array = get_file_as_array(afile)
     # Deal with front/end define, problem, :domain
     if pfile_array[0:4] != ['(', 'define', '(', 'problem']:
-        print 'PARSING ERROR: Expected (define (problem ... at start of agents file'
+        print('PARSING ERROR: Expected (define (problem ... at start of agents file')
         sys.exit(1)
     problem = pfile_array[4]
     '''
@@ -33,7 +33,7 @@ def parse_agents_types(agent_file,domain_name,problem_name):
         sys.exit(1)
     '''
     if pfile_array[5:8] != [')', '(', ':domain']:
-        print 'PARSING ERROR: Expected (:domain ...) after (define (problem ...)'
+        print('PARSING ERROR: Expected (:domain ...) after (define (problem ...)')
         sys.exit(1)
     domain = pfile_array[8]
     '''
@@ -42,7 +42,7 @@ def parse_agents_types(agent_file,domain_name,problem_name):
         sys.exit(1)
     '''
     if pfile_array[9] != ')':
-        print 'PARSING ERROR: Expected end of domain declaration'
+        print('PARSING ERROR: Expected end of domain declaration')
         sys.exit(1)
         
     pfile_array = pfile_array[10:-1]
@@ -66,8 +66,8 @@ def parse_agents_types(agent_file,domain_name,problem_name):
             opencounter -= 1
         elif word.startswith(':'):
             if word[1:] not in AFILE_KEYWORDS:
-                print 'PARSING ERROR: Unknown keyword: ' + word[1:]
-                print 'Known keywords: ' + str(AFILE_KEYWORDS)
+                print('PARSING ERROR: Unknown keyword: ' + word[1:])
+                print('Known keywords: ' + str(AFILE_KEYWORDS))
             else:
                 keyword = word[1:]
     

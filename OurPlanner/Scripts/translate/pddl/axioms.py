@@ -1,4 +1,4 @@
-from __future__ import print_function
+
 
 from . import conditions
 
@@ -16,7 +16,7 @@ class Axiom(object):
         self.uniquify_variables()
 
     def dump(self):
-        args = map(str, self.parameters[:self.num_external_parameters])
+        args = list(map(str, self.parameters[:self.num_external_parameters]))
         print("Axiom %s(%s)" % (self.name, ", ".join(args)))
         self.condition.dump()
 

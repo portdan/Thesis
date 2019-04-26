@@ -7,6 +7,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.concurrent.Semaphore;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 public class ExecCommand {
@@ -91,6 +92,9 @@ public class ExecCommand {
 	}
 
 	public ExecCommand(String command, String input) {
+		
+		LOGGER.setLevel(Level.INFO);
+
 		try {
 			p = Runtime.getRuntime().exec(makeArray(command));
 			new InputWriter(input).start();
@@ -105,6 +109,9 @@ public class ExecCommand {
 	}
 
 	public ExecCommand(String command) {
+		
+		LOGGER.setLevel(Level.INFO);
+
 		try {
 			p = Runtime.getRuntime().exec(makeArray(command));
 			new OutputReader().start();

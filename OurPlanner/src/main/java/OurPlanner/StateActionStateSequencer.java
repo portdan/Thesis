@@ -12,6 +12,7 @@ import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 import Model.SASDomain;
@@ -27,11 +28,12 @@ public class StateActionStateSequencer {
 
 	private final static Logger LOGGER = Logger.getLogger(StateActionStateSequencer.class);
 
-	private static final String TRANSLATOR = "./Scripts/translate/translate.py";
-	private static final String PREPROCESSOR = "./Scripts/preprocess/preprocess-runner";
-	private static final String CONVERTOR = "./Scripts/ma-pddl/ma-to-pddl.py";
+	private static final String TRANSLATOR = Globals.PYTHON_SCRIPTS_FOLDER + "/translate/translate.py";
+	private static final String PREPROCESSOR = Globals.PYTHON_SCRIPTS_FOLDER + "/preprocess/preprocess-runner";
+	private static final String CONVERTOR = Globals.PYTHON_SCRIPTS_FOLDER + "/ma-pddl/ma-to-pddl.py";
 
 	private static final String SAS_FILE_PATH = Globals.SAS_OUTPUT_FILE_PATH;
+	private static final String OUTPUT_FILE_NAME = Globals.PROCESSED_SAS_OUTPUT_FILE_PATH;
 	private static final String TEMP_DIR_PATH = Globals.TEMP_PATH;
 
 	private List<String> agentList = null;
@@ -49,6 +51,8 @@ public class StateActionStateSequencer {
 
 	public StateActionStateSequencer(List<String> agentList, File problemFiles, 
 			String domainFileName, String problemFileName, File trajectoryFiles ) {
+
+		LOGGER.setLevel(Level.INFO);
 
 		LOGGER.info("StateActionStateSequencer constructor");
 
@@ -223,11 +227,13 @@ public class StateActionStateSequencer {
 			return null;
 		}
 
+		/* PREPROCESS NOT NEEDED
 		if(!runPreprocess()) {
 			LOGGER.info("Preprocess failure");
 			return null;
 		}
-
+		 */
+		
 		File sasFile = new File(sasFileName);
 		if (!sasFile.exists()) {
 			LOGGER.info("SAS file " + sasFileName + " does not exist!");
@@ -283,7 +289,8 @@ public class StateActionStateSequencer {
 		LOGGER.info("Translating to sas");
 
 		try {
-			String cmd = TRANSLATOR + " " + convertedDomainPath + " " + convertedProblemPath + " --ignore_unsolvable";
+			String cmd = TRANSLATOR + " " + convertedDomainPath + " " + convertedProblemPath + " " + SAS_FILE_PATH + " --ignore_unsolvable";
+
 			LOGGER.info("RUN: " + cmd);
 			//			Process pr = Runtime.getRuntime().exec(cmd);
 			//			pr.waitFor();
@@ -303,11 +310,9 @@ public class StateActionStateSequencer {
 		//			return false;
 		//		}
 
-		String sasFileName = "output.sas";
+		try (FileReader fr = new FileReader(SAS_FILE_PATH)) {
 
-		try (FileReader fr = new FileReader(sasFileName)) {
-
-			File f = new File(sasFileName);
+			File f = new File(SAS_FILE_PATH);
 
 			BufferedReader br = new BufferedReader(fr);
 
@@ -455,15 +460,15 @@ public class StateActionStateSequencer {
 			}
 		}
 
-		File output = new File("output");		
+		File output = new File(OUTPUT_FILE_NAME);		
 		if(output.exists()) {
-			LOGGER.info("Deleting 'output' file");
+			LOGGER.info("Deleting " + OUTPUT_FILE_NAME + " file");
 			output.delete();
 		}
 
-		File outputSAS = new File("output.sas");		
+		File outputSAS = new File(SAS_FILE_PATH);		
 		if(outputSAS.exists()) {
-			LOGGER.info("Deleting 'output.sas' file");
+			LOGGER.info("Deleting " + SAS_FILE_PATH + " file");
 			outputSAS.delete();
 		}
 	}

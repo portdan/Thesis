@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 import Model.SASDomain;
@@ -23,9 +24,9 @@ public class DeleteEffectGenerator {
 
 	private final static Logger LOGGER = Logger.getLogger(DeleteEffectGenerator.class);
 
-	private static final String TRANSLATOR = "./Scripts/translate/translate.py";
-	private static final String PREPROCESSOR = "./Scripts/preprocess/preprocess-runner";
-	private static final String CONVERTOR = "./Scripts/ma-pddl/ma-to-pddl.py";
+	private static final String TRANSLATOR = Globals.PYTHON_SCRIPTS_FOLDER + "/translate/translate.py";
+	private static final String PREPROCESSOR = Globals.PYTHON_SCRIPTS_FOLDER + "/preprocess/preprocess-runner";
+	private static final String CONVERTOR = Globals.PYTHON_SCRIPTS_FOLDER + "/ma-pddl/ma-to-pddl.py";
 
 	private static final String TEMP_DIR_PATH = Globals.TEMP_PATH;
 	private static final String SAS_FILE_PATH = Globals.SAS_OUTPUT_FILE_PATH;
@@ -37,10 +38,12 @@ public class DeleteEffectGenerator {
 	private File problemFiles = null;
 
 	private boolean sasSolvable = false;
-	
+
 	private Problem problem = null;
 
 	public DeleteEffectGenerator(File problemFiles,String domainFileName, String problemFileName) {
+
+		LOGGER.setLevel(Level.INFO);
 
 		LOGGER.info("DeleteEffectGenerator constructor");
 
@@ -49,7 +52,7 @@ public class DeleteEffectGenerator {
 		this.problemFileName = new String(problemFileName);
 
 		logInput();
-		
+
 		String domainPath = problemFiles.getPath() + "/" + domainFileName;
 		String problemPath = problemFiles.getPath() + "/" + problemFileName;
 
@@ -168,10 +171,12 @@ public class DeleteEffectGenerator {
 			return null;
 		}
 
+		/* PREPROCESS NOT NEEDED
 		if(!runPreprocess()) {
 			LOGGER.info("Preprocess failure");
 			return null;
 		}
+		 */
 
 		File sasFile = new File(SAS_FILE_PATH);
 		if (!sasFile.exists()) {
@@ -228,7 +233,7 @@ public class DeleteEffectGenerator {
 		LOGGER.info("Translating to sas");
 
 		try {
-			String cmd = TRANSLATOR + " " + convertedDomainPath + " " + convertedProblemPath + " --ignore_unsolvable";
+			String cmd = TRANSLATOR + " " + convertedDomainPath + " " + convertedProblemPath + " " + SAS_FILE_PATH + " --ignore_unsolvable";
 			LOGGER.info("RUN: " + cmd);
 			//			Process pr = Runtime.getRuntime().exec(cmd);
 			//			pr.waitFor();

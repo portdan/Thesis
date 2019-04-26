@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 public class TestDataAccumulator {
@@ -41,6 +42,9 @@ public class TestDataAccumulator {
 
 
 	private TestDataAccumulator(String domain, String problem, List<String> agentNames){
+		
+		LOGGER.setLevel(Level.INFO);
+
 		this.domain = domain;
 		this.problem = problem;
 		this.agentNames = new ArrayList<String>(agentNames);
