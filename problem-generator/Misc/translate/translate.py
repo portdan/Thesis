@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#!/usr/bin/python3.5
 # -*- coding: utf-8 -*-
 
 
@@ -17,6 +17,7 @@ import argparse
 from collections import defaultdict
 from copy import deepcopy
 from itertools import product
+import os
 
 import axiom_rules
 import fact_groups
@@ -642,6 +643,8 @@ def parse_args():
     argparser.add_argument(
         "task", help="path to task pddl file")
     argparser.add_argument(
+        "output", help="path to output file")
+    argparser.add_argument(
         "--relaxed", dest="generate_relaxed_task", action="store_true",
         help="output relaxed task (no delete effects)")
     return argparser.parse_args()
@@ -666,9 +669,12 @@ def main():
 
     sas_task = pddl_to_sas(task)
     dump_statistics(sas_task)
+    
+    output_file_name = args.output #"output.sas";
 
     with timers.timing("Writing output"):
-        with open("output.sas", "w") as output_file:
+        with open(output_file_name, "w") as output_file:
+            print("output file location: %s" % output_file.name)
             sas_task.output(output_file)
     print("Done! %s" % timer)
 

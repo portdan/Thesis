@@ -176,7 +176,7 @@ public class StateActionStateGenerator implements Creator {
 
 		SASGenerator sasGenerator = new SASGenerator();
 
-		String TracesFolder = tracesDirPath + "/" + problemFileName;
+		String TracesFolder = tracesDirPath;
 
 		sasGenerator.generateFile(TracesFolder,problemFileName + "_Traces");
 
@@ -212,6 +212,8 @@ public class StateActionStateGenerator implements Creator {
 		sasGenerator.close();
 
 		delelteTemporaryFiles();
+		
+		deleteSasFile();
 	}
 
 
@@ -284,11 +286,11 @@ public class StateActionStateGenerator implements Creator {
 
 			String scriptPath = pythonScriptsPath + "/" + TRANSLATOR;
 
-			String cmd = scriptPath + " " + domainFilePath + " " + problemFilePath;
+			String cmd = scriptPath + " " + domainFilePath + " " + problemFilePath + " " + sasFilePath;
 			
 			LOGGER.info("RUN: " + cmd);
 			
-			ProcessBuilder pb = new ProcessBuilder(scriptPath, domainFilePath, problemFilePath);
+			ProcessBuilder pb = new ProcessBuilder(scriptPath, domainFilePath, problemFilePath, sasFilePath);
             pb.redirectOutput(Redirect.INHERIT);
             
             Process pr = pb.start();
@@ -353,5 +355,19 @@ public class StateActionStateGenerator implements Creator {
 
 		return true;
 	}
+	
+	private boolean deleteSasFile() {
+
+		LOGGER.info("Deleting temporary files");
+
+		File outputSAS = new File(sasFilePath);		
+		if(outputSAS.exists()) {
+			LOGGER.info("Deleting "+ sasFilePath +" file");
+			outputSAS.delete();
+		}
+
+		return true;
+	}
+
 
 }

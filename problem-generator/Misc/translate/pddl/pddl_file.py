@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#!/usr/bin/python3.5
 
 try:
     # Python 3.x

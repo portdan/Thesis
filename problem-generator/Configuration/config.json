@@ -1,1 +1,11 @@
-{"domainFilePath": "/home/daniel/Work/WorkSpace/Thesis/problem-generator/Input/domain.pddl", "numOfTracesToGenerate": 1000, "numOfRandomWalkSteps": 100, "sasFilePath": "/home/daniel/Work/WorkSpace/Thesis/problem-generator/output.sas", "pythonScriptsPath": "/home/daniel/Work/WorkSpace/Thesis/problem-generator/Misc", "problemFilePath": "/home/daniel/Work/WorkSpace/Thesis/problem-generator/Input/probLOGISTICS-6-0.pddl", "tempDirPath": "/home/daniel/Work/WorkSpace/Thesis/problem-generator/Output/Temp", "tracesDirPath": "/home/daniel/Work/WorkSpace/Thesis/problem-generator/Output/Traces"}
+{
+  "domainFilePath": "/home/daniel/Work/WorkSpace/Thesis/problem-generator/Input/domain.pddl", 
+  "numOfRandomWalkSteps": 100, 
+  "numOfTracesToGenerate": 1000, 
+  "problemFilePath": "/home/daniel/Work/WorkSpace/Thesis/problem-generator/Input/probLOGISTICS-6-0.pddl", 
+  "pythonScriptsPath": "/home/daniel/Work/WorkSpace/Thesis/problem-generator/Misc", 
+  "sasFilePath": "/home/daniel/Work/WorkSpace/Thesis/problem-generator/Output/output.sas", 
+  "tempDirPath": "/home/daniel/Work/WorkSpace/Thesis/problem-generator/Output/Temp", 
+  "tracesDirPath": "/home/daniel/Work/WorkSpace/Thesis/problem-generator/Output/Traces"
+}
+
