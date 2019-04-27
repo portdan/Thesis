@@ -19,14 +19,16 @@ class Generator(object):
     classdocs
     '''
 
-    def __init__(self, config):
+    def __init__(self, config, log_output=False):
         '''
         Constructor
         '''
         self.config = config
         self.generator_output_traces_folder = None
+        self.log_output = log_output
         
-    def prepere_to_generate(self, grounded_output_path, problem_name):
+        
+    def prepere_to_generate(self, grounded_output_path, problem_name, num_of_traces_to_generate):
      
         logger.info("prepere_to_generate")
            
@@ -47,6 +49,7 @@ class Generator(object):
             
         generator_config.domainFilePath = domain_file_path_input
         generator_config.problemFilePath = problem_file_path_input
+        generator_config.numOfTracesToGenerate = num_of_traces_to_generate
         
         self.generator_output_traces_folder = generator_config.tracesDirPath
         
@@ -70,7 +73,8 @@ class Generator(object):
         process = subprocess.Popen(processList, stdout=subprocess.PIPE)
         out, err = process.communicate()
         
-        logger.info(str(out.decode('utf-8')))
+        if self.log_output:
+            logger.info(str(out.decode('utf-8')))
 
     def copy_generation_output(self, problem_name):
 
@@ -91,11 +95,11 @@ class Generator(object):
         clear_directory(self.config.problemGeneratorInput)
         clear_directory(self.config.problemGeneratorOutput)
         
-    def generate_problems_and_traces(self, grounded_output_path, problem_name):
+    def generate_problems_and_traces(self, grounded_output_path, problem_name, num_of_traces_to_generate):
         
         logger.info("generate_problems_and_traces")
         
-        self.prepere_to_generate(grounded_output_path, problem_name)
+        self.prepere_to_generate(grounded_output_path, problem_name, num_of_traces_to_generate)
         
         self.run_generation()   
         

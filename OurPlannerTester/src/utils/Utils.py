@@ -21,7 +21,7 @@ def clear_directory(dirpath, delete=False):
         
 def copy_tree(src, dst, symlinks=False, ignore=None):
     
-    logger.info("copy_treedirectory : " + src + " to " + dst)
+    logger.info("copy_tree directory : " + src + " to " + dst)
 
     for item in os.listdir(src):
         s = os.path.join(src, item)

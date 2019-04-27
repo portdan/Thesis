@@ -8,17 +8,27 @@ class TesterConfigProblem(object):
     '''
     classdocs
     '''
-    def __init__(self, problemName: str, maxTracesToUse: int, minTracesToUse : int):
+    def __init__(self, problemName: str, maxTracesToUse: int, minTracesToUse : int, 
+                 solvedRangeSplit : int, unsolvedRangeSplit : int):
         '''
         Constructor
         '''
         self.problemName = problemName
         self.maxTracesToUse = maxTracesToUse
-        self.minTracesToUse = minTracesToUse  
+        self.minTracesToUse = minTracesToUse 
+        self.solvedRangeSplit = solvedRangeSplit
+        self.unsolvedRangeSplit = unsolvedRangeSplit 
         
     def __str__(self):
-        phrase1 = "\tProblem Name: " + str(self.problemName) + "\n" 
-        phrase2 = "\tMax Traces To Use: " + str(self.maxTracesToUse) + "\n"
-        phrase3 = "\tMin Traces To Use: " + str(self.minTracesToUse) + "\n"
         
-        return str(phrase1+phrase2+phrase3)
+        res = ""
+        phrases = []
+        
+        phrases.append("\tProblem Name: " + str(self.problemName) + "\n")
+        phrases.append("\tMax Traces To Use: " + str(self.maxTracesToUse) + "\n")
+        phrases.append("\tMin Traces To Use: " + str(self.minTracesToUse) + "\n")
+        
+        for s in phrases:
+            res += s
+        
+        return res

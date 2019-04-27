@@ -19,7 +19,7 @@ class Grounder(object):
     classdocs
     '''
 
-    def __init__(self, config):
+    def __init__(self, config, log_output=False):
         '''
         Constructor
         '''
@@ -28,6 +28,7 @@ class Grounder(object):
         self.grounded_output_path = None
         self.agent_output_path = None
         self.localView_output_path = None
+        self.log_output = log_output
     
     
     def prepere_to_ground(self, domain_file_path, problem_file_path):
@@ -74,7 +75,8 @@ class Grounder(object):
         process = subprocess.Popen(processList, stdout=subprocess.PIPE)
         out, err = process.communicate()
         
-        logger.info(str(out.decode('utf-8')))
+        if self.log_output:
+            logger.info(str(out.decode('utf-8')))
 
     def copy_generation_output(self, problem_name):
 

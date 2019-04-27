@@ -7,6 +7,7 @@ Created on Apr 25, 2019
 import pyckson
 import subprocess
 import shutil
+import csv
 
 from configuration import PlannerConfig
 from utils.Utils import clear_directory,copy_tree
@@ -20,15 +21,17 @@ class Planner(object):
     classdocs
     '''
 
-    def __init__(self, config):
+    def __init__(self, config, log_output=False):
         '''
         Constructor
         '''
         
         self.config = config
         self.planner_output_folder = None
-
-    
+        self.test_output_CSV_file_path = None
+        self.tested_amounts = None
+        self.log_output = log_output
+        
 
     def preprocess_runner_script_write(self, planner_config):
         
@@ -63,6 +66,8 @@ class Planner(object):
         with open(self.config.problemPlannerConfig, 'r') as plannerConfigJson:
             planner_config = pyckson.load(PlannerConfig, plannerConfigJson)
             
+        self.test_output_CSV_file_path = planner_config.testOutputCSVFilePath
+            
         self.preprocess_runner_script_write(planner_config)
             
         planner_config.domainFileName = self.config.domainName
@@ -95,7 +100,8 @@ class Planner(object):
         process = subprocess.Popen(processList, stdout=subprocess.PIPE)
         out, err = process.communicate()
         
-        logger.info(str(out.decode('utf-8')))
+        if self.log_output:
+            logger.info(str(out.decode('utf-8')))
         
         
     def delete_output(self):
@@ -109,3 +115,75 @@ class Planner(object):
         self.prepere_to_plan(problem_name, num_of_traces_to_use)
         
         self.run_planning()   
+        
+        self.delete_output()
+        
+    def plan_range_traces(self,problem_name, range_start, range_end, range_split):
+    
+        if (range_end-range_start) < range_split:
+            range_step = 1
+        else:
+            range_step = (range_end-range_start) // range_split 
+            
+        range_splited = list(range(range_start, range_end, range_step))
+        
+        if range_end not in range_splited:
+            range_splited.append(range_end)
+        
+        # test between 0 - solved_threshold
+        
+        for traces_amount in range_splited:
+            if traces_amount not in self.tested_amounts:    
+                self.plan(problem_name, traces_amount)
+
+        
+    def search_solved_threshold(self, problem_name, min_traces, max_traces):
+           
+        logger.info("search_solved_threshold")
+        
+        self.tested_amounts = []
+                
+        while min_traces < max_traces:
+            
+            solved_counter = 0
+            timeout_counter = 0
+    
+            current_traces_amount = (min_traces + max_traces) // 2
+                        
+            self.plan(problem_name, current_traces_amount)
+            agents, solved, timeout = self.get_ourplanner_results(self.test_output_CSV_file_path)
+            
+            solved_counter += solved
+            timeout_counter += timeout
+            
+            self.tested_amounts.append(current_traces_amount)
+            
+            if solved_counter >= 1:
+                max_traces = current_traces_amount - 1
+            else:
+                min_traces = current_traces_amount + 1
+                
+        return min_traces  
+    
+    def get_ourplanner_results(self, test_csv):
+    
+        solved = 0
+        timeout = 0
+        agents = 0
+        
+        with open(test_csv, "rt" ) as outputCSV:
+            reader = csv.reader(outputCSV)
+            
+            header = next(reader, None)
+            solved_index = header.index("Solved")
+            timeout_index = header.index("Timeout")
+            agents_index = header.index("Agents")
+    
+            for row in reader:
+                last = row
+                
+            solved = int(last[solved_index])
+            timeout = int(last[timeout_index])
+            agents = int(last[agents_index])
+            
+        return agents, solved, timeout

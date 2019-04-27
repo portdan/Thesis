@@ -50,25 +50,6 @@ def load_testing_configuration(args):
         config = pyckson.load(TesterConfig, configJsonFile)
         logger.info("configuration file:\n" + str(config))
         return config
-    
-def generate_testing_list(config):
-    
-    logger.info("generate_testing_list")
-
-    res = []
-    
-    domain_path = config.domainPath + '/' + config.domainName
-    
-    log = "testing list:\n"
-    for problem in config.problems:
-        
-        problem_file_path = config.problemsPath + '/' + problem.problemName
-        r = (problem.problemName , problem_file_path)
-        log += str(r) + "\n"
-        res.append(r)
-                 
-    logger.info(log)  
-    return domain_path, res
 
 def generate_test_output_folder(domain_file_path, problem_name, problem_file_path, config):
 
@@ -94,29 +75,40 @@ def generate_test_output_folder(domain_file_path, problem_name, problem_file_pat
     shutil.copy2(problem_file_path, origin_dst )
 
 
-def run_tests(config, origin_domain_file_path, origin_problem_path_list):
+def run_tests(config):
     
     logger.info("run_tests")
 
-    clear_directory(config.outputDestination)
+    #clear_directory(config.outputDestination)
     
-    grounder = Grounder(config)
-    generator = Generator(config)
-    planner = Planner(config)
+    origin_domain_file_path = config.domainPath + '/' + config.domainName
+    
+    logger.info("origin_domain_file_path : " + str(origin_domain_file_path))
+    
+    grounder = Grounder(config, log_output=False)
+    generator = Generator(config, log_output=False)
+    planner = Planner(config, log_output=False)
 
-    for problem_name, problem_file_path in origin_problem_path_list:
-        num_of_traces_to_use = 1000
-        generate_test_output_folder(origin_domain_file_path, problem_name, problem_file_path, config)
+    for problem in config.problems:
         
-        grounder.ground_problem(origin_domain_file_path, problem_name ,problem_file_path)
+        problem_file_path = config.problemsPath + '/' + problem.problemName
         
-        generator.generate_problems_and_traces(grounder.grounded_output_path, problem_name)
+        logger.info("problem_file_path : " + str(problem_file_path))
+
+        generate_test_output_folder(origin_domain_file_path, problem.problemName, problem_file_path, config)
         
-        planner.plan(problem_name, num_of_traces_to_use)
+        grounder.ground_problem(origin_domain_file_path, problem.problemName ,problem_file_path)
+        
+        generator.generate_problems_and_traces(grounder.grounded_output_path, problem.problemName, problem.maxTracesToUse)
+        
+        solved_threshold = planner.search_solved_threshold(problem.problemName, problem.minTracesToUse, problem.maxTracesToUse)
+        
+        planner.plan_range_traces(problem.problemName, 0, solved_threshold -1, problem.unsolvedRangeSplit)
+         
+        planner.plan_range_traces(problem.problemName, solved_threshold, problem.maxTracesToUse, problem.solvedRangeSplit)        
         
         grounder.delete_output()
         generator.delete_output()
-        planner.delete_output()
       
 def main():
     
@@ -125,10 +117,8 @@ def main():
     args = parse_args()
     
     config = load_testing_configuration(args)
-    
-    origin_domain_file_path, origin_problem_path_list = generate_testing_list(config) 
-    
-    run_tests(config, origin_domain_file_path, origin_problem_path_list)
+        
+    run_tests(config)
     
     end = time.time() 
         
