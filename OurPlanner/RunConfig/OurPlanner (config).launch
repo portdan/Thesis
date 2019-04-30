@@ -12,4 +12,5 @@
     <stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="OurPlanner.OurPlanner ./Configuration/config.json"/>
     <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="OurPlanner"/>
     <stringAttribute key="org.eclipse.jdt.launching.SOURCE_PATH_PROVIDER" value="org.eclipse.m2e.launchconfig.sourcepathProvider"/>
+    <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Xmx10G"/>
 </launchConfiguration>
