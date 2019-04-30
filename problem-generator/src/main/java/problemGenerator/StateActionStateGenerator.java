@@ -208,6 +208,8 @@ public class StateActionStateGenerator implements Creator {
 			problemCounter++;
 
 		}
+		
+		LOGGER.info("total number of traces generated: " + problemCounter);
 
 		sasGenerator.close();
 
