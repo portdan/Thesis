@@ -6,10 +6,12 @@ import java.lang.ProcessBuilder.Redirect;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Level;
@@ -18,7 +20,6 @@ import org.apache.log4j.Logger;
 import Configuration.ConfigurationManager;
 import Configuration.ProblemGeneratorConfiguration;
 import cz.agents.alite.creator.Creator;
-import cz.agents.dimaptools.experiment.Trace;
 import cz.agents.dimaptools.input.addl.ADDLObject;
 import cz.agents.dimaptools.input.addl.ADDLParser;
 import cz.agents.dimaptools.input.sas.SASParser;
@@ -70,14 +71,18 @@ public class StateActionStateGenerator implements Creator {
 
 	private final List<Problem> problems = new ArrayList<Problem>();
 
-	private Map<String, List<StateActionState>> newStateActionStates = new HashMap<String, List<StateActionState>>();
+	//private Map<String, List<StateActionState>> newStateActionStates = new HashMap<String, List<StateActionState>>();
+	
+	private Set<String> newStateActionStatesMap = new HashSet<String>();
+	private Map<String, List<String>> actionOwnerToActionName = new HashMap<String, List<String>>();
 
+	
 	@Override
 	public void init(String[] args) {
 
 		//Trace.setFileStream("Log/trace.log");
 		LOGGER.setLevel(Level.INFO);
-		
+
 		LOGGER.info("StateActionStateGenerator start");
 
 		if(!ParseArgs(args))
@@ -171,6 +176,7 @@ public class StateActionStateGenerator implements Creator {
 		}
 	}
 
+	/*
 	private void runEntities() {
 		LOGGER.info("run entities:");
 
@@ -208,13 +214,104 @@ public class StateActionStateGenerator implements Creator {
 			problemCounter++;
 
 		}
-		
+
 		LOGGER.info("total number of traces generated: " + problemCounter);
 
 		sasGenerator.close();
 
 		delelteTemporaryFiles();
+
+		deleteSasFile();
+	}
+	 */
+
+	private void runEntities() {
+		LOGGER.info("run entities:");
+
+		SASGenerator sasGenerator = new SASGenerator();
+
+		String TracesFolder = tracesDirPath;
 		
+		int sasCounter = 1;
+		
+		Map<String, List<StateActionState>> sasMap = new HashMap<String, List<StateActionState>>();
+
+		// generate problems
+		for (int i = 1; i <= numOfTracesToGenerate; i++) {
+			
+			LOGGER.info("generating trace number : " + i);
+			
+			List<StateActionState> sasList = new ArrayList<StateActionState>();
+
+			// perform random walk
+			State endState = StateActionStateRandomWalker.RandomWalk(sasList, preprocessor.getGlobalInit(),
+					preprocessor.getGlobalGoal(), numOfRandomWalkSteps, problems, i);
+
+			String humenized = endState.getDomain().humanize(endState.getValues());
+
+			if(!newStateActionStatesMap.contains(humenized)) {
+				
+				newStateActionStatesMap.add(humenized);
+				
+				for (StateActionState stateActionState : sasList) {
+					
+					List<StateActionState> sasMapList = sasMap.get(stateActionState.action);
+					
+					if(sasMapList == null) {						
+						
+						sasMapList = new ArrayList<StateActionState>();
+						sasMap.put(stateActionState.action, sasMapList);
+						
+						List<String> actionNames = actionOwnerToActionName.get(stateActionState.actionOwner);
+						
+						if(actionNames == null) {						
+							
+							actionNames = new ArrayList<String>();
+							actionOwnerToActionName.put(stateActionState.actionOwner, actionNames);
+						}
+						
+						actionNames.add(stateActionState.action);
+					}
+					
+					sasMapList.add(stateActionState);
+					
+					sasCounter++;
+
+				}
+			}
+		}
+
+		LOGGER.info("total number of actions : " + sasMap.keySet().size());
+		
+		Iterator<Entry<String, List<String>>> it = actionOwnerToActionName.entrySet().iterator();
+
+		while (it.hasNext()) {
+			
+			Entry<String, List<String>> actionOwnerNamePair = (Entry<String, List<String>>)it.next();
+			
+			LOGGER.info("appending actions for agent : " + actionOwnerNamePair.getKey());
+			
+			sasGenerator.generateFile(TracesFolder,actionOwnerNamePair.getKey());
+			
+			for (String actionName : actionOwnerNamePair.getValue()) {
+				
+				LOGGER.info("appending action : " + actionName);
+				
+				List<StateActionState> actionSASList = sasMap.get(actionName);
+				
+				// append new sasList
+				sasGenerator.appendSASList(actionSASList, actionName);
+
+				sasCounter+=actionSASList.size();
+			}
+		}
+
+		LOGGER.info("total number of SAS generated: " + sasCounter);
+
+		sasGenerator.close();
+
+		delelteTemporaryFiles();
+
 		deleteSasFile();
 	}
 
@@ -247,17 +344,17 @@ public class StateActionStateGenerator implements Creator {
 
 
 		try {
-			
+
 			String scriptPath = pythonScriptsPath + "/" + CONVERTOR;
 
 			String cmd = scriptPath + " " + path + " " + domainFileName + " " + problemFileName + " " + tempDirPath;
-			
+
 			LOGGER.info("RUN: " + cmd);
-			
+
 			ProcessBuilder pb = new ProcessBuilder(scriptPath, path, domainFileName, problemFileName, tempDirPath);
-            pb.redirectOutput(Redirect.INHERIT);
-            
-            Process pr = pb.start();
+			pb.redirectOutput(Redirect.INHERIT);
+
+			Process pr = pb.start();
 
 			pr.waitFor();			
 		} catch (Exception e) {
@@ -289,13 +386,13 @@ public class StateActionStateGenerator implements Creator {
 			String scriptPath = pythonScriptsPath + "/" + TRANSLATOR;
 
 			String cmd = scriptPath + " " + domainFilePath + " " + problemFilePath + " " + sasFilePath;
-			
+
 			LOGGER.info("RUN: " + cmd);
-			
+
 			ProcessBuilder pb = new ProcessBuilder(scriptPath, domainFilePath, problemFilePath, sasFilePath);
-            pb.redirectOutput(Redirect.INHERIT);
-            
-            Process pr = pb.start();
+			pb.redirectOutput(Redirect.INHERIT);
+
+			Process pr = pb.start();
 
 			pr.waitFor();			
 
@@ -357,7 +454,7 @@ public class StateActionStateGenerator implements Creator {
 
 		return true;
 	}
-	
+
 	private boolean deleteSasFile() {
 
 		LOGGER.info("Deleting temporary files");

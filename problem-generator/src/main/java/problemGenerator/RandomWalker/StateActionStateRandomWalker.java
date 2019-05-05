@@ -19,7 +19,8 @@ public class StateActionStateRandomWalker {
 
 	private final static Logger LOGGER = Logger.getLogger(StateActionStateRandomWalker.class);
 
-	public static State RandomWalk(List<StateActionState> sasList, State startState, SuperState goalState, int numOfExpands, List<Problem> problems) {
+	public static State RandomWalk(List<StateActionState> sasList, State startState, SuperState goalState, 
+int numOfExpands, List<Problem> problems, int trace_number) {
 
 		// Random rand = new Random(1); // fixed seed
 		Random rand = new Random(); // no seed
@@ -80,7 +81,10 @@ public class StateActionStateRandomWalker {
 
 			if(sasList!=null) {
 
-				StateActionState sas = new StateActionState(getStateFacts(pre), randomAction.getSimpleLabel(), randomAction.getOwner(), getStateFacts(current));
+				String actionName = randomAction.getSimpleLabel();
+
+				StateActionState sas = new StateActionState(getStateFacts(pre), actionName, randomAction.getOwner(),
+						getStateFacts(current), trace_number);
 
 				sasList.add(sas);
 			}
@@ -94,6 +98,7 @@ public class StateActionStateRandomWalker {
 
 		return current;
 	}
+
 
 	private static Set<String> getStateFacts(State state) {
 

@@ -53,6 +53,33 @@ public class SASGenerator extends FileGenerator{
 		return true;
 	}
 
+	public boolean appendSASList(List<StateActionState> sasList, String actionName) {	
+		try {
+			
+			String traceStart = "actionName - " + actionName + " : {\n";
+			stream.write(traceStart.getBytes());
+			
+			for (int i = 0; i < sasList.size(); i++) {
+
+				byte bytes[] = sasList.get(i).toString().getBytes();    
+
+				stream.write(bytes);
+				stream.write("\n".getBytes());
+			}
+			
+			String traceEnd = "}\n";
+			stream.write(traceEnd.getBytes());
+			
+			stream.flush();
+
+		} catch (IOException e) {
+			return false;
+		}    
+
+		return true;
+	}
+
+	
 	public boolean close() {
 
 		try {
