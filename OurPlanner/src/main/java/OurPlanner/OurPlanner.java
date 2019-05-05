@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -45,7 +47,7 @@ public class OurPlanner implements Creator  {
 	private String outputLearningDirPath = "";
 	private String outputTempDirPath = "";
 
-	
+
 	private File tracesFile = null;
 	private File outputTestFile = null;
 	private File outputCopyDir = null;
@@ -74,7 +76,7 @@ public class OurPlanner implements Creator  {
 
 	@Override
 	public void init(String[] args) {
-		
+
 		LOGGER.setLevel(Level.INFO);
 
 		long startTime = System.currentTimeMillis();
@@ -149,7 +151,7 @@ public class OurPlanner implements Creator  {
 			System.exit(1);
 		}
 		 */
-		
+
 		long finishTime = System.currentTimeMillis();
 
 		TestDataAccumulator.getAccumulator().totalTimeMs = finishTime-startTime;
@@ -226,12 +228,12 @@ public class OurPlanner implements Creator  {
 		if( !outputTestFile.exists()) {
 			outputTestFile.getParentFile().mkdirs();
 		}
-		
+
 		/*OUTPUT DIR PATH*/
 		outputDirPath = configuration.outputDirPath;
 		Globals.OUTPUT_PATH = outputDirPath;
 		/*OUTPUT DIR PATH*/
-		
+
 		/*OUTPUT LEARNING DIR PATH*/
 		outputLearningDirPath = configuration.outputLearningDirPath;
 		Globals.LEARNED_PATH = outputLearningDirPath;
@@ -245,19 +247,19 @@ public class OurPlanner implements Creator  {
 
 		/*SAS FILE NAME */
 		sasFilePath = configuration.sasFilePath;
-		
+
 		Globals.SAS_OUTPUT_FILE_PATH = sasFilePath;
 		SAS_FILE_PATH = Globals.SAS_OUTPUT_FILE_PATH;
-		
+
 		Globals.PROCESSED_SAS_OUTPUT_FILE_PATH = sasFilePath.split("\\.")[0];
 		OUTPUT_FILE_NAME = Globals.PROCESSED_SAS_OUTPUT_FILE_PATH;
 		/*SAS FILE NAME */
-		
+
 		/*PYTHON SCRIPTS*/
 		pythonScriptsPath = configuration.pythonScriptsPath;
 		Globals.PYTHON_SCRIPTS_FOLDER = pythonScriptsPath;
 		/*PYTHON SCRIPTS*/
-		
+
 		return true;
 	}
 
@@ -269,11 +271,13 @@ public class OurPlanner implements Creator  {
 
 		List<String> leaderAgentPlan = null;
 
-		int rounds = 0;
+		int rounds = 1;
+
+		boolean isLearning = learnFromTraces();
 
 		while(leaderAgentPlan == null) {
 
-			LOGGER.info("Round " + ++rounds + " - Start!");
+			LOGGER.info("Round " + rounds + " - Start!");
 
 			if(availableLeaders.isEmpty()){
 
@@ -282,7 +286,7 @@ public class OurPlanner implements Creator  {
 			}
 
 			currentLeaderAgent = pickLeader();
-
+			/*		
 			long learningStartTime = System.currentTimeMillis();
 
 			boolean isLearning = learnFromTraces(currentLeaderAgent);
@@ -291,6 +295,9 @@ public class OurPlanner implements Creator  {
 
 			TestDataAccumulator.getAccumulator().totalLearningTimeMs += learningFinishTime - learningStartTime;
 			TestDataAccumulator.getAccumulator().agentLearningTimeMs.put(currentLeaderAgent, learningFinishTime - learningStartTime);
+			 */
+
+			LOGGER.info("Current Leader Agent " + currentLeaderAgent);
 
 			long planningStartTime = System.currentTimeMillis();
 
@@ -311,17 +318,19 @@ public class OurPlanner implements Creator  {
 
 				return true;
 			}
+
+			rounds++;
 		}
 
 		return false;
 	}
 
-	private boolean learnFromTraces(String agentName) {
+	private boolean learnFromTraces() {
 
 		LOGGER.info("Running learning algorithm");
 
-		TraceLearner learner = new TraceLearner(agentList,agentName,tracesFile, 
-				groundedFile, localViewFile, domainFileName, problemFileName, numOftraces);	
+		TraceLearner learner = new TraceLearner(agentList,tracesFile, groundedFile, localViewFile, domainFileName,
+				problemFileName, numOftraces);	
 
 		boolean isLearned = learner.learnNewActions();
 
@@ -501,6 +510,9 @@ public class OurPlanner implements Creator  {
 		}
 
 		agentList = new ArrayList<>(output);
+
+		Collections.sort(agentList);
+
 		LOGGER.info("Agents are: " + agentList);
 
 		return true;

@@ -6,8 +6,10 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
@@ -36,7 +38,6 @@ public class StateActionStateSequencer {
 	private static final String OUTPUT_FILE_NAME = Globals.PROCESSED_SAS_OUTPUT_FILE_PATH;
 	private static final String TEMP_DIR_PATH = Globals.TEMP_PATH;
 
-	private List<String> agentList = null;
 	private String domainFileName = "";
 	private String problemFileName = "";
 	private String convertedDomainPath = "";
@@ -49,8 +50,14 @@ public class StateActionStateSequencer {
 
 	State currentState = null;
 
-	public StateActionStateSequencer(List<String> agentList, File problemFiles, 
-			String domainFileName, String problemFileName, File trajectoryFiles ) {
+	private int lastActionLine = 0;
+	private String agentName = "";
+	boolean fileEnd = false;
+
+	Map<String, File> agentTracesFiles = new HashMap<String,File>();
+
+	public StateActionStateSequencer(File problemFiles, String domainFileName,
+			String problemFileName, File trajectoryFiles ) {
 
 		LOGGER.setLevel(Level.INFO);
 
@@ -58,11 +65,21 @@ public class StateActionStateSequencer {
 
 		sasFileName = SAS_FILE_PATH;
 
-		this.agentList = agentList;
 		this.problemFiles = problemFiles;
 		this.trajectoryFiles = trajectoryFiles;
 		this.domainFileName = new String(domainFileName);
 		this.problemFileName = new String(problemFileName);
+
+		File[] TrajDir = trajectoryFiles.listFiles();
+
+		if (TrajDir != null) {
+
+			for (File file : TrajDir) {
+				String fileName = FilenameUtils.getBaseName(file.getPath());
+
+				agentTracesFiles.put(fileName, file);				
+			}
+		}
 
 		logInput();
 	}
@@ -71,7 +88,6 @@ public class StateActionStateSequencer {
 
 		LOGGER.info("Logging input");
 
-		LOGGER.info("agentList: " + agentList);
 		LOGGER.info("sasFileName: " + sasFileName);
 		LOGGER.info("domainFileName: " + domainFileName);
 		LOGGER.info("problemFileName: " + problemFileName);
@@ -79,6 +95,81 @@ public class StateActionStateSequencer {
 		LOGGER.info("trajectoryFiles: " + trajectoryFiles);
 	}
 
+	public void setSequencingData(String agentName) {
+		
+		lastActionLine = 0;
+		fileEnd = false;
+		
+		this.agentName = agentName;
+	}
+	
+	public List<StateActionState> generateSASListForAction(int numOfTracesToUse) {
+
+		LOGGER.info("Generating sequences from SAS traces");
+
+		String newActionStart = "actionName - ";
+
+		List<StateActionState> trajectorySequences = new ArrayList<StateActionState>();
+
+		boolean traceNumberReached = false;
+		boolean actionStart = false;
+		
+		int maxTracesNumber = 0;
+
+		File tracesFile = agentTracesFiles.get(agentName);
+
+		if(tracesFile != null) {
+
+			try(BufferedReader br = new BufferedReader(new FileReader(tracesFile))) {
+
+				for (int i = 0; i < lastActionLine; i++)
+					br.readLine();
+
+				for(String line; (line = br.readLine()) != null; ) {
+
+					if(line.startsWith(newActionStart)) {
+						
+						if(actionStart)
+							break;
+						
+						actionStart = true;
+					}
+					
+					if(traceNumberReached==false && line.startsWith("StateActionState")) {
+
+						StateActionState sas = new StateActionState(line);
+
+						if(sas.traceNumber > numOfTracesToUse)
+							traceNumberReached = true;
+						else {
+							trajectorySequences.add(sas);
+
+							maxTracesNumber = sas.traceNumber;
+						}
+					}
+
+					lastActionLine++;
+				}
+
+				if(br.read() == -1)
+					fileEnd = true;
+
+			}
+			catch (Exception e) {
+				trajectorySequences.clear();
+				return trajectorySequences;
+			}
+
+		}
+
+		if(TestDataAccumulator.getAccumulator().trainingSize < maxTracesNumber)
+			TestDataAccumulator.getAccumulator().trainingSize = maxTracesNumber;
+
+
+		return trajectorySequences;
+	}
+
+	/*
 	public List<StateActionState> generateSequencesFromSASTraces(int numOfTracesToUse) {
 
 		LOGGER.info("Generating sequences from SAS traces");
@@ -126,8 +217,8 @@ public class StateActionStateSequencer {
 
 		return trajectorySequences;
 	}
-
-
+	*/
+	
 	public List<StateActionState> generateSequences() {
 
 		LOGGER.info("Generating sequences");
@@ -170,6 +261,7 @@ public class StateActionStateSequencer {
 
 		return trajectorySequences;
 	}
+	
 
 	private List<StateActionState> generateSequance(String trajectoryPath, String problemPath){
 
@@ -233,7 +325,7 @@ public class StateActionStateSequencer {
 			return null;
 		}
 		 */
-		
+
 		File sasFile = new File(sasFileName);
 		if (!sasFile.exists()) {
 			LOGGER.info("SAS file " + sasFileName + " does not exist!");

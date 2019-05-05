@@ -5,8 +5,10 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
@@ -20,7 +22,6 @@ public class TraceLearner {
 
 	private final static Logger LOGGER = Logger.getLogger(TraceLearner.class);
 
-	private String agentName = "";
 	private List<String> agentList = null;
 
 	private File trajectoryFiles = null;
@@ -32,14 +33,16 @@ public class TraceLearner {
 
 	private int numOfTracesToUse = 0;
 
-	public TraceLearner(List<String> agentList, String agentName ,File trajectoryFiles ,
+	Map<String, List<String>> agentLearnedActions = new HashMap<String,List<String>>();
+	Map<String, Long> agentLearningTimes = new HashMap<String, Long>();
+
+	public TraceLearner(List<String> agentList ,File trajectoryFiles ,
 			File problemFiles , File localViewFiles ,String domainFileName ,String problemFileName, int numOfTracesToUse) {
 
 		LOGGER.setLevel(Level.INFO);
 
 		LOGGER.info("TraceLearner constructor");
 
-		this.agentName = new String(agentName);
 		this.agentList = agentList;
 		this.trajectoryFiles = trajectoryFiles;
 		this.problemFiles = problemFiles;
@@ -55,7 +58,6 @@ public class TraceLearner {
 
 		LOGGER.info("Logging input");
 
-		LOGGER.info("agentName: " + agentName);
 		LOGGER.info("agentList: " + agentList);
 		LOGGER.info("trajectoryFiles: " + trajectoryFiles);
 		LOGGER.info("problemFiles: " + problemFiles);
@@ -66,43 +68,7 @@ public class TraceLearner {
 	}
 
 	/*
-	 * 	public boolean learnNewActions() {
-
-		LOGGER.info("Learning new actions");
-
-		List<String> learnedActions = new ArrayList<String>();
-
-		StateActionStateSequencer sasSequencer = new StateActionStateSequencer(agentList, 
-				problemFiles, domainFileName, problemFileName, trajectoryFiles);
-
-		List<StateActionState> trajectorySequences = sasSequencer.generateSequences();
-
-		while(!trajectorySequences.isEmpty()) {
-
-			StateActionState firstValue = (StateActionState)trajectorySequences.get(0);
-
-			//LOGGER.info("Learning action: " + getActionName(firstValue.action));
-
-			LOGGER.info("Learning action: " + firstValue.action);
-
-			List<StateActionState> sasList = getAllStateActionStateWithAction(trajectorySequences, firstValue.action);
-
-			if(!firstValue.action.getOwner().equals(agentName)) {
-
-				Set<String> pre = learnPreconditions(sasList);
-				Set<String> eff = learnEffects(sasList);
-
-				learnedActions.add(generateLearnedAction(pre,eff,firstValue.action));
-			}
-
-			trajectorySequences.removeAll(sasList);
-		}
-
-		return writeNewLearnedProblemFiles(learnedActions);
-	}
-	 */
-
-	public boolean learnNewActions() {
+	 public boolean learnNewActions() {
 
 		LOGGER.info("Learning new actions");
 
@@ -147,6 +113,82 @@ public class TraceLearner {
 		return writeNewLearnedProblemFiles(learnedActions);
 	}
 
+	 */
+
+	public boolean learnNewActions() {
+
+		LOGGER.info("Learning new actions");
+
+		TestDataAccumulator.getAccumulator().trainingSize = 0;
+
+		StateActionStateSequencer sasSequencer = new StateActionStateSequencer(problemFiles, 
+				domainFileName, problemFileName, trajectoryFiles);
+
+		DeleteEffectGenerator DEGenerator = new DeleteEffectGenerator (problemFiles,
+				domainFileName, problemFileName);
+
+		//List<StateActionState> trajectorySequences = sasSequencer.generateSequences();
+
+		for (String agentName : agentList) {
+
+			long learningStartTime = System.currentTimeMillis();
+
+			List<String> learnedActions = new ArrayList<String>();
+
+			sasSequencer.setSequencingData(agentName);
+
+			while(!sasSequencer.fileEnd) {
+
+				List<StateActionState> sasList = sasSequencer.generateSASListForAction(numOfTracesToUse);
+
+				if(!sasList.isEmpty())
+				{	
+					StateActionState firstValue = (StateActionState)sasList.get(0);
+
+					//LOGGER.info("Learning action: " + getActionName(firstValue.action));
+
+					LOGGER.info("Learning action: " + firstValue.action);
+
+					Set<String> pre = learnPreconditions(sasList);
+					Set<String> eff = learnEffects(sasList);
+
+					eff.addAll(DEGenerator.generateDeleteEffects(firstValue.action,pre,eff));
+
+					pre = FormatFacts(pre);
+					eff = FormatFacts(eff);
+
+					learnedActions.add(generateLearnedAction(pre,eff,firstValue.action,firstValue.actionOwner));					
+				}
+			}
+
+			long learningFinishTime = System.currentTimeMillis();
+
+			TestDataAccumulator.getAccumulator().totalLearningTimeMs += learningFinishTime - learningStartTime;
+			TestDataAccumulator.getAccumulator().agentLearningTimeMs.put(agentName, learningFinishTime - learningStartTime);
+
+			agentLearningTimes.put(agentName, learningFinishTime - learningStartTime);
+
+			agentLearnedActions.put(agentName, learnedActions);
+		}
+
+		/*
+		for (String agentName : agentList) {
+
+			long agentLearningTime = 0;
+
+			for (String otherAgentName : agentList) 
+				if(!otherAgentName.equals(agentName))
+					agentLearningTime += agentLearningTimes.get(otherAgentName);
+
+			TestDataAccumulator.getAccumulator().agentLearningTimeMs.put(agentName, agentLearningTime);
+
+			TestDataAccumulator.getAccumulator().totalLearningTimeMs += agentLearningTimes.get(agentName);
+		}
+		 */
+
+		return writeNewLearnedProblemFiles();
+	}
+
 	private Set<String> FormatFacts(Set<String> facts) {
 
 		Set<String> formatted = new HashSet<String>();
@@ -182,6 +224,7 @@ public class TraceLearner {
 		return formatted;
 	}
 
+	/*
 	private boolean writeNewLearnedProblemFiles(List<String> learnedActions) {
 
 		LOGGER.info("writing newly learned problem .pddl files");
@@ -209,8 +252,55 @@ public class TraceLearner {
 
 		return !learnedActions.isEmpty();
 	}
+	 */
 
-	private boolean writeNewDomain(String newDomainString) {
+	private boolean writeNewLearnedProblemFiles() {
+
+		LOGGER.info("writing newly learned problem .pddl files");
+
+		boolean anyLearned = false;
+
+		for (String agentName : agentList) {
+
+			List<String> learnedActions = new ArrayList<String>();
+
+			for (String otherAgentName : agentList) {
+				if(!otherAgentName.equals(agentName))
+					learnedActions.addAll(agentLearnedActions.get(otherAgentName));
+			}
+
+			if(!learnedActions.isEmpty()) {
+
+				anyLearned = true;
+
+				String domainStr = readDomainString(agentName);
+
+				if(domainStr.isEmpty())
+				{
+					LOGGER.info("Reading domain pddl failure");
+					return false;
+				}
+
+				String newDomainStr = addActionsToDomainString(learnedActions, domainStr ,agentName);
+
+				if(newDomainStr.isEmpty())
+				{
+					LOGGER.info("Adding new actions to domain failure");
+					return false;
+				}
+
+				if(!writeNewDomain(newDomainStr, agentName)) {
+					LOGGER.info("Writing new domain to file failure");
+					return false;
+				}
+			}
+
+		}
+
+		return anyLearned;
+	}
+
+	private boolean writeNewDomain(String newDomainString, String agentName) {
 
 		LOGGER.info("Writing new PDDL domain file");
 
@@ -245,7 +335,7 @@ public class TraceLearner {
 		return sb.toString();
 	}
 
-	private String readDomainString() {
+	private String readDomainString(String agentName) {
 
 		LOGGER.info("Reading domain pddl");
 

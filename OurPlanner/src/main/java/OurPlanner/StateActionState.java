@@ -10,6 +10,17 @@ public class StateActionState {
 	String action = null;
 	String actionOwner = null;
 	Set<String> post = null;
+	int traceNumber = 0;
+	
+	public StateActionState(Set<String> pre, String action, String actionOwner, Set<String> post, int traceNumber) {
+
+		this.pre = new HashSet<String>(pre);
+		this.action = new String(action);
+		this.actionOwner = new String(actionOwner);
+		this.post = new HashSet<String>(post);
+		this.traceNumber = traceNumber;
+	}
+
 
 	public StateActionState(Set<String> pre, String action, String actionOwner, Set<String> post) {
 
@@ -17,6 +28,7 @@ public class StateActionState {
 		this.action = new String(action);
 		this.actionOwner = new String(actionOwner);
 		this.post = new HashSet<String>(post);
+		this.traceNumber = -1;
 	}
 
 	public StateActionState(String sas) {
@@ -29,6 +41,8 @@ public class StateActionState {
 			reconstructActionOwner(sas);
 
 			reconstructPost(sas);
+			
+			reconstructTraceNumber(sas);
 		}
 	}
 
@@ -78,6 +92,15 @@ public class StateActionState {
 		}
 	}
 
+	private void reconstructTraceNumber(String sas) {
+		String traceNumStart = "traceNum[ ";
+
+		int traceNumStartnStartInd = sas.indexOf(traceNumStart) + traceNumStart.length();			
+		int traceNumStartEndInd = sas.indexOf(" ]",traceNumStartnStartInd);
+
+		this.traceNumber = Integer.parseInt(sas.substring(traceNumStartnStartInd,traceNumStartEndInd));
+	}
+
 	@Override
 	public String toString() {
 
@@ -109,6 +132,8 @@ public class StateActionState {
 			else
 				res += " ] ";
 		}
+		
+		res += " ; traceNum[ " + traceNumber + " ] ";
 
 		res += "]";
 
