@@ -74,6 +74,8 @@ class Planner(object):
         planner_config.problemFileName = problem_name
         planner_config.numOfTracesToUse = num_of_traces_to_use
         planner_config.agentsFileName = problem_name.split(".")[0] + ".agents"
+        planner_config.verificationModel = self.config.problemPlannerVerificationModel
+        planner_config.planningModel = self.config.problemPlannerPlanningModel
         
         self.planner_output_folder = self.config.outputDestination + "/" + problem_name + "/" + self.config.problemPlannerOutputDestination
 
@@ -81,27 +83,27 @@ class Planner(object):
         
         with open(self.config.problemPlannerConfig, 'w+') as plannerConfigJson:
             pyckson.dump(planner_config, plannerConfigJson)
+            
+        logger.info("prepering to plan for : " + str(planner_config.problemFileName) + "with " + str(planner_config.numOfTracesToUse) + " traces")
        
                   
     def run_planning(self):
     
         logger.info("run_planning")
         
-        processList = ['java', '-jar', self.config.problemPlannerJAR, self.config.problemPlannerCreator, 
+        processList = ['java', '-Xmx10g', '-jar', self.config.problemPlannerJAR, self.config.problemPlannerCreator, 
                        self.config.problemPlannerConfig]
         
         print(', '.join(processList))
         
-        '''
-        process = subprocess.Popen(processList)
-        process.wait()
-        '''
-        
-        process = subprocess.Popen(processList, stdout=subprocess.PIPE)
-        out, err = process.communicate()
         
         if self.log_output:
+            process = subprocess.Popen(processList, stdout=subprocess.PIPE)
+            out, err = process.communicate()
             logger.info(str(out.decode('utf-8')))
+        else:
+            process = subprocess.Popen(processList)
+            process.wait()
         
         
     def delete_output(self):

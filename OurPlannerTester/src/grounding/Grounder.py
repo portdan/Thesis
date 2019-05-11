@@ -67,16 +67,13 @@ class Grounder(object):
         
         print(', '.join(processList))
         
-        '''
-        process = subprocess.Popen(processList)
-        process.wait()
-        '''
-        
-        process = subprocess.Popen(processList, stdout=subprocess.PIPE)
-        out, err = process.communicate()
-        
         if self.log_output:
+            process = subprocess.Popen(processList, stdout=subprocess.PIPE)
+            out, err = process.communicate()
             logger.info(str(out.decode('utf-8')))
+        else:
+            process = subprocess.Popen(processList)
+            process.wait()
 
     def copy_generation_output(self, problem_name):
 

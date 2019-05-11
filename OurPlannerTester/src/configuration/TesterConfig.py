@@ -18,7 +18,8 @@ class TesterConfig(object):
                  problemGeneratorCreator: str, outputDestination: str, originDestination: str,
                  problemGrounderOutputDestination : str, problemGeneratorOutputDestination : str,
                  problemPlannerConfig : str, problemPlannerCreator : str, problemPlannerInput :str, 
-        problemPlannerJAR : str, problemPlannerOutput : str, problemPlannerOutputDestination : str):
+        problemPlannerJAR : str, problemPlannerOutput : str, problemPlannerOutputDestination : str,
+        problemPlannerVerificationModel : str, problemPlannerPlanningModel : str):
         '''
         Constructor
         '''
@@ -50,6 +51,9 @@ class TesterConfig(object):
         self.problemPlannerJAR = problemPlannerJAR
         self.problemPlannerOutput = problemPlannerOutput
         self.problemPlannerOutputDestination = problemPlannerOutputDestination
+        
+        self.problemPlannerVerificationModel = problemPlannerVerificationModel
+        self.problemPlannerPlanningModel = problemPlannerPlanningModel
             
         
     def __str__(self):
@@ -86,6 +90,10 @@ class TesterConfig(object):
         phrases.append("Planner Creator Name: " + str(self.problemPlannerCreator) + "\n" ) 
         phrases.append("Planner Destination Path: " + str(self.problemPlannerOutputDestination) + "\n" )
         
+        phrases.append("Planner Verification Model: " + str(self.problemPlannerVerificationModel) + "\n" ) 
+        phrases.append("Planner Planning Model: " + str(self.problemPlannerPlanningModel) + "\n" )
+
+
         phrases.append("Problems To Test List: " + "\n" )
         
         for tcp in self.problems:

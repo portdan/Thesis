@@ -9,10 +9,11 @@ class PlannerConfig(object):
     classdocs
     '''
     def __init__(self, domainFileName: str, problemFileName: str, groundedDirPath: str, 
-                 localViewDirPath: str, tracesDirPath : str, numOfTracesToUse : int,
+                 localViewDirPath: str, tracesDirPath : str, numOfTracesToUse : int, tracesLearinigInterval : int,
                  agentsFilePath: str, outputCopyDirPath: str, testOutputCSVFilePath: str,
                  agentsFileName: str, pythonScriptsPath : str, sasFilePath : str, outputDirPath : str, 
-                 outputLearningDirPath: str, outputTempDirPath : str ):
+                 outputSafeModelLearningDirPath: str, outputUnSafeModelLearningDirPath : str, 
+                 outputTempDirPath : str, verificationModel : str, planningModel : str ):
         '''
         Constructor
         '''
@@ -23,11 +24,15 @@ class PlannerConfig(object):
         self.localViewDirPath = localViewDirPath
         self.tracesDirPath = tracesDirPath
         self.numOfTracesToUse = numOfTracesToUse
+        self.tracesLearinigInterval = tracesLearinigInterval
         self.agentsFilePath = agentsFilePath
         self.outputCopyDirPath = outputCopyDirPath
         self.testOutputCSVFilePath = testOutputCSVFilePath
         self.pythonScriptsPath = pythonScriptsPath
         self.sasFilePath = sasFilePath
         self.outputDirPath = outputDirPath
-        self.outputLearningDirPath = outputLearningDirPath
-        self.outputTempDirPath = outputTempDirPath
+        self.outputSafeModelLearningDirPath = outputSafeModelLearningDirPath;
+        self.outputUnSafeModelLearningDirPath = outputUnSafeModelLearningDirPath;
+        self.outputTempDirPath = outputTempDirPath;
+        self.verificationModel = verificationModel;
+        self.planningModel = planningModel;

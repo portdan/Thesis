@@ -25,11 +25,25 @@
   "problemPlannerPlanningModel": "SafeModel", 
   "problems": [
     {
-      "maxTracesToUse": 20000, 
-      "minTracesToUse": 16000, 
-      "problemName": "probLOGISTICS-14-0.pddl", 
-      "solvedRangeSplit": 3, 
-      "unsolvedRangeSplit": 3
+      "maxTracesToUse": 100, 
+      "minTracesToUse": 0, 
+      "problemName": "probLOGISTICS-4-0.pddl", 
+      "solvedRangeSplit": 5, 
+      "unsolvedRangeSplit": 5
+    }, 
+    {
+      "maxTracesToUse": 100, 
+      "minTracesToUse": 0, 
+      "problemName": "probLOGISTICS-5-0.pddl", 
+      "solvedRangeSplit": 5, 
+      "unsolvedRangeSplit": 5
+    }, 
+    {
+      "maxTracesToUse": 100, 
+      "minTracesToUse": 0, 
+      "problemName": "probLOGISTICS-6-0.pddl", 
+      "solvedRangeSplit": 5, 
+      "unsolvedRangeSplit": 5
     }
   ], 
   "problemsPath": "/home/daniel/Work/WorkSpace/Thesis/OurPlannerTester/mapddl-benchmarks/logistics00"
