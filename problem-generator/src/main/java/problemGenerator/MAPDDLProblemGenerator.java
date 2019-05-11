@@ -26,7 +26,6 @@ import cz.agents.alite.creator.Creator;
 import cz.agents.dimaptools.DIMAPWorldInterface;
 import cz.agents.dimaptools.DefaultDIMAPWorld;
 import cz.agents.dimaptools.communication.protocol.DefaultEncoder;
-import cz.agents.dimaptools.experiment.Trace;
 import cz.agents.dimaptools.input.addl.ADDLObject;
 import cz.agents.dimaptools.input.addl.ADDLParser;
 import cz.agents.dimaptools.input.sas.SASParser;
@@ -102,7 +101,7 @@ public class MAPDDLProblemGenerator implements Creator {
 
 		//Trace.setFileStream("Log/trace.log");
 		LOGGER.setLevel(Level.INFO);
-		
+
 		LOGGER.info("init end");
 
 	}
@@ -193,32 +192,36 @@ public class MAPDDLProblemGenerator implements Creator {
 
 			String newProblemFileName = problemFileName + "_" + i;
 
-			// if problem file created
-			if (pddlGenerator.generateFile(GEN,newProblemFileName)) {
+			// get old problem text
+			String problemText = null;
 
-				// get old problem text
-				String problemText = null;
-				try {
-					problemText = new String(Files.readAllBytes(Paths.get(oldProblemFilePath)));
-				} catch (IOException e) {
-					LOGGER.fatal(e, e);
-					System.exit(1);
-				}
+			try {
+				pddlGenerator.generateFile(GEN,newProblemFileName);	
 
-				String humenized = endState.getDomain().humanize(endState.getValues());
+				problemText = new String(Files.readAllBytes(Paths.get(oldProblemFilePath)));
 
-				// generate new problem
+			} catch (IOException e) {
+				LOGGER.fatal(e, e);
+				System.exit(1);
+			}			
+
+			String humenized = endState.getDomain().humanize(endState.getValues());
+
+			// generate new problem
+			try {
 				pddlGenerator.generateRandomProblem(problemText,newProblemFileName, humenized);
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
 		}
 
 		removeDupliacteProblems();
 
 		//renameProblems();
-		
+
 		delelteTemporaryFiles();
 	}
-	
+
 	private void delelteTemporaryFiles() {
 
 		LOGGER.info("Deleting temporary files");
@@ -363,9 +366,13 @@ public class MAPDDLProblemGenerator implements Creator {
 
 				String newProblemText = renameProblem(child,newProblemName);
 
-				// if problem file created
-				if (pddlGenerator.generateFile(GEN,newProblemName))
+				try {
+					pddlGenerator.generateFile(GEN,newProblemName);
 					pddlGenerator.writeToFile(newProblemText);
+
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
 	}
 

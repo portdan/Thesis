@@ -1,5 +1,7 @@
 package problemGenerator.FileGenerator;
 
+import java.io.IOException;
+
 public class ADDLGenerator{
 
 	private static final String FOLDER_PATH = "./gen/addl/";
@@ -8,22 +10,21 @@ public class ADDLGenerator{
 	private FileGenerator fg = new FileGenerator();
 	private String fileName = null;
 
-	public boolean generateADDLFile(String fileName) {
+	public void generateADDLFile(String fileName) throws IOException{
 
 		this.fileName = fileName;
 
-		if(!generateFile(fileName))
-			return false;
-		if(!defineDomain())
-			return false;
-		return true;
+		generateFile(fileName);
+
+		defineDomain();
 	}
 
-	private boolean defineDomain() {
-		return fg.writeToFile("(define (problem "+fileName+")");
+	private void defineDomain() throws IOException {
+		fg.writeToFile("(define (problem "+fileName+")");
 	}
 
-	private boolean generateFile(String fileName) {
-		return fg.generateFile(FOLDER_PATH, fileName, FILE_TYPE);
+	private void generateFile(String fileName) throws IOException{
+
+		fg.generateFile(FOLDER_PATH, fileName, FILE_TYPE);
 	}
 }

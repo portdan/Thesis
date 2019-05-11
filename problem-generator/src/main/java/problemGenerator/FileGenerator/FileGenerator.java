@@ -4,75 +4,86 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.util.List;
 
 public class FileGenerator {
 
-	public File outFile = null;
-	public PrintWriter writer = null;
+	private static final double KILO_BYTE = (Math.pow(2, 10));
+	private static final double MEGA_BYTE = (Math.pow(2, 20));
 
-	public boolean generateFile(String folderPath, String fileName, String fileType) {
+	//private static final double BUFFER_SIZE = 4 * MEGA_BYTE;
+	private static final double BUFFER_SIZE = 8 * KILO_BYTE;
+
+	public File outFile = null;
+	public BufferedWriter writer = null;
+
+	public void generateFile(String folderPath, String fileName, String fileType) throws IOException {
 
 		outFile = new File(folderPath + "/" + fileName + "." + fileType);
 
 		if (!outFile.exists()) {
-			try {
-				new File(folderPath).mkdirs();
-				outFile.createNewFile();
-			} catch (IOException e) {
-				e.printStackTrace();
-				return false;
-			}
-		} else {
 
+			new File(folderPath).mkdirs();
+			outFile.createNewFile();
+
+		} else
 			clearFile();
-		}
-
-		return true;
 	}
 
-	public boolean writeToFile(String str) {
+	/*
+	private void appendToFile(List<String> strings) throws IOException{
+
+		writer = new BufferedWriter(new FileWriter(outFile, true), (int)BUFFER_SIZE);
+
+		for (String str: strings) {
+			writer.append(str);
+		}
+
+		writer.flush();
+		writer.close();
+	}
+
+	public void appendToFile(String str) throws IOException{
 
 		if (outFile != null) {
 
-			try {
-				writer = new PrintWriter(new BufferedWriter(new FileWriter(outFile, true)));
+			writer = new BufferedWriter(new FileWriter(outFile, true), (int)BUFFER_SIZE);
+			writer.append(str);
+			writer.flush();
+			writer.close();
+		} 
+	}
+	*/
+
+	public void writeToFile(List<String> strings) throws IOException{
+
+		if (outFile != null) {
+						
+			writer = new BufferedWriter(new FileWriter(outFile, true), (int)BUFFER_SIZE);
+			
+			for (String str: strings) {
 				writer.write(str);
-				writer.flush();
-				writer.close();
-			} catch (IOException ex) {
-				ex.printStackTrace();
-
-				if (writer != null) {
-					writer.close();
-					return false;
-				}
 			}
-			return true;
-		}
-		return false;
-	}
 
-	public boolean clearFile() {
+			writer.flush();
+			writer.close();
+		} 
+	}
+	
+	public void writeToFile(String str) throws IOException{
 
 		if (outFile != null) {
 
-			try {
-				writer = new PrintWriter(new BufferedWriter(new FileWriter(outFile, false)));
-				writer.write("");
-				writer.flush();
-				writer.close();
-			} catch (IOException ex) {
-				ex.printStackTrace();
-
-				if (writer != null) {
-					writer.close();
-					return false;
-				}
-			}
-			return true;
-		}
-		return false;
+			writer = new BufferedWriter(new FileWriter(outFile, true), (int)BUFFER_SIZE);
+			writer.write(str);
+			writer.flush();
+			writer.close();
+		} 
 	}
 
+
+	public void clearFile() throws IOException{
+
+		writeToFile("");
+	}
 }

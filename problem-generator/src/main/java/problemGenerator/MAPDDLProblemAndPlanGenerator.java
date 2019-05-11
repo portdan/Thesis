@@ -28,7 +28,6 @@ import cz.agents.alite.creator.Creator;
 import cz.agents.dimaptools.DIMAPWorldInterface;
 import cz.agents.dimaptools.DefaultDIMAPWorld;
 import cz.agents.dimaptools.communication.protocol.DefaultEncoder;
-import cz.agents.dimaptools.experiment.Trace;
 import cz.agents.dimaptools.input.addl.ADDLObject;
 import cz.agents.dimaptools.input.addl.ADDLParser;
 import cz.agents.dimaptools.input.sas.SASParser;
@@ -105,7 +104,7 @@ public class MAPDDLProblemAndPlanGenerator implements Creator {
 
 		//Trace.setFileStream("Log/trace.log");
 		LOGGER.setLevel(Level.INFO);
-		
+
 		LOGGER.info("init end");
 
 	}
@@ -222,22 +221,25 @@ public class MAPDDLProblemAndPlanGenerator implements Creator {
 			String newProblemFileName = problemFileName + "_" + problemCounter;
 			String newPlanFileName = "out";			
 
-			// if problem file created
-			if (pddlGenerator.generateFile(TracesFolder,newProblemFileName)) {
+			try {
+				//  problem file created
+				pddlGenerator.generateFile(TracesFolder,newProblemFileName);
 				// generate new problem
 				pddlGenerator.generateRandomProblem(problemText,newProblemFileName, statePlanPair.getKey());		
-			}
 
-			// if plan file created
-			if (planGenerator.generateFile(TracesFolder,newPlanFileName)) {
+				//  plan file created
+				planGenerator.generateFile(TracesFolder,newPlanFileName);
 				// generate plan
 				planGenerator.generatePlan(statePlanPair.getValue());		
-			}
 
-			// if problem file created
-			if (pddlGenerator.generateFile(OUTPUT_PROBLEMS,newProblemFileName)) {
+				//  problem file created
+				pddlGenerator.generateFile(OUTPUT_PROBLEMS,newProblemFileName);
 				// generate new problem
 				pddlGenerator.generateRandomProblem(problemText,newProblemFileName, statePlanPair.getKey());		
+
+			}
+			catch (IOException e) {
+				e.printStackTrace();
 			}
 
 			problemCounter++;

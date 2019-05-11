@@ -1,9 +1,7 @@
 package problemGenerator.FileGenerator;
 
-import java.io.BufferedOutputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import problemGenerator.StateActionState;
@@ -12,82 +10,70 @@ public class SASGenerator extends FileGenerator{
 
 	private static final String FILE_TYPE = "txt";
 
-	private BufferedOutputStream stream;
+	public void generateFile(String folderPath, String fileName) throws IOException{
 
-	public boolean generateFile(String folderPath, String fileName) {
+		generateFile(folderPath, fileName, FILE_TYPE);
+	}
 
-		boolean isGenerated = generateFile(folderPath, fileName, FILE_TYPE);
+	public void appendSASList(List<StateActionState> sasList, int traceCounter) throws IOException {	
 
-		try {
-			stream = new BufferedOutputStream(new FileOutputStream(outFile));
-		} catch (FileNotFoundException e) {
-			return false;
+		StringBuilder sb = new StringBuilder();
+		List<String> sasListStr = new ArrayList<String>();
+
+		sb.append("trace_");
+		sb.append(traceCounter);
+		sb.append(": {\n");
+
+		String traceStart = sb.toString();
+		sasListStr.add(traceStart);
+
+		for (int i = 0; i < sasList.size(); i++) {
+
+			sb.setLength(0);
+
+			sb.append(sasList.get(i).toString());
+			sb.append("\n");
+
+			String sasStr = sb.toString();
+
+			sasListStr.add(sasStr);
 		}
 
-		return isGenerated;
+		String traceEnd = "}\n";
+		sasListStr.add(traceEnd);
+
+		writeToFile(sasListStr);
 	}
 
-	public boolean appendSASList(List<StateActionState> sasList, int traceCounter) {	
-		try {
-			
-			String traceStart = "trace_" + traceCounter + ": {\n";
-			stream.write(traceStart.getBytes());
-			
-			for (int i = 0; i < sasList.size(); i++) {
 
-				byte bytes[] = sasList.get(i).toString().getBytes();    
+	public void appendSASList(List<StateActionState> sasList, String actionName) throws IOException {	
 
-				stream.write(bytes);
-				stream.write("\n".getBytes());
-			}
-			
-			String traceEnd = "}\n";
-			stream.write(traceEnd.getBytes());
-			
-			stream.flush();
+		StringBuilder sb = new StringBuilder();
+		List<String> sasListStr = new ArrayList<String>();
 
-		} catch (IOException e) {
-			return false;
-		}    
+		sb.append("actionName - ");
+		sb.append(actionName);
+		sb.append(": {\n");
 
-		return true;
-	}
+		String traceStart = sb.toString();
+		sasListStr.add(traceStart);
 
-	public boolean appendSASList(List<StateActionState> sasList, String actionName) {	
-		try {
-			
-			String traceStart = "actionName - " + actionName + " : {\n";
-			stream.write(traceStart.getBytes());
-			
-			for (int i = 0; i < sasList.size(); i++) {
+		for (int i = 0; i < sasList.size(); i++) {
 
-				byte bytes[] = sasList.get(i).toString().getBytes();    
+			sb.setLength(0);
 
-				stream.write(bytes);
-				stream.write("\n".getBytes());
-			}
-			
-			String traceEnd = "}\n";
-			stream.write(traceEnd.getBytes());
-			
-			stream.flush();
+			sb.append(sasList.get(i).toString());
+			sb.append("\n");
 
-		} catch (IOException e) {
-			return false;
-		}    
+			String sasStr = sb.toString();
 
-		return true;
-	}
-
-	
-	public boolean close() {
-
-		try {
-			stream.close();
-		} catch (IOException e) {
-			return false;
+			sasListStr.add(sasStr);
 		}
 
-		return true;
+		String traceEnd = "}\n";
+		sasListStr.add(traceEnd);
+
+		writeToFile(sasListStr);
+
 	}
 }

@@ -72,11 +72,11 @@ public class StateActionStateGenerator implements Creator {
 	private final List<Problem> problems = new ArrayList<Problem>();
 
 	//private Map<String, List<StateActionState>> newStateActionStates = new HashMap<String, List<StateActionState>>();
-	
+
 	private Set<String> newStateActionStatesMap = new HashSet<String>();
 	private Map<String, List<String>> actionOwnerToActionName = new HashMap<String, List<String>>();
 
-	
+	private Set<String> endStates = new HashSet<String>();
 	@Override
 	public void init(String[] args) {
 
@@ -224,23 +224,23 @@ public class StateActionStateGenerator implements Creator {
 		deleteSasFile();
 	}
 	 */
-
+	/*
 	private void runEntities() {
 		LOGGER.info("run entities:");
 
 		SASGenerator sasGenerator = new SASGenerator();
 
 		String TracesFolder = tracesDirPath;
-		
+
 		int sasCounter = 1;
-		
+
 		Map<String, List<StateActionState>> sasMap = new HashMap<String, List<StateActionState>>();
 
 		// generate problems
 		for (int i = 1; i <= numOfTracesToGenerate; i++) {
-			
+
 			LOGGER.info("generating trace number : " + i);
-			
+
 			List<StateActionState> sasList = new ArrayList<StateActionState>();
 
 			// perform random walk
@@ -250,31 +250,31 @@ public class StateActionStateGenerator implements Creator {
 			String humenized = endState.getDomain().humanize(endState.getValues());
 
 			if(!newStateActionStatesMap.contains(humenized)) {
-				
+
 				newStateActionStatesMap.add(humenized);
-				
+
 				for (StateActionState stateActionState : sasList) {
-					
+
 					List<StateActionState> sasMapList = sasMap.get(stateActionState.action);
-					
+
 					if(sasMapList == null) {						
-						
+
 						sasMapList = new ArrayList<StateActionState>();
 						sasMap.put(stateActionState.action, sasMapList);
-						
+
 						List<String> actionNames = actionOwnerToActionName.get(stateActionState.actionOwner);
-						
+
 						if(actionNames == null) {						
-							
+
 							actionNames = new ArrayList<String>();
 							actionOwnerToActionName.put(stateActionState.actionOwner, actionNames);
 						}
-						
+
 						actionNames.add(stateActionState.action);
 					}
-					
+
 					sasMapList.add(stateActionState);
-					
+
 					sasCounter++;
 
 				}
@@ -282,23 +282,23 @@ public class StateActionStateGenerator implements Creator {
 		}
 
 		LOGGER.info("total number of actions : " + sasMap.keySet().size());
-		
+
 		Iterator<Entry<String, List<String>>> it = actionOwnerToActionName.entrySet().iterator();
 
 		while (it.hasNext()) {
-			
+
 			Entry<String, List<String>> actionOwnerNamePair = (Entry<String, List<String>>)it.next();
-			
+
 			LOGGER.info("appending actions for agent : " + actionOwnerNamePair.getKey());
-			
+
 			sasGenerator.generateFile(TracesFolder,actionOwnerNamePair.getKey());
-			
+
 			for (String actionName : actionOwnerNamePair.getValue()) {
-				
+
 				LOGGER.info("appending action : " + actionName);
-				
+
 				List<StateActionState> actionSASList = sasMap.get(actionName);
-				
+
 				// append new sasList
 				sasGenerator.appendSASList(actionSASList, actionName);
 
@@ -314,8 +314,53 @@ public class StateActionStateGenerator implements Creator {
 
 		deleteSasFile();
 	}
+	 */
+	private void runEntities() {
+		LOGGER.info("run entities:");
 
+		SASGenerator sasGenerator = new SASGenerator();
 
+		String TracesFolder = tracesDirPath;
+
+		try {
+			sasGenerator.generateFile(TracesFolder,problemFileName + "_Traces");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		int problemCounter = 1;
+
+		// generate problems
+		for (int i = 1; i <= numOfTracesToGenerate; i++) {
+
+			LOGGER.info("generating trace number : " + i);
+
+			List<StateActionState> sasList = new ArrayList<StateActionState>();
+			// perform random walk
+			State endState = StateActionStateRandomWalker.RandomWalk(sasList, preprocessor.getGlobalInit(),
+					preprocessor.getGlobalGoal(), numOfRandomWalkSteps, problems, i);
+
+			String humenizedEndState = endState.getDomain().humanize(endState.getValues());
+
+			if(!endStates.contains(humenizedEndState)) {
+				endStates.add(humenizedEndState);
+
+				try {
+					sasGenerator.appendSASList(sasList, problemCounter);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+
+				problemCounter++;
+			}
+		}
+
+		LOGGER.info("total number of traces generated: " + problemCounter);
+
+		delelteTemporaryFiles();
+
+		deleteSasFile();
+	}
 	private void delelteTemporaryFiles() {
 
 		LOGGER.info("Deleting temporary files");

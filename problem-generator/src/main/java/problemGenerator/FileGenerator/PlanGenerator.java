@@ -1,5 +1,6 @@
 package problemGenerator.FileGenerator;
 
+import java.io.IOException;
 import java.util.List;
 
 public class PlanGenerator extends FileGenerator{
@@ -7,12 +8,12 @@ public class PlanGenerator extends FileGenerator{
 	private static final String FILE_TYPE = "plan";
 
 
-	public  boolean generateFile(String folderPath, String fileName) {
+	public void generateFile(String folderPath, String fileName) throws IOException {
 
-		return generateFile(folderPath, fileName, FILE_TYPE);
+		generateFile(folderPath, fileName, FILE_TYPE);
 	}
 
-	public void generatePlan(List<String> plan) {	
+	public void generatePlan(List<String> plan) throws IOException {	
 
 		String planText = createPlanString(plan);
 
