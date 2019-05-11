@@ -97,11 +97,15 @@ public class DeleteEffectGenerator {
 				}
 
 				if(!isExistsBoth) {
+					
+					res.add(effFact);
 
 					Set<Integer> deleteVals = problem.getDomain().getVariableDomains().get(effVar);
 
 					for (int val : deleteVals) {
-						res.add("not ( "+ Domain.valNames.get(val) +")");
+						
+						if(val != effVal)
+							res.add("not ( "+ Domain.valNames.get(val) +")");
 					}
 				}
 			}

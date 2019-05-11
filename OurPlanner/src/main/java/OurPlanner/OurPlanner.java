@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
@@ -44,9 +43,11 @@ public class OurPlanner implements Creator  {
 	private String pythonScriptsPath = "";
 	private String sasFilePath = "";
 	private String outputDirPath = "";
-	private String outputLearningDirPath = "";
+	private String outputSafeModelDirPath = "";
+	private String outputUnSafeModelDirPath = "";
 	private String outputTempDirPath = "";
-
+	public VerificationModel verificationModel = VerificationModel.GroundedModel;
+	public PlanningModel planningModel = PlanningModel.SafeModel;
 
 	private File tracesFile = null;
 	private File outputTestFile = null;
@@ -63,7 +64,7 @@ public class OurPlanner implements Creator  {
 	private	Random rnd = new Random(SEED);
 
 	private int numOftraces = 0;
-
+	private int tracesLearinigInterval = 0;
 	private int num_agents_solved = 0;
 	private int num_agents_not_solved = 0;
 	private int num_agents_timeout = 0;
@@ -192,6 +193,8 @@ public class OurPlanner implements Creator  {
 
 		numOftraces = configuration.numOfTracesToUse;
 
+		tracesLearinigInterval = configuration.tracesLearinigInterval;
+
 		domainFileName = configuration.domainFileName;
 		extension = domainFileName.substring(domainFileName.lastIndexOf(".") + 1);
 		//Checks if input domain name is of .pddl type
@@ -234,10 +237,15 @@ public class OurPlanner implements Creator  {
 		Globals.OUTPUT_PATH = outputDirPath;
 		/*OUTPUT DIR PATH*/
 
-		/*OUTPUT LEARNING DIR PATH*/
-		outputLearningDirPath = configuration.outputLearningDirPath;
-		Globals.LEARNED_PATH = outputLearningDirPath;
-		/*OUTPUT LEARNING DIR PATH*/
+		/*OUTPUT SAFE MODEL LEARNING DIR PATH*/
+		outputSafeModelDirPath = configuration.outputSafeModelLearningDirPath;
+		Globals.SAFE_MODEL_PATH = outputSafeModelDirPath;
+		/*OUTPUT SAFE MODEL LEARNING DIR PATH*/
+
+		/*OUTPUT SAFE MODEL LEARNING DIR PATH*/
+		outputUnSafeModelDirPath = configuration.outputUnSafeModelLearningDirPath;
+		Globals.UNSAFE_MODEL_PATH = outputUnSafeModelDirPath;
+		/*OUTPUT SAFE MODEL LEARNING DIR PATH*/
 
 		/*OUTPUT TEMP DIR PATH*/
 		outputTempDirPath = configuration.outputTempDirPath;
@@ -260,6 +268,10 @@ public class OurPlanner implements Creator  {
 		Globals.PYTHON_SCRIPTS_FOLDER = pythonScriptsPath;
 		/*PYTHON SCRIPTS*/
 
+		verificationModel = configuration.verificationModel;
+
+		planningModel = configuration.planningModel;
+
 		return true;
 	}
 
@@ -273,11 +285,18 @@ public class OurPlanner implements Creator  {
 
 		int rounds = 1;
 
-		boolean isLearning = learnFromTraces();
+		long learningStartTime = System.currentTimeMillis();
+
+		boolean isLearning = learnFromTraces("");
+
+		long learningFinishTime = System.currentTimeMillis();
+
+		TestDataAccumulator.getAccumulator().totalLearningTimeMs = learningFinishTime - learningStartTime;
 
 		while(leaderAgentPlan == null) {
 
 			LOGGER.info("Round " + rounds + " - Start!");
+			rounds++;
 
 			if(availableLeaders.isEmpty()){
 
@@ -286,22 +305,24 @@ public class OurPlanner implements Creator  {
 			}
 
 			currentLeaderAgent = pickLeader();
-			/*		
-			long learningStartTime = System.currentTimeMillis();
 
-			boolean isLearning = learnFromTraces(currentLeaderAgent);
+			//			TestDataAccumulator.getAccumulator().trainingSize = 0;
+			//
+			//			long learningStartTime = System.currentTimeMillis();
+			//
+			//			boolean isLearning = learnFromTraces(currentLeaderAgent);
+			//
+			//			long learningFinishTime = System.currentTimeMillis();
+			//
+			//			TestDataAccumulator.getAccumulator().totalLearningTimeMs += learningFinishTime - learningStartTime;
+			//			TestDataAccumulator.getAccumulator().agentLearningTimeMs.put(currentLeaderAgent, learningFinishTime - learningStartTime);
 
-			long learningFinishTime = System.currentTimeMillis();
-
-			TestDataAccumulator.getAccumulator().totalLearningTimeMs += learningFinishTime - learningStartTime;
-			TestDataAccumulator.getAccumulator().agentLearningTimeMs.put(currentLeaderAgent, learningFinishTime - learningStartTime);
-			 */
 
 			LOGGER.info("Current Leader Agent " + currentLeaderAgent);
 
 			long planningStartTime = System.currentTimeMillis();
 
-			leaderAgentPlan = planForAgent(currentLeaderAgent, isLearning);
+			leaderAgentPlan = planForAgent(currentLeaderAgent, isLearning, planningModel);
 
 			long planningFinishTime = System.currentTimeMillis();
 
@@ -311,26 +332,24 @@ public class OurPlanner implements Creator  {
 			if(leaderAgentPlan == null)
 				continue;		
 
-			if(verifyPlan(leaderAgentPlan, isLearning)) {
+			if(verifyPlan(leaderAgentPlan, isLearning, verificationModel)) {
 
 				TestDataAccumulator.getAccumulator().solvingAgent = currentLeaderAgent;
 				TestDataAccumulator.getAccumulator().planLength= leaderAgentPlan.size();
 
 				return true;
 			}
-
-			rounds++;
 		}
 
 		return false;
 	}
 
-	private boolean learnFromTraces() {
+	private boolean learnFromTraces(String agentName) {
 
 		LOGGER.info("Running learning algorithm");
 
-		TraceLearner learner = new TraceLearner(agentList,tracesFile, groundedFile, localViewFile, domainFileName,
-				problemFileName, numOftraces);	
+		TraceLearner learner = new TraceLearner(agentList,agentName,tracesFile, 
+				groundedFile, localViewFile, domainFileName, problemFileName, numOftraces, tracesLearinigInterval);	
 
 		boolean isLearned = learner.learnNewActions();
 
@@ -347,7 +366,16 @@ public class OurPlanner implements Creator  {
 
 		LOGGER.info("Copy the original problem files");
 
-		File destDir = new File(Globals.LEARNED_PATH);
+		File destDir = new File(Globals.SAFE_MODEL_PATH);
+
+		try {
+			FileUtils.copyDirectory(localViewFile, destDir);
+		} catch (IOException e) {
+			LOGGER.fatal(e, e);
+			return false;
+		}
+
+		destDir = new File(Globals.UNSAFE_MODEL_PATH);
 
 		try {
 			FileUtils.copyDirectory(localViewFile, destDir);
@@ -376,18 +404,35 @@ public class OurPlanner implements Creator  {
 	}
 
 
-	private boolean verifyPlan(List<String> plan, boolean isLearning) {
+	private boolean verifyPlan(List<String> plan, boolean isLearning, VerificationModel model) {
 
 		LOGGER.info("Verifing plan");
 
-		String localViewPath = "";
+		String problemFilesPath = "";
 
-		if (isLearning) 
-			localViewPath = Globals.LEARNED_PATH;
-		else 
-			localViewPath = this.localViewFolder;
+		boolean useGrounded = false;
 
-		PlanVerifier planVerifier = new PlanVerifier(agentList,domainFileName,problemFileName,localViewPath);		
+		if (isLearning) {
+
+			switch (model) {
+			case SafeModel:
+				problemFilesPath = Globals.SAFE_MODEL_PATH;
+				break;
+			case UnSafeModel:
+				problemFilesPath = Globals.UNSAFE_MODEL_PATH;
+				break;
+			case GroundedModel:
+			default:
+				problemFilesPath = this.groundedFolder;
+				useGrounded = true;
+				break;
+			}
+		}else {
+			problemFilesPath = this.localViewFolder;
+		}
+
+		PlanVerifier planVerifier = new PlanVerifier(agentList,domainFileName,problemFileName,
+				problemFilesPath, useGrounded);		
 
 		boolean isVerified = planVerifier.verifyPlan(plan,0);
 
@@ -402,14 +447,27 @@ public class OurPlanner implements Creator  {
 		return isVerified;
 	}
 
-	private List<String> planForAgent(String agentName, boolean isLearning) {
+	private List<String> planForAgent(String agentName, boolean isLearning, PlanningModel model ) {
 
 		LOGGER.info("Planning for leader agent");
 
 		String agentDomainPath = "";
 
-		if (isLearning) 
-			agentDomainPath = Globals.LEARNED_PATH  + "/" + agentName + "/" + domainFileName;
+		if (isLearning) {
+
+			switch (model) {
+			case UnSafeModel:
+				agentDomainPath = Globals.UNSAFE_MODEL_PATH  + "/" + agentName + "/" + domainFileName;
+				break;
+			case SafeModel:
+				agentDomainPath = Globals.SAFE_MODEL_PATH  + "/" + agentName + "/" + domainFileName;
+				break;
+			case GroundedModel:
+			default:
+				agentDomainPath = groundedFolder + "/" + domainFileName;
+				break;
+			}
+		}
 		else 
 			agentDomainPath = localViewFolder + "/" + agentName + "/" + domainFileName;
 
@@ -597,7 +655,19 @@ public class OurPlanner implements Creator  {
 
 		LOGGER.info("Deleting learned files");
 
-		File temp = new File(Globals.LEARNED_PATH);		
+		File temp = new File(Globals.SAFE_MODEL_PATH);		
+		if(temp.exists()) {
+			LOGGER.info("Deleting 'learned' folder");
+
+			try {
+				FileUtils.deleteDirectory(temp);
+			} catch (IOException e) {
+				LOGGER.fatal(e, e);
+				return false;
+			}
+		}
+
+		temp = new File(Globals.UNSAFE_MODEL_PATH);		
 		if(temp.exists()) {
 			LOGGER.info("Deleting 'learned' folder");
 

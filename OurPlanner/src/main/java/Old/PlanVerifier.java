@@ -1,4 +1,4 @@
-package OurPlanner;
+package Old;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -20,6 +20,8 @@ import Model.*;
 import cz.agents.dimaptools.input.addl.ADDLObject;
 import cz.agents.dimaptools.input.addl.ADDLParser;
 import cz.agents.dimaptools.model.*;
+import OurPlanner.*;
+
 
 public class PlanVerifier {
 
@@ -90,6 +92,7 @@ public class PlanVerifier {
 			}
 		}
 	}
+
 
 	private void logInput() {
 
@@ -440,6 +443,15 @@ public class PlanVerifier {
 			return false;
 		}
 
+		//		if(actionIndex == plan.size() - 1){
+		//			LOGGER.info("Plan verifing finished - plan verified!");
+		//			return true;
+		//		}
+		//		if(state.unifiesWith(goalState)){
+		//			LOGGER.info("Goal is reached - plan verified!");
+		//			return true;
+		//		}
+
 		if(actionIndex == plan.size() - 1) {
 
 			if(state.unifiesWith(agentGoalState)) {
@@ -489,8 +501,6 @@ public class PlanVerifier {
 	}
 
 	private String GetLabelFormated(String[] split) {
-
-		LOGGER.info("Get action label formatted");
 
 		String label = split[2];
 
@@ -630,8 +640,6 @@ public class PlanVerifier {
 
 	private HashMap<String, String> getOldNewFacts(State state) {
 
-		LOGGER.info("Getting old-to-new facts map");
-
 		HashMap<String, String> oldnewFacts = new HashMap<String,String>();
 
 		for (int i = 0; i < state.getValues().length; i++) {
@@ -656,8 +664,6 @@ public class PlanVerifier {
 	}
 
 	private String formatFact(State state, int i) {
-		
-		LOGGER.info("formatting facts");
 
 		String res = getKeyFromValue(agentValCodes, state.getValue(i));
 		String[] words = null;

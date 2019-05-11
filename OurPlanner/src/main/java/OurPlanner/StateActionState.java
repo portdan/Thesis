@@ -6,11 +6,11 @@ import java.util.Set;
 
 public class StateActionState {
 
-	Set<String> pre = null;
-	String action = null;
-	String actionOwner = null;
-	Set<String> post = null;
-	int traceNumber = 0;
+	public Set<String> pre = null;
+	public String action = null;
+	public String actionOwner = null;
+	public Set<String> post = null;
+	public int traceNumber = 0;
 	
 	public StateActionState(Set<String> pre, String action, String actionOwner, Set<String> post, int traceNumber) {
 

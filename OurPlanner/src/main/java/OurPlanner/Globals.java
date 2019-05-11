@@ -4,7 +4,8 @@ public class Globals {
 
 	public static String OUTPUT_PATH;
 	public static String TEMP_PATH;
-	public static String LEARNED_PATH;
+	public static String SAFE_MODEL_PATH;
+	public static String UNSAFE_MODEL_PATH;
 
 	public static String SAS_OUTPUT_FILE_PATH;
 	public static String PROCESSED_SAS_OUTPUT_FILE_PATH;

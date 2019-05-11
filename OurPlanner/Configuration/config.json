@@ -1,18 +1,22 @@
 {
-  "agentsFileName": "probLOGISTICS-6-0.agents", 
+  "agentsFileName": "probLOGISTICS-13-0.agents", 
   "agentsFilePath": "/home/daniel/Work/WorkSpace/Thesis/OurPlanner/Input/Agent", 
   "domainFileName": "domain.pddl", 
   "groundedDirPath": "/home/daniel/Work/WorkSpace/Thesis/OurPlanner/Input/Grounded", 
   "localViewDirPath": "/home/daniel/Work/WorkSpace/Thesis/OurPlanner/Input/LocalView", 
-  "numOfTracesToUse": 1000, 
-  "outputCopyDirPath": "/home/daniel/Work/WorkSpace/Thesis/OurPlannerTester/Output/probLOGISTICS-6-0.pddl/OurPlanner", 
+  "numOfTracesToUse": 1001, 
+  "outputCopyDirPath": "/home/daniel/Work/WorkSpace/Thesis/OurPlannerTester/Output/probLOGISTICS-13-0.pddl/OurPlanner", 
   "outputDirPath": "/home/daniel/Work/WorkSpace/Thesis/OurPlanner/Output", 
-  "outputLearningDirPath": "/home/daniel/Work/WorkSpace/Thesis/OurPlanner/Output/Learning", 
+  "outputSafeModelLearningDirPath": "/home/daniel/Work/WorkSpace/Thesis/OurPlanner/Output/SafeModel", 
   "outputTempDirPath": "/home/daniel/Work/WorkSpace/Thesis/OurPlanner/Output/temp", 
-  "problemFileName": "probLOGISTICS-6-0.pddl", 
+  "outputUnSafeModelLearningDirPath": "/home/daniel/Work/WorkSpace/Thesis/OurPlanner/Output/UnSafeModel", 
+  "planningModel": "SafeModel", 
+  "problemFileName": "probLOGISTICS-13-0.pddl", 
   "pythonScriptsPath": "/home/daniel/Work/WorkSpace/Thesis/OurPlanner/Scripts", 
   "sasFilePath": "/home/daniel/Work/WorkSpace/Thesis/OurPlanner/Output/output.sas", 
   "testOutputCSVFilePath": "/home/daniel/Work/WorkSpace/Thesis/OurPlannerTester/Output/output.csv", 
-  "tracesDirPath": "/home/daniel/Work/WorkSpace/Thesis/OurPlanner/Input/Traces"
+  "tracesDirPath": "/home/daniel/Work/WorkSpace/Thesis/OurPlanner/Input/Traces", 
+  "tracesLearinigInterval": 1000, 
+  "verificationModel": "GroundedModel"
 }
 
