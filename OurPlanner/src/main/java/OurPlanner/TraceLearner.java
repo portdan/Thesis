@@ -148,7 +148,7 @@ public class TraceLearner {
 
 	private void addAgentLearningTime(long sequancingTimeTotal, long sequancingAmountTotal, long learningStartTime,
 			String actionOwnerName, List<StateActionState> sasListForAction, long learningFinishTime) {
-		
+
 		LOGGER.info("Linking agent learning times");
 
 		long relativeSequancingTime = (sasListForAction.size()*sequancingTimeTotal) / sequancingAmountTotal;
@@ -257,6 +257,12 @@ public class TraceLearner {
 			int endIndex = fact.length();
 
 			boolean isNegated = false;
+
+			if(fact.startsWith("Negated")) {
+				isNegated = true;
+				fact = fact.replace("Negated", "");
+				endIndex = fact.length();
+			}
 
 			if(fact.startsWith("not")) {
 				isNegated = true;
