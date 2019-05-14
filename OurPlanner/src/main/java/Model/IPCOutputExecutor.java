@@ -82,7 +82,7 @@ public class IPCOutputExecutor implements PlanExecutorInterface {
 					label = label.replace(Globals.PARAMETER_INDICATION, " ");
 				}
 				else {
-					for (int ind = 1; ind < split.length-1; ind++)
+					for (int ind = 1; ind < split.length; ind++)
 						label += " " + split[ind];
 				}
 
