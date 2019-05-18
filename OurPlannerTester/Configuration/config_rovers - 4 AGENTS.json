@@ -1,6 +1,6 @@
 {
   "domainName": "domain.pddl", 
-  "domainPath": "/home/daniel/Work/WorkSpace/Thesis/OurPlannerTester/mapddl-benchmarks/logistics00", 
+  "domainPath": "/home/daniel/Work/WorkSpace/Thesis/OurPlannerTester/mapddl-benchmarks/rovers", 
   "originDestination": "Origin", 
   "outputDestination": "/home/daniel/Work/WorkSpace/Thesis/OurPlannerTester/Output", 
   "problemGeneratorConfig": "/home/daniel/Work/WorkSpace/Thesis/OurPlannerTester/Testing_Environment/problem-generator/Configuration/config.json", 
@@ -21,38 +21,73 @@
   "problemPlannerJAR": "/home/daniel/Work/WorkSpace/Thesis/OurPlannerTester/Testing_Environment/OurPlanner/target/OurPlanner-0.0.1-SNAPSHOT-jar-with-dependencies.jar", 
   "problemPlannerOutput": "/home/daniel/Work/WorkSpace/Thesis/OurPlannerTester/Testing_Environment/OurPlanner/Output", 
   "problemPlannerOutputDestination": "OurPlanner", 
-  "problemPlannerVerificationModel": "GroundedModel",
-  "problemPlannerPlanningModel": "SafeModel",
+  "problemPlannerPlanningModel": "SafeModel", 
+  "problemPlannerVerificationModel": "GroundedModel", 
   "problems": [
     {
-      "maxTracesToUse": 4000, 
+      "maxTracesToUse": 500, 
       "minTracesToUse": 0, 
-      "problemName": "probLOGISTICS-10-0.pddl", 
-      "solvedRangeSplit": 3, 
-      "unsolvedRangeSplit": 3
+      "problemName": "p08.pddl", 
+      "solvedRangeSplit": 5, 
+      "unsolvedRangeSplit": 5
     }, 
     {
-      "maxTracesToUse": 4000, 
+      "maxTracesToUse": 500, 
       "minTracesToUse": 0, 
-      "problemName": "probLOGISTICS-10-1.pddl", 
-      "solvedRangeSplit": 3, 
-      "unsolvedRangeSplit": 3
+      "problemName": "p09.pddl", 
+      "solvedRangeSplit": 5, 
+      "unsolvedRangeSplit": 5
     }, 
     {
-      "maxTracesToUse": 4000, 
+      "maxTracesToUse": 500, 
       "minTracesToUse": 0, 
-      "problemName": "probLOGISTICS-11-0.pddl", 
-      "solvedRangeSplit": 3, 
-      "unsolvedRangeSplit": 3
+      "problemName": "p10.pddl", 
+      "solvedRangeSplit": 5, 
+      "unsolvedRangeSplit": 5
     }, 
     {
-      "maxTracesToUse": 4000, 
+      "maxTracesToUse": 500, 
       "minTracesToUse": 0, 
-      "problemName": "probLOGISTICS-12-0.pddl", 
-      "solvedRangeSplit": 3, 
-      "unsolvedRangeSplit": 3
+      "problemName": "p11.pddl", 
+      "solvedRangeSplit": 5, 
+      "unsolvedRangeSplit": 5
+    }, 
+    {
+      "maxTracesToUse": 500, 
+      "minTracesToUse": 0, 
+      "problemName": "p12.pddl", 
+      "solvedRangeSplit": 5, 
+      "unsolvedRangeSplit": 5
+    }, 
+    {
+      "maxTracesToUse": 500, 
+      "minTracesToUse": 0, 
+      "problemName": "p13.pddl", 
+      "solvedRangeSplit": 5, 
+      "unsolvedRangeSplit": 5
+    }, 
+    {
+      "maxTracesToUse": 500, 
+      "minTracesToUse": 0, 
+      "problemName": "p14.pddl", 
+      "solvedRangeSplit": 5, 
+      "unsolvedRangeSplit": 5
+    }, 
+    {
+      "maxTracesToUse": 500, 
+      "minTracesToUse": 0, 
+      "problemName": "p15.pddl", 
+      "solvedRangeSplit": 5, 
+      "unsolvedRangeSplit": 5
+    }, 
+    {
+      "maxTracesToUse": 500, 
+      "minTracesToUse": 0, 
+      "problemName": "p16.pddl", 
+      "solvedRangeSplit": 5, 
+      "unsolvedRangeSplit": 5
     }
-  ],  
-  "problemsPath": "/home/daniel/Work/WorkSpace/Thesis/OurPlannerTester/mapddl-benchmarks/logistics00"
+  ], 
+  "problemsPath": "/home/daniel/Work/WorkSpace/Thesis/OurPlannerTester/mapddl-benchmarks/rovers"
 }
 

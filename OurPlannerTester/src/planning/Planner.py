@@ -8,6 +8,7 @@ import pyckson
 import subprocess
 import shutil
 import csv
+import math
 
 from configuration import PlannerConfig
 from utils.Utils import clear_directory,copy_tree
@@ -145,12 +146,12 @@ class Planner(object):
         
         self.tested_amounts = []
                 
-        while min_traces < max_traces:
+        while min_traces <= max_traces:
             
             solved_counter = 0
             timeout_counter = 0
     
-            current_traces_amount = (min_traces + max_traces) // 2
+            current_traces_amount = math.ceil((min_traces + max_traces) / 2)
                         
             self.plan(problem_name, current_traces_amount)
             agents, solved, timeout = self.get_ourplanner_results(self.test_output_CSV_file_path)
