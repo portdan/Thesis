@@ -287,8 +287,11 @@ public class OurPlanner implements Creator  {
 
 		long learningStartTime = System.currentTimeMillis();
 
-		boolean isLearning = learnFromTraces("");
-
+		boolean isLearning = false;
+		
+		if(numOftraces>0)
+			isLearning = learnFromTraces();
+		
 		long learningFinishTime = System.currentTimeMillis();
 
 		TestDataAccumulator.getAccumulator().totalLearningTimeMs = learningFinishTime - learningStartTime;
@@ -344,11 +347,11 @@ public class OurPlanner implements Creator  {
 		return false;
 	}
 
-	private boolean learnFromTraces(String agentName) {
+	private boolean learnFromTraces() {
 
 		LOGGER.info("Running learning algorithm");
 
-		TraceLearner learner = new TraceLearner(agentList,agentName,tracesFile, 
+		TraceLearner learner = new TraceLearner(agentList,tracesFile, 
 				groundedFile, localViewFile, domainFileName, problemFileName, numOftraces, tracesLearinigInterval);	
 
 		boolean isLearned = learner.learnNewActions();

@@ -94,6 +94,9 @@ public class TraceLearner {
 
 		DeleteEffectGenerator DEGenerator = new DeleteEffectGenerator (problemFiles,
 				domainFileName, problemFileName);
+		
+		for (String agentName : agentList) 
+				agentLearningTimes.put(agentName,(long) 0);
 
 		while(!sasSequencer.StopSequencing) {
 
@@ -181,12 +184,12 @@ public class TraceLearner {
 
 		// SAFE MODEL //
 		LOGGER.info("Learning safe preconditions and effects");
-
+		
 		Set<String> safePre = learnSafePreconditions(sasListForAction);
 		Set<String> safeEff = learnSafeEffects(sasListForAction);
 
 		safeEff.addAll(DEGenerator.generateDeleteEffects(actionName,safePre,safeEff));
-
+		
 		safePre = formatFacts(safePre);
 		safeEff = formatFacts(safeEff);
 
@@ -257,20 +260,19 @@ public class TraceLearner {
 			int endIndex = fact.length();
 
 			boolean isNegated = false;
-
-			if(fact.startsWith("Negated")) {
-				isNegated = true;
-				fact = fact.replace("Negated", "");
-				endIndex = fact.length();
+			String formattedFact = fact;
+			
+			if(formattedFact.startsWith("not")) {
+				isNegated = !isNegated;
+				startIndex = formattedFact.indexOf('(');
+				endIndex = formattedFact.lastIndexOf(')');			
+				formattedFact = formattedFact.substring(startIndex+1,endIndex);
 			}
-
-			if(fact.startsWith("not")) {
-				isNegated = true;
-				startIndex = fact.indexOf('(');
-				endIndex = fact.lastIndexOf(')');
+			
+			if(formattedFact.startsWith("Negated")) {
+				isNegated = !isNegated;
+				formattedFact = formattedFact.replace("Negated", "");
 			}
-
-			String formattedFact = fact.substring(startIndex,endIndex);
 
 			formattedFact = formattedFact.replace("(", " ");
 			formattedFact = formattedFact.replace(",", "");
@@ -278,9 +280,8 @@ public class TraceLearner {
 
 			formattedFact = formattedFact.trim();
 
-			if (isNegated) {
+			if (isNegated)
 				formattedFact = "not (" + formattedFact + ")";
-			}
 
 			formatted.add(formattedFact);
 		}
