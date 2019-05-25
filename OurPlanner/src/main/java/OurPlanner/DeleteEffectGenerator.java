@@ -28,7 +28,7 @@ public class DeleteEffectGenerator {
 	private static final String PREPROCESSOR = Globals.PYTHON_SCRIPTS_FOLDER + "/preprocess/preprocess-runner";
 	private static final String CONVERTOR = Globals.PYTHON_SCRIPTS_FOLDER + "/ma-pddl/ma-to-pddl.py";
 
-	private static final String TEMP_DIR_PATH = Globals.TEMP_PATH;
+	private static final String TEMP_DIR_PATH = Globals.OUTPUT_TEMP_PATH;
 	private static final String SAS_FILE_PATH = Globals.SAS_OUTPUT_FILE_PATH;
 
 	private String domainFileName = "";

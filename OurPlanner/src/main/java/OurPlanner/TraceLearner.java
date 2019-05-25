@@ -437,7 +437,7 @@ public class TraceLearner {
 
 		LOGGER.info("Writing new safe PDDL domain file");
 
-		String learnedDomainPath = Globals.SAFE_MODEL_PATH + "/" + agentName + "/" + domainFileName;
+		String learnedDomainPath = Globals.OUTPUT_SAFE_MODEL_PATH + "/" + agentName + "/" + domainFileName;
 
 		try {
 			FileUtils.writeStringToFile(new File(learnedDomainPath), newDomainString, Charset.defaultCharset());
@@ -453,7 +453,7 @@ public class TraceLearner {
 
 		LOGGER.info("Writing new unsafe PDDL domain file");
 
-		String learnedDomainPath = Globals.UNSAFE_MODEL_PATH + "/" + agentName + "/" + domainFileName;
+		String learnedDomainPath = Globals.OUTPUT_UNSAFE_MODEL_PATH + "/" + agentName + "/" + domainFileName;
 
 		try {
 			FileUtils.writeStringToFile(new File(learnedDomainPath), newDomainString, Charset.defaultCharset());

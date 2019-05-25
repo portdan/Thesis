@@ -14,6 +14,7 @@ import org.apache.log4j.Logger;
 
 import Configuration.ConfigurationManager;
 import Configuration.OurPlannerConfiguration;
+import Utils.FileDeleter;
 import cz.agents.alite.creator.Creator;
 
 public class OurPlanner implements Creator  {
@@ -25,27 +26,12 @@ public class OurPlanner implements Creator  {
 
 	private static final String AGENT_PARSER_SCRIPT = "parse-agents.py";
 
-	private static String SAS_FILE_PATH;
-	private static String OUTPUT_FILE_NAME;
-	private static String TEMP_DIR_PATH;
-
 	/* Class variables */
 	private String configurationFilePath = "";
 
-	private String tracesFolder = "";
-	private String outputCopyDirPath = "";
-	private String outputTestDirPath = "";
-	private String groundedFolder = "";
-	private String localViewFolder = "";
 	private String domainFileName = "";
 	private String problemFileName = "";
-	private String agentsFilePath = "";
-	private String pythonScriptsPath = "";
-	private String sasFilePath = "";
-	private String outputDirPath = "";
-	private String outputSafeModelDirPath = "";
-	private String outputUnSafeModelDirPath = "";
-	private String outputTempDirPath = "";
+
 	public VerificationModel verificationModel = VerificationModel.GroundedModel;
 	public PlanningModel planningModel = PlanningModel.SafeModel;
 
@@ -110,15 +96,15 @@ public class OurPlanner implements Creator  {
 
 		TestDataAccumulator.startNewAccumulator(domainFileName, problemFileName, agentList);
 
-		TestDataAccumulator.getAccumulator().setOutputFile(outputTestDirPath);
+		TestDataAccumulator.getAccumulator().setOutputFile(Globals.OUTPUT_TEST_FILE_PATH);
 
 
-		if(!deleteLearnedFiles()) {
+		if(!FileDeleter.deleteLearnedFiles()) {
 			LOGGER.info("Deleting Learned files failure");
 			System.exit(1);
 		}
 
-		if(!deleteTempFiles()) {
+		if(!FileDeleter.deleteTempFiles()) {
 			LOGGER.info("Deleting Temporary files failure");
 			System.exit(1);
 		}
@@ -136,6 +122,8 @@ public class OurPlanner implements Creator  {
 		 */
 
 		runPlanningAlgorithm();
+
+		//runPlanningAlgorithmWithModelUpdating();
 
 		TestDataAccumulator.getAccumulator().numOfAgentsSolved = num_agents_solved;
 		TestDataAccumulator.getAccumulator().numOfAgentsTimeout = num_agents_timeout;
@@ -165,29 +153,45 @@ public class OurPlanner implements Creator  {
 	private boolean ApplyConfiguration(OurPlannerConfiguration configuration) {
 		LOGGER.info("Applying configuration");
 
+		File f = null;
 		String extension = "";
 
-		groundedFolder = configuration.groundedDirPath;
-		groundedFile = new File(groundedFolder);
+		/*INPUT DIR PATH*/
+		Globals.INPUT_PATH = configuration.inputDirPath;
+		/*INPUT DIR PATH*/
+
+		/*OUTPUT DIR PATH*/
+		Globals.OUTPUT_PATH = configuration.outputDirPath;
+		/*OUTPUT DIR PATH*/
+
+		Globals.INPUT_GROUNDED_PATH = Globals.INPUT_PATH + "/" + configuration.inputGoundedDirName;
+		groundedFile = new File(Globals.INPUT_GROUNDED_PATH);
 
 		if( !groundedFile.exists()) {
 			LOGGER.fatal("provided path to grounded folder not existing");
 			return false;
 		}
 
-		localViewFolder = configuration.localViewDirPath;
-		localViewFile = new File(localViewFolder);
+		Globals.INPUT_LOCAL_VIEW_PATH = Globals.INPUT_PATH + "/" + configuration.inputLocalViewDirName;
+		localViewFile = new File(Globals.INPUT_LOCAL_VIEW_PATH);
 
 		if( !localViewFile.exists()) {
 			LOGGER.fatal("provided path to local view folder not existing");
 			return false;
 		}
 
-		tracesFolder = configuration.tracesDirPath;
-		tracesFile = new File(tracesFolder);
+		Globals.INPUT_TRACES_PATH = Globals.INPUT_PATH + "/" + configuration.inputTracesDirName;
+		tracesFile = new File(Globals.INPUT_TRACES_PATH);
 
 		if( !tracesFile.exists()) {
 			LOGGER.fatal("provided path to traces folder not existing");
+			return false;
+		}
+
+		Globals.INPUT_AGENTS_PATH = Globals.INPUT_PATH + "/" + configuration.inputAgentsDirName + "/" + configuration.agentsFileName;
+		agentsFile = new File(Globals.INPUT_AGENTS_PATH);
+		if( !agentsFile.exists()) {
+			LOGGER.fatal("provided path to .agents file not existing");
 			return false;
 		}
 
@@ -211,62 +215,63 @@ public class OurPlanner implements Creator  {
 			return false;
 		}
 
-		agentsFilePath = configuration.agentsFilePath + "/" + configuration.agentsFileName;
-		agentsFile = new File(agentsFilePath);
-		if( !agentsFile.exists()) {
-			LOGGER.fatal("provided path to .agents file not existing");
-			return false;
-		}
-
-		outputCopyDirPath = configuration.outputCopyDirPath + "/" + numOftraces + "_traces";
-		outputCopyDir = new File(outputCopyDirPath);
+		Globals.OUTPUT_COPY_PATH = configuration.outputCopyDirPath + "/" + numOftraces + "_traces";
+		outputCopyDir = new File(Globals.OUTPUT_COPY_PATH);
 
 		if( !outputCopyDir.exists()) {
 			outputCopyDir.getParentFile().mkdirs();
 		}
 
-		outputTestDirPath = configuration.testOutputCSVFilePath;
-		outputTestFile = new File(outputTestDirPath);
+		Globals.OUTPUT_TEST_FILE_PATH = configuration.testOutputCSVFilePath;
+		outputTestFile = new File(Globals.OUTPUT_TEST_FILE_PATH);
 
 		if( !outputTestFile.exists()) {
 			outputTestFile.getParentFile().mkdirs();
 		}
 
-		/*OUTPUT DIR PATH*/
-		outputDirPath = configuration.outputDirPath;
-		Globals.OUTPUT_PATH = outputDirPath;
-		/*OUTPUT DIR PATH*/
+		Globals.OUTPUT_TEMP_PATH = Globals.OUTPUT_PATH  + "/" + configuration.outputTempDirPath;
 
-		/*OUTPUT SAFE MODEL LEARNING DIR PATH*/
-		outputSafeModelDirPath = configuration.outputSafeModelLearningDirPath;
-		Globals.SAFE_MODEL_PATH = outputSafeModelDirPath;
-		/*OUTPUT SAFE MODEL LEARNING DIR PATH*/
+		Globals.OUTPUT_SAFE_MODEL_PATH = Globals.OUTPUT_PATH  + "/" + configuration.outputSafeModelLearningDirName;
+		f = new File(Globals.OUTPUT_SAFE_MODEL_PATH);
+		if( !f.exists()) {
+			f.mkdirs();
+		}
 
-		/*OUTPUT SAFE MODEL LEARNING DIR PATH*/
-		outputUnSafeModelDirPath = configuration.outputUnSafeModelLearningDirPath;
-		Globals.UNSAFE_MODEL_PATH = outputUnSafeModelDirPath;
-		/*OUTPUT SAFE MODEL LEARNING DIR PATH*/
+		Globals.OUTPUT_UNSAFE_MODEL_PATH = Globals.OUTPUT_PATH  + "/" + configuration.outputUnSafeModelLearningDirName;
+		f = new File(Globals.OUTPUT_UNSAFE_MODEL_PATH);
+		if( !f.exists()) {
+			f.mkdirs();
+		}
 
-		/*OUTPUT TEMP DIR PATH*/
-		outputTempDirPath = configuration.outputTempDirPath;
-		Globals.TEMP_PATH = outputTempDirPath;
-		TEMP_DIR_PATH = outputTempDirPath;
-		/*OUTPUT TEMP DIR PATH*/
+		Globals.OUTPUT_OPEN_PATH = Globals.OUTPUT_PATH  + "/" + configuration.outputOpenDirName;
+		f = new File(Globals.OUTPUT_OPEN_PATH);
+		if( !f.exists()) {
+			f.mkdirs();
+		}
 
-		/*SAS FILE NAME */
-		sasFilePath = configuration.sasFilePath;
+		Globals.OUTPUT_CLOSED_PATH = Globals.OUTPUT_PATH  + "/" + configuration.outputClosedDirPath;
+		f = new File(Globals.OUTPUT_CLOSED_PATH);
+		if( !f.exists()) {
+			f.mkdirs();
+		}
 
-		Globals.SAS_OUTPUT_FILE_PATH = sasFilePath;
-		SAS_FILE_PATH = Globals.SAS_OUTPUT_FILE_PATH;
+		Globals.OUTPUT_EXPANDED_SAFE_PATH = Globals.OUTPUT_PATH  + "/" + configuration.outputExpandedSafeDirName;
+		f = new File(Globals.OUTPUT_EXPANDED_SAFE_PATH);
+		if( !f.exists()) {
+			f.mkdirs();
+		}
 
-		Globals.PROCESSED_SAS_OUTPUT_FILE_PATH = sasFilePath.split("\\.")[0];
-		OUTPUT_FILE_NAME = Globals.PROCESSED_SAS_OUTPUT_FILE_PATH;
-		/*SAS FILE NAME */
+		Globals.OUTPUT_EXPANDED_UNSAFE_PATH = Globals.OUTPUT_PATH  + "/" + configuration.outputExpandedUnSafeDirName;
+		f = new File(Globals.OUTPUT_EXPANDED_UNSAFE_PATH);
+		if( !f.exists()) {
+			f.mkdirs();
+		}
 
-		/*PYTHON SCRIPTS*/
-		pythonScriptsPath = configuration.pythonScriptsPath;
-		Globals.PYTHON_SCRIPTS_FOLDER = pythonScriptsPath;
-		/*PYTHON SCRIPTS*/
+		Globals.SAS_OUTPUT_FILE_PATH = Globals.OUTPUT_PATH  + "/" + configuration.outputSASFileName;
+
+		Globals.PROCESSED_SAS_OUTPUT_FILE_PATH = Globals.OUTPUT_PATH  + "/" + configuration.outputSASFileName.split("\\.")[0];
+
+		Globals.PYTHON_SCRIPTS_FOLDER = configuration.pythonScriptsPath;
 
 		verificationModel = configuration.verificationModel;
 
@@ -288,10 +293,10 @@ public class OurPlanner implements Creator  {
 		long learningStartTime = System.currentTimeMillis();
 
 		boolean isLearning = false;
-		
+
 		if(numOftraces>0)
-			isLearning = learnFromTraces();
-		
+			isLearning = learnSafeAndUnSafeModelsFromTraces();
+
 		long learningFinishTime = System.currentTimeMillis();
 
 		TestDataAccumulator.getAccumulator().totalLearningTimeMs = learningFinishTime - learningStartTime;
@@ -347,7 +352,56 @@ public class OurPlanner implements Creator  {
 		return false;
 	}
 
-	private boolean learnFromTraces() {
+	private boolean runPlanningAlgorithmWithModelUpdating() {
+
+		LOGGER.info("Running planning algorithm with model updating");
+
+		availableLeaders = new ArrayList<>(agentList);
+
+		List<String> leaderAgentPlan = null;
+
+		long learningStartTime = System.currentTimeMillis();
+
+		if(numOftraces>0)
+			learnSafeAndUnSafeModelsFromTraces();
+
+		long learningFinishTime = System.currentTimeMillis();
+
+		TestDataAccumulator.getAccumulator().totalLearningTimeMs = learningFinishTime - learningStartTime;
+
+		while(!availableLeaders.isEmpty()) {
+
+			currentLeaderAgent = pickLeader();
+
+			LOGGER.info("Current Leader Agent " + currentLeaderAgent);
+
+			long planningStartTime = System.currentTimeMillis();
+
+			leaderAgentPlan = planAndLearnModels(currentLeaderAgent);
+
+			long planningFinishTime = System.currentTimeMillis();
+
+			TestDataAccumulator.getAccumulator().totalPlaningTimeMs += planningFinishTime - planningStartTime;
+			TestDataAccumulator.getAccumulator().agentPlanningTimeMs.put(currentLeaderAgent, planningFinishTime - planningStartTime);
+
+			if(leaderAgentPlan != null)
+				return true;
+		}
+
+		LOGGER.fatal("No more available leaders. No solution!");
+
+		return false;
+	}
+
+	private List<String> planAndLearnModels(String agentName) {
+
+		PlannerAndModelLearner asd = new PlannerAndModelLearner(agentName, agentList,
+				domainFileName, problemFileName);
+
+		return null;
+	}
+
+	private boolean learnSafeAndUnSafeModelsFromTraces() {
 
 		LOGGER.info("Running learning algorithm");
 
@@ -356,7 +410,7 @@ public class OurPlanner implements Creator  {
 
 		boolean isLearned = learner.learnNewActions();
 
-		if(!deleteTempFiles()) {
+		if(!FileDeleter.deleteTempFiles()) {
 			LOGGER.info("Deleting Temporary files failure");
 			return false;
 		}
@@ -369,7 +423,7 @@ public class OurPlanner implements Creator  {
 
 		LOGGER.info("Copy the original problem files");
 
-		File destDir = new File(Globals.SAFE_MODEL_PATH);
+		File destDir = new File(Globals.OUTPUT_SAFE_MODEL_PATH);
 
 		try {
 			FileUtils.copyDirectory(localViewFile, destDir);
@@ -378,7 +432,7 @@ public class OurPlanner implements Creator  {
 			return false;
 		}
 
-		destDir = new File(Globals.UNSAFE_MODEL_PATH);
+		destDir = new File(Globals.OUTPUT_UNSAFE_MODEL_PATH);
 
 		try {
 			FileUtils.copyDirectory(localViewFile, destDir);
@@ -419,19 +473,19 @@ public class OurPlanner implements Creator  {
 
 			switch (model) {
 			case SafeModel:
-				problemFilesPath = Globals.SAFE_MODEL_PATH;
+				problemFilesPath = Globals.OUTPUT_SAFE_MODEL_PATH;
 				break;
 			case UnSafeModel:
-				problemFilesPath = Globals.UNSAFE_MODEL_PATH;
+				problemFilesPath = Globals.OUTPUT_UNSAFE_MODEL_PATH;
 				break;
 			case GroundedModel:
 			default:
-				problemFilesPath = this.groundedFolder;
+				problemFilesPath = Globals.INPUT_GROUNDED_PATH;
 				useGrounded = true;
 				break;
 			}
 		}else {
-			problemFilesPath = this.localViewFolder;
+			problemFilesPath = Globals.INPUT_LOCAL_VIEW_PATH;
 		}
 
 		PlanVerifier planVerifier = new PlanVerifier(agentList,domainFileName,problemFileName,
@@ -442,7 +496,7 @@ public class OurPlanner implements Creator  {
 		if(isVerified)
 			num_agents_solved++;
 
-		if(!deleteTempFiles()) {
+		if(!FileDeleter.deleteTempFiles()) {
 			LOGGER.info("Deleting Temporary files failure");
 			return false;	
 		}
@@ -460,22 +514,22 @@ public class OurPlanner implements Creator  {
 
 			switch (model) {
 			case UnSafeModel:
-				agentDomainPath = Globals.UNSAFE_MODEL_PATH  + "/" + agentName + "/" + domainFileName;
+				agentDomainPath = Globals.OUTPUT_UNSAFE_MODEL_PATH  + "/" + agentName + "/" + domainFileName;
 				break;
 			case SafeModel:
-				agentDomainPath = Globals.SAFE_MODEL_PATH  + "/" + agentName + "/" + domainFileName;
+				agentDomainPath = Globals.OUTPUT_SAFE_MODEL_PATH  + "/" + agentName + "/" + domainFileName;
 				break;
 			case GroundedModel:
 			default:
-				agentDomainPath = groundedFolder + "/" + domainFileName;
+				agentDomainPath = Globals.INPUT_GROUNDED_PATH + "/" + domainFileName;
 				break;
 			}
 		}
 		else 
-			agentDomainPath = localViewFolder + "/" + agentName + "/" + domainFileName;
+			agentDomainPath = Globals.INPUT_LOCAL_VIEW_PATH + "/" + agentName + "/" + domainFileName;
 
-		String agentProblemPath = localViewFolder + "/" + agentName + "/" + problemFileName;
-		String agentADDLPath = TEMP_DIR_PATH + "/" + problemFileName.split("\\.")[0] + ".addl";
+		String agentProblemPath = Globals.INPUT_LOCAL_VIEW_PATH + "/" + agentName + "/" + problemFileName;
+		String agentADDLPath = Globals.OUTPUT_TEMP_PATH + "/" + problemFileName.split("\\.")[0] + ".addl";
 		String heuristic = "saFF-glcl";
 		int recursionLevel = -1;
 		double timeLimitMin = 1;
@@ -493,7 +547,7 @@ public class OurPlanner implements Creator  {
 		if(planner.isNotSolved)
 			num_agents_not_solved++;
 
-		if(!deleteTempFiles()) {
+		if(!FileDeleter.deleteTempFiles()) {
 			LOGGER.info("Deleting Temporary files failure");
 			return null;
 		}
@@ -527,9 +581,9 @@ public class OurPlanner implements Creator  {
 			String domainName = domainFileName.substring(0,domainFileName.lastIndexOf(".") );
 			String problemName = problemFileName.substring(0,problemFileName.lastIndexOf(".") );
 
-			String scriptPath = pythonScriptsPath + "/" + AGENT_PARSER_SCRIPT;
+			String scriptPath = Globals.PYTHON_SCRIPTS_FOLDER + "/" + AGENT_PARSER_SCRIPT;
 
-			String cmd = scriptPath + " " + agentsFilePath + " " + domainName + " " + problemName;
+			String cmd = scriptPath + " " + Globals.INPUT_AGENTS_PATH + " " + domainName + " " + problemName;
 
 			LOGGER.info("Running: " + cmd);
 
@@ -618,87 +672,6 @@ public class OurPlanner implements Creator  {
 		if( !configurationFile.exists()) {
 			LOGGER.fatal(".json configuration file not exists");
 			return false;
-		}
-
-		return true;
-	}
-
-	private boolean deleteTempFiles() {
-
-		LOGGER.info("Deleting temporary files");
-
-		File temp = new File(TEMP_DIR_PATH);		
-		if(temp.exists()) {
-			LOGGER.info("Deleting 'temp' folder");
-
-			try {
-				FileUtils.deleteDirectory(temp);
-			} catch (IOException e) {
-				LOGGER.fatal(e, e);
-				return false;
-			}
-		}
-
-		File output = new File(OUTPUT_FILE_NAME);		
-		if(output.exists()) {
-			LOGGER.info("Deleting " + OUTPUT_FILE_NAME + " file");
-			output.delete();
-		}
-
-		File outputSAS = new File(SAS_FILE_PATH);		
-		if(outputSAS.exists()) {
-			LOGGER.info("Deleting "+ SAS_FILE_PATH +" file");
-			outputSAS.delete();
-		}
-
-		return true;
-	}
-
-	private boolean deleteLearnedFiles() {
-
-		LOGGER.info("Deleting learned files");
-
-		File temp = new File(Globals.SAFE_MODEL_PATH);		
-		if(temp.exists()) {
-			LOGGER.info("Deleting 'learned' folder");
-
-			try {
-				FileUtils.deleteDirectory(temp);
-			} catch (IOException e) {
-				LOGGER.fatal(e, e);
-				return false;
-			}
-		}
-
-		temp = new File(Globals.UNSAFE_MODEL_PATH);		
-		if(temp.exists()) {
-			LOGGER.info("Deleting 'learned' folder");
-
-			try {
-				FileUtils.deleteDirectory(temp);
-			} catch (IOException e) {
-				LOGGER.fatal(e, e);
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	private boolean deleteOutputFiles() {
-
-		LOGGER.info("Deleting output files");
-
-		File temp = new File(Globals.OUTPUT_PATH);		
-		if(temp.exists()) {
-			LOGGER.info("Deleting 'output' folder");
-
-			try {
-				FileUtils.deleteDirectory(temp);
-			} catch (IOException e) {
-				LOGGER.fatal(e, e);
-				return false;
-			}
 		}
 
 		return true;

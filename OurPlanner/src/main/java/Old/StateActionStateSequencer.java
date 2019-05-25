@@ -37,7 +37,7 @@ public class StateActionStateSequencer {
 
 	private static final String SAS_FILE_PATH = Globals.SAS_OUTPUT_FILE_PATH;
 	private static final String OUTPUT_FILE_NAME = Globals.PROCESSED_SAS_OUTPUT_FILE_PATH;
-	private static final String TEMP_DIR_PATH = Globals.TEMP_PATH;
+	private static final String TEMP_DIR_PATH = Globals.OUTPUT_TEMP_PATH;
 
 	private List<String> agentList = null;
 

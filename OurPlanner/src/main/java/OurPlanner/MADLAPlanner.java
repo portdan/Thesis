@@ -46,7 +46,7 @@ public class MADLAPlanner {
 	private static final String OUTPUT_PLAN_PATH = Globals.OUTPUT_PATH + "/out.plan";
 
 	private static final String SAS_FILE_PATH = Globals.SAS_OUTPUT_FILE_PATH;
-	private static final String TEMP_DIR_PATH = Globals.TEMP_PATH;
+	private static final String TEMP_DIR_PATH = Globals.OUTPUT_TEMP_PATH;
 
 	private final ReceiverTable receiverTable = new DefaultReceiverTable();
 	private final ExecutorService executorService = Executors.newFixedThreadPool(1);

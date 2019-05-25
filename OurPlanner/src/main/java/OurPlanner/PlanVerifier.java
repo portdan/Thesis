@@ -17,6 +17,7 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 import Model.*;
+import Utils.FileDeleter;
 import cz.agents.dimaptools.input.addl.ADDLObject;
 import cz.agents.dimaptools.input.addl.ADDLParser;
 import cz.agents.dimaptools.model.*;
@@ -31,7 +32,7 @@ public class PlanVerifier {
 
 	private static final String OUTPUT_FILE_NAME = Globals.PROCESSED_SAS_OUTPUT_FILE_PATH;
 	private static final String SAS_FILE_PATH = Globals.SAS_OUTPUT_FILE_PATH;
-	private static final String TEMP_DIR_PATH = Globals.TEMP_PATH;
+	private static final String TEMP_DIR_PATH = Globals.OUTPUT_TEMP_PATH;
 
 	private String domainFileName = "";
 	private String problemFileName = "";
@@ -461,7 +462,7 @@ public class PlanVerifier {
 			else
 				writeNewPDDLProblemLocalView(state);
 
-			deleteSASfiles();
+			FileDeleter.deleteSASfiles();
 
 			return verifyPlan(plan, actionIndex + 1);
 		}
@@ -679,22 +680,4 @@ public class PlanVerifier {
 		}
 		return null;
 	}
-
-	private void deleteSASfiles() {
-
-		LOGGER.info("Deleting sas files");
-
-		File output = new File(OUTPUT_FILE_NAME);		
-		if(output.exists()) {
-			LOGGER.info("Deleting " + OUTPUT_FILE_NAME + " file");
-			output.delete();
-		}
-
-		File outputSAS = new File(SAS_FILE_PATH);		
-		if(outputSAS.exists()) {
-			LOGGER.info("Deleting " + SAS_FILE_PATH + " file");
-			outputSAS.delete();
-		}
-	}
-
 }

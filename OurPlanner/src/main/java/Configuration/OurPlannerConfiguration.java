@@ -5,23 +5,28 @@ import OurPlanner.VerificationModel;
 
 public class OurPlannerConfiguration {
 
-	public String domainFileName;
 	public String agentsFileName;
-	public String problemFileName;
-	public String groundedDirPath;
-	public String localViewDirPath;
-	public String tracesDirPath;
+	public String domainFileName;
+	public String inputAgentsDirName;
+	public String inputDirPath;
+	public String inputGoundedDirName;
+	public String inputLocalViewDirName;
+	public String inputTracesDirName;
 	public int numOfTracesToUse;
-	public int tracesLearinigInterval;
-	public String agentsFilePath;
+	public String outputClosedDirPath;
 	public String outputCopyDirPath;
-	public String testOutputCSVFilePath;
-	public String pythonScriptsPath;
-	public String sasFilePath;
 	public String outputDirPath;
-	public String outputSafeModelLearningDirPath;
-	public String outputUnSafeModelLearningDirPath;
+	public String outputExpandedSafeDirName;
+	public String outputExpandedUnSafeDirName;
+	public String outputOpenDirName;
+	public String outputSASFileName;
+	public String outputSafeModelLearningDirName;
 	public String outputTempDirPath;
-	public VerificationModel verificationModel;
+	public String outputUnSafeModelLearningDirName;
 	public PlanningModel planningModel;
+	public String problemFileName;
+	public String pythonScriptsPath;
+	public String testOutputCSVFilePath;
+	public int tracesLearinigInterval;
+	public VerificationModel verificationModel;
 }

@@ -126,6 +126,7 @@ public class TestDataAccumulator {
 				outFile.createNewFile();
 				newFile = true;
 			} catch (IOException e) {
+				LOGGER.fatal(e, e);
 				e.printStackTrace();
 			}
 		}
