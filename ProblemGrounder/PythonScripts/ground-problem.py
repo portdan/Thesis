@@ -17,6 +17,7 @@ PFILE_KEYWORDS = ["objects", "init", "goal", "private", "metric"]
 AFILE_KEYWORDS = ["agents"]
 
 PUBLIC = "public"
+AGENT_HEADER = "-agent-"
 
 verbose = False
 
@@ -704,7 +705,7 @@ class Grounder(object):
                 for action in self.actions:
                     if action.agent_type == type:
                         new_action = copy.deepcopy(action);
-                        new_action.name += "-" + agent
+                        new_action.name += AGENT_HEADER + agent
                         new_action.agent_type = agent                    
                         new_actions.append(new_action) 
                         
