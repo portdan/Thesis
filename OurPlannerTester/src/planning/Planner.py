@@ -50,17 +50,11 @@ class Planner(object):
             preprocess_runner_script.write(preprocess_script_path)
             preprocess_runner_script.write(preprocess_sas_file_input)
 
-    def prepere_to_plan(self, problem_name, num_of_traces_to_use):
+    def prepere_planning_config(self, problem_name, num_of_traces_to_use):
      
-        logger.info("prepere_to_plan")
+        logger.info("prepere_planning_config")
         
-        clear_directory(self.config.problemPlannerInput, delete=True)
         clear_directory(self.config.problemPlannerOutput)
-        
-        logger.info("problemPlannerInput : " + self.config.problemPlannerInput)
-    
-        shutil.copytree(self.config.problemGrounderOutput, self.config.problemPlannerInput)
-        copy_tree(self.config.problemGeneratorOutput, self.config.problemPlannerInput)
   
         planner_config = None
         
@@ -87,6 +81,16 @@ class Planner(object):
             
         logger.info("prepering to plan for : " + str(planner_config.problemFileName) + "with " + str(planner_config.numOfTracesToUse) + " traces")
        
+    def copy_input_files(self):
+     
+        logger.info("copy_input_files")
+        
+        clear_directory(self.config.problemPlannerInput, delete=True)
+        
+        logger.info("problemPlannerInput : " + self.config.problemPlannerInput)
+    
+        shutil.copytree(self.config.problemGrounderOutput, self.config.problemPlannerInput)
+        copy_tree(self.config.problemGeneratorOutput, self.config.problemPlannerInput)
                   
     def run_planning(self):
     
@@ -108,14 +112,13 @@ class Planner(object):
         
         
     def delete_output(self):
-        clear_directory(self.config.problemPlannerInput)
         clear_directory(self.config.problemPlannerOutput)
 
     def plan(self, problem_name, num_of_traces_to_use):
            
         logger.info("plan")
         
-        self.prepere_to_plan(problem_name, num_of_traces_to_use)
+        self.prepere_planning_config(problem_name, num_of_traces_to_use)
         
         self.run_planning()   
         

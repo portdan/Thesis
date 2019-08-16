@@ -101,6 +101,8 @@ def run_tests(config):
         
         generator.generate_problems_and_traces(grounder.grounded_output_path, problem.problemName, problem.maxTracesToUse)
         
+        planner.copy_input_files()
+        
         solved_threshold = planner.search_solved_threshold(problem.problemName, problem.minTracesToUse, problem.maxTracesToUse)
         
         planner.plan_range_traces(problem.problemName, 0, max(0, solved_threshold -1), problem.unsolvedRangeSplit)

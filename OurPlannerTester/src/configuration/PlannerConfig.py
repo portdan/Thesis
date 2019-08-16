@@ -8,31 +8,39 @@ class PlannerConfig(object):
     '''
     classdocs
     '''
-    def __init__(self, domainFileName: str, problemFileName: str, groundedDirPath: str, 
-                 localViewDirPath: str, tracesDirPath : str, numOfTracesToUse : int, tracesLearinigInterval : int,
-                 agentsFilePath: str, outputCopyDirPath: str, testOutputCSVFilePath: str,
-                 agentsFileName: str, pythonScriptsPath : str, sasFilePath : str, outputDirPath : str, 
-                 outputSafeModelLearningDirPath: str, outputUnSafeModelLearningDirPath : str, 
-                 outputTempDirPath : str, verificationModel : str, planningModel : str ):
+    def __init__(self, agentsFileName : str, domainFileName : str, inputAgentsDirName : str, inputDirPath : str, 
+                inputGoundedDirName : str, inputLocalViewDirName : str, inputTracesDirName : str, 
+                numOfTracesToUse : int, outputClosedDirPath : str, outputCopyDirPath : str, outputDirPath : str,
+                outputExpandedSafeDirName : str, outputExpandedUnSafeDirName : str, outputOpenDirName : str, 
+                outputSASFileName : str, outputSafeModelLearningDirName : str, outputTempDirPath : str, 
+                outputUnSafeModelLearningDirName : str, planningModel : str, problemFileName : str, 
+                pythonScriptsPath : str, testOutputCSVFilePath : str, tracesLearinigInterval : int, 
+                verificationModel : str): 
         '''
         Constructor
         '''
-        self.domainFileName = domainFileName
+        
         self.agentsFileName = agentsFileName
-        self.problemFileName = problemFileName
-        self.groundedDirPath = groundedDirPath
-        self.localViewDirPath = localViewDirPath
-        self.tracesDirPath = tracesDirPath
+        self.domainFileName = domainFileName
+        self.inputAgentsDirName =inputAgentsDirName
+        self.inputDirPath = inputDirPath
+        self.inputGoundedDirName = inputGoundedDirName
+        self.inputLocalViewDirName = inputLocalViewDirName
+        self.inputTracesDirName = inputTracesDirName
         self.numOfTracesToUse = numOfTracesToUse
-        self.tracesLearinigInterval = tracesLearinigInterval
-        self.agentsFilePath = agentsFilePath
+        self.outputClosedDirPath = outputClosedDirPath
         self.outputCopyDirPath = outputCopyDirPath
-        self.testOutputCSVFilePath = testOutputCSVFilePath
-        self.pythonScriptsPath = pythonScriptsPath
-        self.sasFilePath = sasFilePath
         self.outputDirPath = outputDirPath
-        self.outputSafeModelLearningDirPath = outputSafeModelLearningDirPath;
-        self.outputUnSafeModelLearningDirPath = outputUnSafeModelLearningDirPath;
-        self.outputTempDirPath = outputTempDirPath;
-        self.verificationModel = verificationModel;
-        self.planningModel = planningModel;
+        self.outputExpandedSafeDirName = outputExpandedSafeDirName
+        self.outputExpandedUnSafeDirName = outputExpandedUnSafeDirName
+        self.outputOpenDirName = outputOpenDirName
+        self.outputSASFileName = outputSASFileName
+        self.outputSafeModelLearningDirName = outputSafeModelLearningDirName
+        self.outputTempDirPath = outputTempDirPath
+        self.outputUnSafeModelLearningDirName = outputUnSafeModelLearningDirName
+        self.planningModel = planningModel
+        self.problemFileName = problemFileName
+        self.pythonScriptsPath = pythonScriptsPath
+        self.testOutputCSVFilePath = testOutputCSVFilePath
+        self.tracesLearinigInterval = tracesLearinigInterval
+        self.verificationModel = verificationModel
