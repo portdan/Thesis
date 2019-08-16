@@ -19,11 +19,11 @@ import org.apache.log4j.Logger;
 
 import Configuration.ConfigurationManager;
 import Configuration.ProblemGeneratorConfiguration;
+import Model.SASParser;
+import Model.SASPreprocessor;
 import cz.agents.alite.creator.Creator;
 import cz.agents.dimaptools.input.addl.ADDLObject;
 import cz.agents.dimaptools.input.addl.ADDLParser;
-import cz.agents.dimaptools.input.sas.SASParser;
-import cz.agents.dimaptools.input.sas.SASPreprocessor;
 import cz.agents.dimaptools.model.Problem;
 import cz.agents.dimaptools.model.State;
 import problemGenerator.FileGenerator.SASGenerator;
@@ -339,6 +339,9 @@ public class StateActionStateGenerator implements Creator {
 			// perform random walk
 			State endState = StateActionStateRandomWalker.RandomWalk(sasList, preprocessor.getGlobalInit(),
 					preprocessor.getGlobalGoal(), numOfRandomWalkSteps, problems, i);
+
+			//			State endState = StateActionStateRandomWalker.RandomWalk(sasList, preprocessor,
+			//					numOfRandomWalkSteps, problems, i);
 
 			String humenizedEndState = endState.getDomain().humanize(endState.getValues());
 

@@ -1,6 +1,7 @@
 eclipse.preferences.version=1
 encoding//Misc/translate/build_model.py=utf-8
 encoding//Misc/translate/pddl_parser/parsing_functions.py=utf-8
+encoding//Misc/translate/simplify.py=utf-8
 encoding//Misc/translate/translate.py=utf-8
 encoding//src/main/java=UTF-8
 encoding//src/test/java=UTF-8
