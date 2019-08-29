@@ -364,7 +364,7 @@ public class MADLAPlanner {
 
 			DIMAPWorldInterface world = initWorld(agentName,addl.getAgentCount());
 
-			planners.add(new Planner(heuristic,recursionLevel,world,executor,(long)timeLimitMin*60L*1000L));
+			planners.add(new Planner(heuristic,recursionLevel,world,executor,timeLimitMin*60L*1000L));
 
 			executor.addProblem(world.getProblem());
 		}

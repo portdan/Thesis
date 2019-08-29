@@ -1,6 +1,5 @@
 package Model;
 
-import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -8,6 +7,10 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import Model.Search.AsyncDistributedBestFirstSearch;
+import Model.Search.DistributedBestFirstSearch;
+import Model.Search.GlobalLocalDistributedBestFirstSearch;
+import Model.Search.SyncDistributedBestFirstSearch;
 import cz.agents.alite.communication.Communicator;
 import cz.agents.alite.configurator.ConfigurationInterface;
 import cz.agents.alite.configurator.MapConfiguration;
@@ -35,13 +38,9 @@ import cz.agents.dimaptools.heuristic.relaxed.evaluator.FFEvaluator;
 import cz.agents.dimaptools.heuristic.relaxed.evaluator.MaxEvaluator;
 import cz.agents.dimaptools.model.*;
 import cz.agents.dimaptools.search.AStar;
-import cz.agents.dimaptools.search.AsyncDistributedBestFirstSearch;
-import cz.agents.dimaptools.search.DistributedBestFirstSearch;
-import cz.agents.dimaptools.search.GlobalLocalDistributedBestFirstSearch;
 import cz.agents.dimaptools.search.HeuristicOpenList;
 import cz.agents.dimaptools.search.MultiheuristicDistributedBestFirstSearch;
 import cz.agents.dimaptools.search.SearchInterface;
-import cz.agents.dimaptools.search.SyncDistributedBestFirstSearch;
 import cz.agents.dimaptools.util.DisRPSharedProblemInfoProvider;
 import cz.agents.dimaptools.util.RPSharedProblemInfoProvider;
 import cz.agents.dimaptools.util.SharedProblemInfoProvider;
@@ -75,7 +74,7 @@ public class Planner {
 	private boolean restricted = false;
 	private boolean bestfirst = false;
 	private boolean localRequestsLIFO = true;
-	private long timeLimitMs = Long.MAX_VALUE;
+	private double timeLimitMs = Double.MAX_VALUE;
 	private boolean lazy = false;
 	private boolean setadditive = false;
 	private boolean ppsetadditive = false;
@@ -85,7 +84,7 @@ public class Planner {
 	public List<String> foundPlan = null;
 	public boolean isTimeout = false;
 
-	public Planner(String useHeuristic, int recursionLevel, DIMAPWorldInterface world, PlanExecutorInterface executor,long timeLimitMs) {
+	public Planner(String useHeuristic, int recursionLevel, DIMAPWorldInterface world, PlanExecutorInterface executor,double timeLimitMs) {
 		this.world = world;
 		this.problem = world.getProblem();
 		this.comm = world.getCommunicator();
