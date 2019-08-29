@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -520,16 +521,16 @@ public class PlanVerifier {
 	private String getActionOwnerFromAction(String actionStr) {
 
 		LOGGER.info("Extracting aftion owner from action " + actionStr);
-		
+
 		if(actionStr.contains(Globals.PARAMETER_INDICATION))
 			actionStr = actionStr.replace(Globals.PARAMETER_INDICATION, " ");
-		
+
 		String[] split = actionStr.split(" ");
 
 		String label = split[2];
-		
-		split = label.split("-");
-		
+
+		split = label.split(Globals.AGENT_INDICATION);
+
 		return split[split.length-1];		
 	}
 
@@ -537,7 +538,7 @@ public class PlanVerifier {
 
 		LOGGER.info("Writing new PDDL problem files");
 
-		HashMap<String, String> oldnewFacts = getOldNewFacts(state);
+		HashMap<String, List<String>> oldnewFacts = getOldNewFacts(state);
 
 		for (String agentName : agentList) {
 
@@ -550,19 +551,22 @@ public class PlanVerifier {
 
 				String initSection = oldPDDL.substring(initIndex,goalIndex);
 
-				Iterator<Entry<String, String>> it = oldnewFacts.entrySet().iterator();
+				Iterator<Entry<String, List<String>>> it = oldnewFacts.entrySet().iterator();
 				while (it.hasNext()) {
-					Entry<String, String> pair = (Entry<String, String>)it.next();
+					Entry<String, List<String>> pair = (Entry<String, List<String>>)it.next();
 
 					String oldFact = pair.getKey();
-					String newFact = pair.getValue();
+					List<String> newFacts = pair.getValue();
 
-					if(oldFact == Globals.ADD_NEW_FACT_INDICATION)
-						initSection = "\t(" + newFact + ")\n" + initSection;
-					else if(newFact == Globals.REMOVE_OLD_FACT_INDICATION)
-						initSection = initSection.replace("\t(" + oldFact + ")\n", "");
-					else
-						initSection = initSection.replaceAll(oldFact, newFact);
+					for (String newFact : newFacts) {
+
+						if(oldFact == Globals.ADD_NEW_FACT_INDICATION)
+							initSection = "\t(" + newFact + ")\n" + initSection;
+						else if(newFact == Globals.REMOVE_OLD_FACT_INDICATION)
+							initSection = initSection.replace("\t(" + oldFact + ")\n", "");
+						else
+							initSection = initSection.replaceAll(oldFact, newFact);
+					}
 				}
 
 				String newPDDL = oldPDDL.substring(0,initIndex) 
@@ -586,7 +590,7 @@ public class PlanVerifier {
 
 		LOGGER.info("Writing new grouned PDDL problem file");
 
-		HashMap<String, String> oldnewFacts = getOldNewFacts(state);
+		HashMap<String, List<String>> oldnewFacts = getOldNewFacts(state);
 
 		try {
 
@@ -597,19 +601,22 @@ public class PlanVerifier {
 
 			String initSection = oldPDDL.substring(initIndex,goalIndex);
 
-			Iterator<Entry<String, String>> it = oldnewFacts.entrySet().iterator();
+			Iterator<Entry<String, List<String>>> it = oldnewFacts.entrySet().iterator();
 			while (it.hasNext()) {
-				Entry<String, String> pair = (Entry<String, String>)it.next();
+				Entry<String, List<String>> pair = (Entry<String, List<String>>)it.next();
 
 				String oldFact = pair.getKey();
-				String newFact = pair.getValue();
+				List<String> newFacts = pair.getValue();
 
-				if(oldFact == Globals.ADD_NEW_FACT_INDICATION)
-					initSection = "\t(" + newFact + ")\n" + initSection;
-				else if(newFact == Globals.REMOVE_OLD_FACT_INDICATION)
-					initSection = initSection.replace("\t(" + oldFact + ")\n", "");
-				else
-					initSection = initSection.replaceAll(oldFact, newFact);
+				for (String newFact : newFacts) {
+
+					if(oldFact == Globals.ADD_NEW_FACT_INDICATION)
+						initSection = "\t(" + newFact + ")\n" + initSection;
+					else if(newFact == Globals.REMOVE_OLD_FACT_INDICATION)
+						initSection = initSection.replace("\t(" + oldFact + ")\n", "");
+					else
+						initSection = initSection.replaceAll(oldFact, newFact);
+				}
 			}
 
 			String newPDDL = oldPDDL.substring(0,initIndex) 
@@ -629,11 +636,11 @@ public class PlanVerifier {
 
 	}
 
-	private HashMap<String, String> getOldNewFacts(State state) {
+	private HashMap<String,  List<String>> getOldNewFacts(State state) {
 
 		LOGGER.info("Getting old-to-new facts map");
 
-		HashMap<String, String> oldnewFacts = new HashMap<String,String>();
+		HashMap<String, List<String>> oldnewFacts = new HashMap<String, List<String>>();
 
 		for (int i = 0; i < state.getValues().length; i++) {
 
@@ -642,14 +649,20 @@ public class PlanVerifier {
 				String oldFact = formatFact(agentInitState, i);
 				String newFact = formatFact(state, i);
 
-				if(oldFact.startsWith(Globals.NEGATED_KEYWORD) && 
+				if((oldFact.startsWith(Globals.NEGATED_KEYWORD) || oldFact.startsWith(Globals.NONE_KEYWORD)) && 
 						!newFact.startsWith(Globals.NEGATED_KEYWORD))
 					oldFact = Globals.ADD_NEW_FACT_INDICATION;
 
 				if(newFact.startsWith(Globals.NEGATED_KEYWORD))
 					newFact = Globals.REMOVE_OLD_FACT_INDICATION;
 
-				oldnewFacts.put(oldFact, newFact);
+				List<String> newFacts = oldnewFacts.get(oldFact);
+				if(newFacts==null) {
+					newFacts = new ArrayList<String>();
+					oldnewFacts.put(oldFact,newFacts);
+				}
+
+				newFacts.add(newFact);
 			}
 		}
 
@@ -657,7 +670,7 @@ public class PlanVerifier {
 	}
 
 	private String formatFact(State state, int i) {
-		
+
 		LOGGER.info("formatting facts");
 
 		String res = getKeyFromValue(agentValCodes, state.getValue(i));

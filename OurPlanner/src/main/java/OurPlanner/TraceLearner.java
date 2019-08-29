@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -15,6 +16,8 @@ import java.util.Set;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+
+import cz.agents.dimaptools.model.Domain;
 
 public class TraceLearner {
 
@@ -40,6 +43,9 @@ public class TraceLearner {
 	Map<String, Set<String>> agentLearnedSafeActionsEffects = new HashMap<String,Set<String>>();
 	Map<String, Set<String>> agentLearnedUnSafeActionsPreconditions = new HashMap<String,Set<String>>();
 	Map<String, Set<String>> agentLearnedUnSafeActionsEffects = new HashMap<String,Set<String>>();
+
+	StateActionStateSequencer sasSequencer = null;
+	DeleteEffectGenerator DEGenerator = null;
 
 	public TraceLearner(List<String> agentList , String agentName, File trajectoryFiles ,
 			File problemFiles , File localViewFiles ,String domainFileName ,String problemFileName, 
@@ -89,14 +95,14 @@ public class TraceLearner {
 
 		TestDataAccumulator.getAccumulator().trainingSize = 0;
 
-		StateActionStateSequencer sasSequencer = new StateActionStateSequencer(agentList, 
+		sasSequencer = new StateActionStateSequencer(agentList, 
 				problemFiles, domainFileName, problemFileName, trajectoryFiles);
 
-		DeleteEffectGenerator DEGenerator = new DeleteEffectGenerator (problemFiles,
+		DEGenerator = new DeleteEffectGenerator (problemFiles,
 				domainFileName, problemFileName);
-		
+
 		for (String agentName : agentList) 
-				agentLearningTimes.put(agentName,(long) 0);
+			agentLearningTimes.put(agentName,(long) 0);
 
 		while(!sasSequencer.StopSequencing) {
 
@@ -184,12 +190,12 @@ public class TraceLearner {
 
 		// SAFE MODEL //
 		LOGGER.info("Learning safe preconditions and effects");
-		
+
 		Set<String> safePre = learnSafePreconditions(sasListForAction);
 		Set<String> safeEff = learnSafeEffects(sasListForAction);
 
 		safeEff.addAll(DEGenerator.generateDeleteEffects(actionName,safePre,safeEff));
-		
+
 		safePre = formatFacts(safePre);
 		safeEff = formatFacts(safeEff);
 
@@ -261,14 +267,14 @@ public class TraceLearner {
 
 			boolean isNegated = false;
 			String formattedFact = fact;
-			
+
 			if(formattedFact.startsWith("not")) {
 				isNegated = !isNegated;
 				startIndex = formattedFact.indexOf('(');
 				endIndex = formattedFact.lastIndexOf(')');			
 				formattedFact = formattedFact.substring(startIndex+1,endIndex);
 			}
-			
+
 			if(formattedFact.startsWith("Negated")) {
 				isNegated = !isNegated;
 				formattedFact = formattedFact.replace("Negated", "");
@@ -280,11 +286,44 @@ public class TraceLearner {
 
 			formattedFact = formattedFact.trim();
 
-			if (isNegated)
-				formattedFact = "not (" + formattedFact + ")";
+			if(formattedFact.startsWith(Globals.NONE_KEYWORD)) {
+				//formatted.addAll(formatNONEFact(formattedFact, isNegated));
+				//formatted.add(formattedFact);
+			}
+			else {
+				if (isNegated)
+					formattedFact = "not (" + formattedFact + ")";
 
-			formatted.add(formattedFact);
+				formatted.add(formattedFact);
+			}
 		}
+
+		return formatted;
+	}
+
+	private Set<String> formatNONEFact(String fact, boolean isNegated) {
+
+		Set<String> formatted = new HashSet<String>();
+
+		if(isNegated)
+			return formatted;
+
+		String var = fact.split("-")[1];	
+
+		Map<Integer, Set<Integer>> variableDomains = DEGenerator.problem.getDomain().getVariableDomains();
+
+		Map<String, Integer> valCodes =  DEGenerator.preprocessor.valCodes;
+		Map<String, Integer> varCodes =  DEGenerator.preprocessor.varCodes;
+
+		int varCode = varCodes.get(var);
+		int valCode = valCodes.get(fact);
+
+		for (int val : variableDomains.get(varCode)) {
+
+			if(valCode!=val)
+				formatted.add("not (" + Domain.valNames.get(val).toString() + ")");
+		}
+
 
 		return formatted;
 	}

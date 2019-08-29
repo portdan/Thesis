@@ -39,7 +39,8 @@ public class DeleteEffectGenerator {
 
 	private boolean sasSolvable = false;
 
-	private Problem problem = null;
+	public Problem problem = null;
+	public StateActionStateSASPreprocessor preprocessor = null;
 
 	public DeleteEffectGenerator(File problemFiles,String domainFileName, String problemFileName) {
 
@@ -101,7 +102,7 @@ public class DeleteEffectGenerator {
 					res.add(effFact);
 
 					Set<Integer> deleteVals = problem.getDomain().getVariableDomains().get(effVar);
-
+					
 					for (int val : deleteVals) {
 
 						if(val != effVal) {
@@ -198,7 +199,7 @@ public class DeleteEffectGenerator {
 		SASParser parser = new SASParser(sasFile);
 		SASDomain sasDom = parser.getDomain();
 
-		StateActionStateSASPreprocessor preprocessor = new StateActionStateSASPreprocessor(sasDom);
+		preprocessor = new StateActionStateSASPreprocessor(sasDom);
 
 		return preprocessor.getProblemForAgent();
 	}

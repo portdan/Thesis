@@ -93,7 +93,8 @@ public class SASParser {
 				String val;
 
 				if(atom.endsWith("<none of those>")){
-					val = "NONE";
+					//val = "NONE";
+					val = "NONE-var"+i;
 				}else{
 					val = atom.replaceAll("Atom ", "");
 				}
