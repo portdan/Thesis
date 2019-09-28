@@ -14,7 +14,9 @@ import org.apache.log4j.Logger;
 
 import Configuration.ConfigurationManager;
 import Configuration.OurPlannerConfiguration;
+import PlannerAndLearner.PlannerAndModelLearner;
 import Utils.FileDeleter;
+import Utils.VerificationResult;
 import cz.agents.alite.creator.Creator;
 
 public class OurPlanner implements Creator  {
@@ -34,6 +36,8 @@ public class OurPlanner implements Creator  {
 
 	public VerificationModel verificationModel = VerificationModel.GroundedModel;
 	public PlanningModel planningModel = PlanningModel.SafeModel;
+	
+	private TraceLearner learner = null;
 
 	private File tracesFile = null;
 	private File outputTestFile = null;
@@ -121,9 +125,9 @@ public class OurPlanner implements Creator  {
 		}
 		 */
 
-		runPlanningAlgorithm();
+		//runPlanningAlgorithm();
 
-		//runPlanningAlgorithmWithModelUpdating();
+		runPlanningAlgorithmWithModelUpdating();
 
 		TestDataAccumulator.getAccumulator().numOfAgentsSolved = num_agents_solved;
 		TestDataAccumulator.getAccumulator().numOfAgentsTimeout = num_agents_timeout;
@@ -243,26 +247,8 @@ public class OurPlanner implements Creator  {
 			f.mkdirs();
 		}
 
-		Globals.OUTPUT_OPEN_PATH = Globals.OUTPUT_PATH  + "/" + configuration.outputOpenDirName;
-		f = new File(Globals.OUTPUT_OPEN_PATH);
-		if( !f.exists()) {
-			f.mkdirs();
-		}
-
-		Globals.OUTPUT_CLOSED_PATH = Globals.OUTPUT_PATH  + "/" + configuration.outputClosedDirPath;
-		f = new File(Globals.OUTPUT_CLOSED_PATH);
-		if( !f.exists()) {
-			f.mkdirs();
-		}
-
-		Globals.OUTPUT_EXPANDED_SAFE_PATH = Globals.OUTPUT_PATH  + "/" + configuration.outputExpandedSafeDirName;
-		f = new File(Globals.OUTPUT_EXPANDED_SAFE_PATH);
-		if( !f.exists()) {
-			f.mkdirs();
-		}
-
-		Globals.OUTPUT_EXPANDED_UNSAFE_PATH = Globals.OUTPUT_PATH  + "/" + configuration.outputExpandedUnSafeDirName;
-		f = new File(Globals.OUTPUT_EXPANDED_UNSAFE_PATH);
+		Globals.OUTPUT_SOUND_MODEL_PATH = Globals.OUTPUT_PATH  + "/" + configuration.outputSoundModelLearningDirName;
+		f = new File(Globals.OUTPUT_SOUND_MODEL_PATH);
 		if( !f.exists()) {
 			f.mkdirs();
 		}
@@ -396,7 +382,9 @@ public class OurPlanner implements Creator  {
 	private List<String> planAndLearnModels(String agentName) {
 
 		PlannerAndModelLearner asd = new PlannerAndModelLearner(agentName, agentList,
-				domainFileName, problemFileName);
+				domainFileName, problemFileName, learner);
+		
+		asd.test();
 
 		return null;
 	}
@@ -405,7 +393,7 @@ public class OurPlanner implements Creator  {
 
 		LOGGER.info("Running learning algorithm");
 
-		TraceLearner learner = new TraceLearner(agentList,tracesFile, 
+		learner = new TraceLearner(agentList,tracesFile, 
 				groundedFile, localViewFile, domainFileName, problemFileName, numOftraces, tracesLearinigInterval);	
 
 		boolean isLearned = learner.learnNewActions();
@@ -491,9 +479,9 @@ public class OurPlanner implements Creator  {
 		PlanVerifier planVerifier = new PlanVerifier(agentList,domainFileName,problemFileName,
 				problemFilesPath, useGrounded);		
 
-		boolean isVerified = planVerifier.verifyPlan(plan,0);
+		VerificationResult res = planVerifier.verifyPlan(plan,0);
 
-		if(isVerified)
+		if(res.isVerified)
 			num_agents_solved++;
 
 		if(!FileDeleter.deleteTempFiles()) {
@@ -501,7 +489,7 @@ public class OurPlanner implements Creator  {
 			return false;	
 		}
 
-		return isVerified;
+		return res.isVerified;
 	}
 
 	private List<String> planForAgent(String agentName, boolean isLearning, PlanningModel model ) {
