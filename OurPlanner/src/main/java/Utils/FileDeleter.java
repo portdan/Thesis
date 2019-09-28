@@ -49,7 +49,7 @@ public class FileDeleter {
 
 		File temp = new File(Globals.OUTPUT_SAFE_MODEL_PATH);		
 		if(temp.exists()) {
-			LOGGER.info("Deleting 'learned' folder");
+			LOGGER.info("Deleting 'safe model' folder");
 
 			try {
 				FileUtils.deleteDirectory(temp);
@@ -61,7 +61,7 @@ public class FileDeleter {
 
 		temp = new File(Globals.OUTPUT_UNSAFE_MODEL_PATH);		
 		if(temp.exists()) {
-			LOGGER.info("Deleting 'learned' folder");
+			LOGGER.info("Deleting 'unsafe model' folder");
 
 			try {
 				FileUtils.deleteDirectory(temp);

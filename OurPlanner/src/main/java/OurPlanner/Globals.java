@@ -12,10 +12,7 @@ public class Globals {
 	public static String OUTPUT_TEMP_PATH;
 	public static String OUTPUT_SAFE_MODEL_PATH;
 	public static String OUTPUT_UNSAFE_MODEL_PATH;
-	public static String OUTPUT_OPEN_PATH;
-	public static String OUTPUT_CLOSED_PATH;
-	public static String OUTPUT_EXPANDED_SAFE_PATH;
-	public static String OUTPUT_EXPANDED_UNSAFE_PATH;
+	public static String OUTPUT_SOUND_MODEL_PATH;
 	public static String OUTPUT_COPY_PATH;
 	public static String OUTPUT_TEST_FILE_PATH;
 
