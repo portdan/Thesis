@@ -4,10 +4,10 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -35,7 +35,7 @@ public class TraceLearner {
 	private int numOfTracesToUse = 0;
 	private int tracesLearinigInterval = 0;
 
-	Map<String, List<String>> agentLearnedActionNames = new HashMap<String,List<String>>();
+	Map<String, Set<String>> agentLearnedActionNames = new HashMap<String,Set<String>>();
 
 	Map<String, Long> agentLearningTimes = new HashMap<String, Long>();
 
@@ -151,6 +151,38 @@ public class TraceLearner {
 
 			TestDataAccumulator.getAccumulator().agentLearningTimeMs.put(agentName, agentLearningTime);
 		}
+		
+		return writeNewSafeLearnedProblemFiles() && writeNewUnSafeLearnedProblemFiles();
+	}
+
+	public boolean learnActionsFromPlan(List<StateActionState> planSASList, String pathToSafeModel,
+			String pathUnSafeModel) {
+
+		LOGGER.info("Learning new actions from plan");
+
+		DEGenerator = new DeleteEffectGenerator (problemFiles,
+				domainFileName, problemFileName);
+
+		List<StateActionState> sasList = new ArrayList<StateActionState>(planSASList); 
+
+		while(!sasList.isEmpty()) {
+
+			StateActionState firstValue = (StateActionState)sasList.get(0);
+
+			String actionName = firstValue.action;
+			String actionOwnerName = firstValue.actionOwner;
+
+			LOGGER.info("Learning action: " + actionName);
+
+			List<StateActionState> sasListForAction = getAllStateActionStateWithAction(sasList, actionName);	
+
+			addActionToOwnerLink(actionName, actionOwnerName);
+
+			learnPreconditionAndEffects(DEGenerator, actionName, sasListForAction);
+
+			sasList.removeAll(sasListForAction);
+
+		}
 
 		return writeNewSafeLearnedProblemFiles() && writeNewUnSafeLearnedProblemFiles();
 	}
@@ -175,10 +207,10 @@ public class TraceLearner {
 
 		LOGGER.info("Linking actionName to actionOwner");
 
-		List<String> agentActions = agentLearnedActionNames.get(actionOwnerName);
+		Set<String> agentActions = agentLearnedActionNames.get(actionOwnerName);
 
 		if(agentActions == null) {
-			agentActions = new ArrayList<String>();
+			agentActions = new LinkedHashSet<String>();
 			agentLearnedActionNames.put(actionOwnerName, agentActions);
 		}
 
@@ -334,7 +366,9 @@ public class TraceLearner {
 
 		for (String agentName : agentList) {
 
-			String domainStr = readDomainString(agentName);
+			String domainPath = localViewFiles + "/" + agentName + "/" + domainFileName;
+
+			String domainStr = readDomainString(domainPath, agentName);
 
 			if(domainStr.isEmpty())
 			{
@@ -344,21 +378,23 @@ public class TraceLearner {
 
 			String learnedSafeActionsString = generateLearnedSafeActionsString(agentName);
 
-			if(learnedSafeActionsString.isEmpty())
+			/*if(learnedSafeActionsString.isEmpty())
 			{
 				LOGGER.info("Reading domain pddl failure");
 				return false;
-			}
+			}*/
 
 			String learnedDomainStr = addActionsToDomainString(domainStr, learnedSafeActionsString);
 
-			if(domainStr.isEmpty())
+			/*if(domainStr.isEmpty())
 			{
 				LOGGER.info("Adding new actions to domain failure");
 				return false;
-			}
+			}*/
 
-			if(!writeNewSafeDomain(learnedDomainStr, agentName)) {
+			String learnedDomainPath = Globals.OUTPUT_SAFE_MODEL_PATH + "/" + agentName + "/" + domainFileName;
+
+			if(!writeNewSafeDomain(learnedDomainStr, agentName, learnedDomainPath)) {
 				LOGGER.info("Writing new safe domain to file failure");
 				return false;
 			}
@@ -371,9 +407,12 @@ public class TraceLearner {
 
 		LOGGER.info("writing newly unsafe learned problem .pddl file");
 
+
 		for (String agentName : agentList) {
 
-			String domainStr = readDomainString(agentName);
+			String domainPath = localViewFiles + "/" + agentName + "/" + domainFileName;
+
+			String domainStr = readDomainString(domainPath, agentName);
 
 			if(domainStr.isEmpty())
 			{
@@ -383,21 +422,23 @@ public class TraceLearner {
 
 			String learnedUnSafeActionsString = generateLearnedUnSafeActionsString(agentName);
 
-			if(learnedUnSafeActionsString.isEmpty())
+			/*if(learnedUnSafeActionsString.isEmpty())
 			{
 				LOGGER.info("Reading domain pddl failure");
 				return false;
 			}
-
+*/
 			String learnedDomainStr = addActionsToDomainString(domainStr, learnedUnSafeActionsString);
 
-			if(domainStr.isEmpty())
+			/*if(domainStr.isEmpty())
 			{
 				LOGGER.info("Adding new actions to domain failure");
 				return false;
-			}
+			}*/
 
-			if(!writeNewUnSafeDomain(learnedDomainStr, agentName)) {
+			String learnedDomainPath = Globals.OUTPUT_UNSAFE_MODEL_PATH + "/" + agentName + "/" + domainFileName;
+
+			if(!writeNewUnSafeDomain(learnedDomainStr, agentName, learnedDomainPath)) {
 				LOGGER.info("Writing new unsafe domain to file failure");
 				return false;
 			}
@@ -410,14 +451,14 @@ public class TraceLearner {
 
 		LOGGER.info("Generating safe actions string");
 
-		Iterator<Entry<String, List<String>>> it = agentLearnedActionNames.entrySet().iterator();
+		Iterator<Entry<String, Set<String>>> it = agentLearnedActionNames.entrySet().iterator();
 
 		StringBuilder sb = new StringBuilder();
 
 		while (it.hasNext()) {
-			Entry<String, List<String>> agentActionNames = (Entry<String, List<String>>)it.next();
+			Entry<String, Set<String>> agentActionNames = (Entry<String, Set<String>>)it.next();
 
-			List<String> actionNames = agentActionNames.getValue();
+			Set<String> actionNames = agentActionNames.getValue();
 			String actionOwnerName = agentActionNames.getKey();
 
 			for (String actionName : actionNames) {			
@@ -433,14 +474,14 @@ public class TraceLearner {
 
 		LOGGER.info("Generating unsafe actions string");
 
-		Iterator<Entry<String, List<String>>> it = agentLearnedActionNames.entrySet().iterator();
+		Iterator<Entry<String, Set<String>>> it = agentLearnedActionNames.entrySet().iterator();
 
 		StringBuilder sb = new StringBuilder();
 
 		while (it.hasNext()) {
-			Entry<String, List<String>> agentActionNames = (Entry<String, List<String>>)it.next();
+			Entry<String, Set<String>> agentActionNames = (Entry<String, Set<String>>)it.next();
 
-			List<String> actionNames = agentActionNames.getValue();
+			Set<String> actionNames = agentActionNames.getValue();
 			String actionOwnerName = agentActionNames.getKey();
 
 			for (String actionName : actionNames) {			
@@ -472,14 +513,12 @@ public class TraceLearner {
 		return generateLearnedAction(unsafePreSet, unsafeEffSet, actionName, agentName);
 	}
 
-	private boolean writeNewSafeDomain(String newDomainString, String agentName) {
+	private boolean writeNewSafeDomain(String newDomainString, String agentName, String outputPath) {
 
 		LOGGER.info("Writing new safe PDDL domain file");
 
-		String learnedDomainPath = Globals.OUTPUT_SAFE_MODEL_PATH + "/" + agentName + "/" + domainFileName;
-
 		try {
-			FileUtils.writeStringToFile(new File(learnedDomainPath), newDomainString, Charset.defaultCharset());
+			FileUtils.writeStringToFile(new File(outputPath), newDomainString, Charset.defaultCharset());
 		} catch (IOException e) {
 			LOGGER.info(e,e);
 			return false;
@@ -488,14 +527,12 @@ public class TraceLearner {
 		return true;
 	}
 
-	private boolean writeNewUnSafeDomain(String newDomainString, String agentName) {
+	private boolean writeNewUnSafeDomain(String newDomainString, String agentName, String outputPath) {
 
 		LOGGER.info("Writing new unsafe PDDL domain file");
 
-		String learnedDomainPath = Globals.OUTPUT_UNSAFE_MODEL_PATH + "/" + agentName + "/" + domainFileName;
-
 		try {
-			FileUtils.writeStringToFile(new File(learnedDomainPath), newDomainString, Charset.defaultCharset());
+			FileUtils.writeStringToFile(new File(outputPath), newDomainString, Charset.defaultCharset());
 		} catch (IOException e) {
 			LOGGER.info(e,e);
 			return false;
@@ -522,16 +559,14 @@ public class TraceLearner {
 		return sb.toString();
 	}
 
-	private String readDomainString(String agentName) {
+	private String readDomainString(String domainPath,String agentName) {
 
 		LOGGER.info("Reading domain pddl string");
-
-		String learnedDomainPath = localViewFiles + "/" + agentName + "/" + domainFileName;
 
 		String fileStr = "";
 
 		try {
-			fileStr = FileUtils.readFileToString(new File(learnedDomainPath),Charset.defaultCharset());
+			fileStr = FileUtils.readFileToString(new File(domainPath),Charset.defaultCharset());
 		} catch (IOException e) {
 			LOGGER.info(e,e);
 			return "";
