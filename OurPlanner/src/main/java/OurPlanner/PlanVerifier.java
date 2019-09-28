@@ -19,6 +19,7 @@ import org.apache.log4j.Logger;
 
 import Model.*;
 import Utils.FileDeleter;
+import Utils.VerificationResult;
 import cz.agents.dimaptools.input.addl.ADDLObject;
 import cz.agents.dimaptools.input.addl.ADDLParser;
 import cz.agents.dimaptools.model.*;
@@ -396,10 +397,10 @@ public class PlanVerifier {
 		return true;
 	}
 
-	public boolean verifyPlan(List<String> plan, int actionIndex) {
+	public VerificationResult verifyPlan(List<String> plan, int actionIndex) {
 
 		LOGGER.info("Verifying plan");
-
+		
 		String actionStr = plan.get(actionIndex);
 
 		String actionOwner = getActionOwnerFromAction(actionStr);
@@ -434,12 +435,12 @@ public class PlanVerifier {
 			}
 			else {
 				LOGGER.info("Action " + action.getSimpleLabel() + " is not applicable!");
-				return false;
+				return new VerificationResult(actionIndex, false);
 			}
 		}
 		else {
 			LOGGER.info("agent " + agentName + " is not the owner of this action - plan not verified!");
-			return false;
+			return new VerificationResult(-1, false);
 		}
 
 		if(actionIndex == plan.size() - 1) {
@@ -447,11 +448,11 @@ public class PlanVerifier {
 			if(state.unifiesWith(agentGoalState)) {
 
 				LOGGER.info("Goal is reached - plan verified!");
-				return true;
+				return new VerificationResult(actionIndex, true);
 			}
 			else{
 				LOGGER.info("Goal is not reached - plan not verified!");
-				return false;
+				return new VerificationResult(actionIndex, false);
 			}
 		}
 		else {
