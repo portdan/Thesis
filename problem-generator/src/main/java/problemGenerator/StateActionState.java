@@ -12,6 +12,15 @@ public class StateActionState {
 	public Set<String> post = null;
 	public int traceNumber = 0;
 	
+	public StateActionState(StateActionState toCopy) {
+
+		this.pre = new HashSet<String>(toCopy.pre);
+		this.action = new String(toCopy.action);
+		this.actionOwner = new String(toCopy.actionOwner);
+		this.post = new HashSet<String>(toCopy.post);
+		this.traceNumber = toCopy.traceNumber;
+	}
+	
 	public StateActionState(Set<String> pre, String action, String actionOwner, Set<String> post, int traceNumber) {
 
 		this.pre = new HashSet<String>(pre);
