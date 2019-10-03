@@ -3,6 +3,7 @@ package PlannerAndLearner;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map.Entry;
@@ -16,6 +17,7 @@ import org.apache.log4j.Logger;
 import OurPlanner.Globals;
 import OurPlanner.MADLAPlanner;
 import OurPlanner.PlanToStateActionState;
+import OurPlanner.PlanToStateActionState2;
 import OurPlanner.PlanVerifier;
 import OurPlanner.StateActionState;
 import OurPlanner.TraceLearner;
@@ -126,6 +128,8 @@ public class PlannerAndModelLearner {
 
 		open.add(tmpModel);
 
+		Model referanceModel = new Model(safeModel);
+
 		while (!open.isEmpty()) {
 
 			int index = rnd.nextInt(open.size());
@@ -135,14 +139,15 @@ public class PlannerAndModelLearner {
 			open.remove(currTempModel);
 			closed.add(currTempModel);			
 
-			Model currModel = safeModel.extendModel(currTempModel);
+			Model currModel = referanceModel.extendModel(currTempModel);
 
 			writeDomainFile(currModel.reconstructModelString());
 
 			List<String> plan = plan();
 
 			if(plan == null) {
-				open.addAll(ExtendUnsafe(currModel, unsafeModel, currTempModel));
+				Set<TempModel> newModels = ExtendUnsafe(currModel, unsafeModel, currTempModel);
+				open.addAll(newModels);
 				open.removeAll(closed);
 			}
 			else {
@@ -161,12 +166,14 @@ public class PlannerAndModelLearner {
 
 						planSASList.remove(res.lastActionIndex);						
 
-						UpdateModels(safeModel, unsafeModel,open, closed, planSASList, failedActionSAS);
+						UpdateOpenListModels(referanceModel, open, closed, planSASList, failedActionSAS);
+						UpdateSafeUnSafeModels(safeModel, unsafeModel, planSASList);
 
-						if(res.lastActionIndex > 0)
-							open.addAll(ExtendSafe(currModel, safeModel, currTempModel, failedActionSAS));
-
-						open.removeAll(closed);
+						if(res.lastActionIndex > 0) {
+							Set<TempModel> newModels = ExtendSafe(currModel, safeModel, currTempModel, failedActionSAS);
+							open.addAll(newModels);		
+							open.removeAll(closed);
+						}
 					}
 				}
 				else
@@ -177,8 +184,7 @@ public class PlannerAndModelLearner {
 		return true;
 	}
 
-	private boolean UpdateModels(Model safeModel, Model unsafeModel, Set<TempModel> open, Set<TempModel> closed,
-			List<StateActionState> planSASList, StateActionState failedActionSAS) {
+	private boolean UpdateSafeUnSafeModels(Model safeModel, Model unsafeModel, List<StateActionState> planSASList) {
 
 		LOGGER.info("Updating safe and unsafe models with new plan training set");
 
@@ -202,6 +208,77 @@ public class PlannerAndModelLearner {
 
 		return true;
 	}
+
+	private boolean UpdateOpenListModels(Model model, Set<TempModel> open, Set<TempModel> closed,
+			List<StateActionState> planSASList, StateActionState failedActionSAS) {
+
+		LOGGER.info("Updating open list models with new plan training set");
+
+		Set<TempModel> toRemove = new LinkedHashSet<TempModel>();
+
+		for (TempModel tempModel : open) {
+
+			Model testedModel = model.extendModel(tempModel);
+
+			// remove open list models that does not allow OK actions
+			for (StateActionState sas : planSASList) {				
+				if(!sas.actionOwner.equals(agentName)) {
+
+					Action modelAction = testedModel.actions.get(sas.action); 
+
+					Set<String> modelActionPre = new LinkedHashSet<String>(modelAction.preconditions);
+
+					Set<String> modelActionEff = new LinkedHashSet<String>(modelAction.effects);
+
+					Set<String> verifiedActionPre = new LinkedHashSet<String>(sas.pre);
+					verifiedActionPre = formatFacts(verifiedActionPre);
+
+					Set<String> verifiedActionEff = new LinkedHashSet<String>(sas.post);
+					verifiedActionEff = formatFacts(verifiedActionEff);
+
+					verifiedActionEff.removeAll(verifiedActionPre);
+
+					if(!verifiedActionPre.containsAll(modelActionPre)) {
+						toRemove.add(tempModel);
+					}
+					/*else if(modelActionEff.containsAll(planActionEff)) {
+						toRemove.add(tempModel);
+					}*/
+				}
+			}
+
+			if(!failedActionSAS.actionOwner.equals(agentName)) {
+
+				// remove open list models that allow failed actions
+				Action modelAction = testedModel.actions.get(failedActionSAS.action);
+
+				Set<String> modelActionPre = new LinkedHashSet<String>(modelAction.preconditions);
+
+				Set<String> modelActionEff = new LinkedHashSet<String>(modelAction.effects);
+
+				Set<String> failedActionPre = new LinkedHashSet<String>(failedActionSAS.pre);
+				failedActionPre = formatFacts(failedActionPre);
+
+				Set<String> failedActionEff = new LinkedHashSet<String>(failedActionSAS.post);
+				failedActionEff = formatFacts(failedActionEff);
+
+				failedActionEff.removeAll(failedActionPre);
+
+				if(failedActionPre.containsAll(modelActionPre)) {
+					toRemove.add(tempModel);
+				}
+				/*else if(!modelActionEff.containsAll(failedActionEff)) { 
+					toRemove.add(tempModel);
+				}*/
+			}
+		}
+
+		open.removeAll(toRemove);
+		closed.addAll(toRemove);
+
+		return true;
+	}
+
 
 	private Set<TempModel> ExtendSafe(Model currModel, Model safeModel, TempModel currTempModel,
 			StateActionState failedActionSAS) {
@@ -251,24 +328,53 @@ public class PlannerAndModelLearner {
 		return res;
 	}
 
-	private Set<String> formatFacts(Set<String> statePreconditions) {
+	private Set<String> formatFacts(Set<String> facts) {
 
-		Set<String> res = new LinkedHashSet<String>();
+		LOGGER.info("Formatting facts");
 
-		for (String fact : statePreconditions) {
+		Set<String> formatted = new HashSet<String>();
 
+		for (String fact : facts) {
+
+			int startIndex = 0;
+			int endIndex = fact.length();
+
+			boolean isNegated = false;
 			String formattedFact = fact;
+
+			if(formattedFact.startsWith("not")) {
+				isNegated = !isNegated;
+				startIndex = formattedFact.indexOf('(');
+				endIndex = formattedFact.lastIndexOf(')');			
+				formattedFact = formattedFact.substring(startIndex+1,endIndex);
+			}
+
+			if(formattedFact.startsWith(Globals.NEGATED_KEYWORD)) {
+				isNegated = !isNegated;
+				formattedFact = formattedFact.replace(Globals.NEGATED_KEYWORD, "");
+			}
 
 			formattedFact = formattedFact.replace("(", " ");
 			formattedFact = formattedFact.replace(",", "");
 			formattedFact = formattedFact.replace(")", "");
 
+			formattedFact = formattedFact.trim();
+
 			formattedFact = '(' + formattedFact + ')';
 
-			res.add(formattedFact);
+			if(formattedFact.startsWith(Globals.NONE_KEYWORD)) {
+				//formatted.addAll(formatNONEFact(formattedFact, isNegated));
+				//formatted.add(formattedFact);
+			}
+			else {
+				if (isNegated)
+					formattedFact = "(not " + formattedFact + ")";
+
+				formatted.add(formattedFact);
+			}
 		}
 
-		return res;
+		return formatted;
 	}
 
 	private Set<TempModel> ExtendUnsafe(Model currModel, Model unsafeModel,
@@ -301,7 +407,7 @@ public class PlannerAndModelLearner {
 
 				if(tempAction == null)
 					tempAction = new TempAction();
-				
+
 				if(!tempAction.preconditionsSub.contains(pre)) {
 
 					tempAction.name = action.name;
@@ -373,7 +479,12 @@ public class PlannerAndModelLearner {
 
 		PlanToStateActionState plan2SAS = new PlanToStateActionState(domainFileName, problemFileName, problemFilesPath);
 
+		problemFilesPath = Globals.OUTPUT_SOUND_MODEL_PATH;
+		PlanToStateActionState2 plan2SAS2 = new PlanToStateActionState2(domainFileName, problemFileName,
+				problemFilesPath, agentName);
+
 		List<StateActionState> res = plan2SAS.generateSASList(plan, lastActionIndex);
+		//List<StateActionState> res = plan2SAS2.generateSASList(plan, lastActionIndex);
 
 		if(!FileDeleter.deleteTempFiles()) {
 			LOGGER.info("Deleting Temporary files failure");
