@@ -393,8 +393,8 @@ public class OurPlanner implements Creator  {
 
 		LOGGER.info("Running learning algorithm");
 
-		learner = new TraceLearner(agentList,tracesFile, 
-				groundedFile, localViewFile, domainFileName, problemFileName, numOftraces, tracesLearinigInterval);	
+		learner = new TraceLearner(agentList,tracesFile, groundedFile, localViewFile, 
+				domainFileName, problemFileName, numOftraces, tracesLearinigInterval);	
 
 		boolean isLearned = learner.learnNewActions();
 

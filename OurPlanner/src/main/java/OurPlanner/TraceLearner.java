@@ -224,7 +224,8 @@ public class TraceLearner {
 		LOGGER.info("Learning safe preconditions and effects");
 
 		Set<String> safePre = learnSafePreconditions(sasListForAction);
-		Set<String> safeEff = learnSafeEffects(sasListForAction);
+		//Set<String> safeEff = learnSafeEffects(sasListForAction);
+		Set<String> safeEff = DEGenerator.generateAllEffects(actionName);
 
 		safeEff.addAll(DEGenerator.generateDeleteEffects(actionName,safePre,safeEff));
 
@@ -257,7 +258,8 @@ public class TraceLearner {
 		LOGGER.info("Learning unsafe preconditions and effects");
 
 		Set<String> unsafePre = learnUnSafePreconditions(sasListForAction);
-		Set<String> unsafeEff = learnUnSafeEffects(sasListForAction);
+		//Set<String> unsafeEff = learnUnSafeEffects(sasListForAction);
+		Set<String> unsafeEff = DEGenerator.generateAllEffects(actionName);
 
 		unsafeEff.addAll(DEGenerator.generateDeleteEffects(actionName,unsafePre,unsafeEff));
 

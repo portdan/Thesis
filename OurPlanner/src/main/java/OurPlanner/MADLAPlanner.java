@@ -68,7 +68,7 @@ public class MADLAPlanner {
 
 	private boolean sasSolvable = false;
 
-	protected SASPreprocessor preprocessor = null;
+	public SASPreprocessor preprocessor = null;
 
 	private final Set<Planner> planners = new LinkedHashSet<Planner>();
 	private final Set<Thread> threadSet = new LinkedHashSet<Thread>();

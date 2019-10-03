@@ -18,6 +18,7 @@ import Model.StateActionStateSASPreprocessor;
 import cz.agents.dimaptools.model.Action;
 import cz.agents.dimaptools.model.Domain;
 import cz.agents.dimaptools.model.Problem;
+import cz.agents.dimaptools.model.SuperState;
 
 
 public class DeleteEffectGenerator {
@@ -69,6 +70,25 @@ public class DeleteEffectGenerator {
 		LOGGER.info("problemFiles: " + problemFiles);
 	}
 
+	public Set<String> generateAllEffects(String actionName) {
+
+		LOGGER.info("Generating all effects for action " + actionName );
+
+		Set<String> res = new HashSet<String>();		
+
+		Action action = getActionFromName(problem, actionName);
+
+		SuperState eff = action.getEffect();
+
+		for (int valNum : eff.getValues()) {
+			if(valNum>=0) {
+				res.add(Domain.valNames.get(valNum).toString());
+			}
+		}
+
+		return res;
+	}
+
 	public Set<String> generateDeleteEffects(String actionName, Set<String> pre, Set<String> eff) {
 
 		LOGGER.info("Generating delete effects for action " + actionName );
@@ -102,7 +122,7 @@ public class DeleteEffectGenerator {
 					res.add(effFact);
 
 					Set<Integer> deleteVals = problem.getDomain().getVariableDomains().get(effVar);
-					
+
 					for (int val : deleteVals) {
 
 						if(val != effVal) {
