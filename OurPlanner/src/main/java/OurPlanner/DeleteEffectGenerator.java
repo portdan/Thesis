@@ -109,8 +109,8 @@ public class DeleteEffectGenerator {
 
 							String valStr = Domain.valNames.get(val).toString();
 
-							if(valStr.startsWith("Negated"))
-								res.add(valStr.replace("Negated", ""));
+							if(valStr.startsWith(Globals.NEGATED_KEYWORD))
+								res.add(valStr.replace(Globals.NEGATED_KEYWORD, ""));
 							else
 								res.add("not ( "+ valStr +")");
 						}

@@ -151,7 +151,7 @@ public class TraceLearner {
 
 			TestDataAccumulator.getAccumulator().agentLearningTimeMs.put(agentName, agentLearningTime);
 		}
-		
+
 		return writeNewSafeLearnedProblemFiles() && writeNewUnSafeLearnedProblemFiles();
 	}
 
@@ -307,9 +307,9 @@ public class TraceLearner {
 				formattedFact = formattedFact.substring(startIndex+1,endIndex);
 			}
 
-			if(formattedFact.startsWith("Negated")) {
+			if(formattedFact.startsWith(Globals.NEGATED_KEYWORD)) {
 				isNegated = !isNegated;
-				formattedFact = formattedFact.replace("Negated", "");
+				formattedFact = formattedFact.replace(Globals.NEGATED_KEYWORD, "");
 			}
 
 			formattedFact = formattedFact.replace("(", " ");
@@ -427,7 +427,7 @@ public class TraceLearner {
 				LOGGER.info("Reading domain pddl failure");
 				return false;
 			}
-*/
+			 */
 			String learnedDomainStr = addActionsToDomainString(domainStr, learnedUnSafeActionsString);
 
 			/*if(domainStr.isEmpty())
