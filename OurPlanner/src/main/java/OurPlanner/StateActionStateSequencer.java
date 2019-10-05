@@ -130,8 +130,6 @@ public class StateActionStateSequencer {
 
 		}
 
-		TestDataAccumulator.getAccumulator().trainingSize += traceNumber;
-
 		return trajectorySequences;
 	}
 }

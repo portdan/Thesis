@@ -246,7 +246,7 @@ public class TraceLearner {
 
 		LOGGER.info("Learning new actions");
 
-		TestDataAccumulator.getAccumulator().trainingSize = 0;
+		TestDataAccumulator.getAccumulator().initialTrainingSize = 0;
 
 		StateActionStateSequencer sasSequencer = new StateActionStateSequencer(agentList, 
 				problemFiles, domainFileName, problemFileName, trajectoryFiles);

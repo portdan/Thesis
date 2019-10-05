@@ -20,6 +20,7 @@ import OurPlanner.PlanToStateActionState;
 import OurPlanner.PlanToStateActionState2;
 import OurPlanner.PlanVerifier;
 import OurPlanner.StateActionState;
+import OurPlanner.TestDataAccumulator;
 import OurPlanner.TraceLearner;
 import Utils.FileDeleter;
 import Utils.VerificationResult;
@@ -38,6 +39,12 @@ public class PlannerAndModelLearner {
 
 	private TraceLearner learner = null;
 
+	private long sequancingTimeTotal = 0;
+	private long sequancingAmountTotal = 0;
+
+	public int num_agents_solved = 0;
+	public int num_agents_not_solved = 0;
+	public int num_agents_timeout = 0;
 
 	public PlannerAndModelLearner(String agentName, List<String> agentList, String domainFileName,
 			String problemFileName, TraceLearner learner) {
@@ -96,13 +103,18 @@ public class PlannerAndModelLearner {
 	}
 
 
-	public boolean test () {
+	public List<String> planAndLearn () {
 
 		LOGGER.info("test");
 
+		List<String> plan = null;
+
+		TestDataAccumulator.getAccumulator().addedTrainingSize = 0;
+		TestDataAccumulator.getAccumulator().numOfIterations = 0;
+
 		if(!copyProblemFiles()) {
 			LOGGER.info("Coping domain file failure");
-			return false;
+			return null;
 		}		
 
 		String safeModelPath = Globals.OUTPUT_SAFE_MODEL_PATH + "/" + agentName + "/" + domainFileName;
@@ -113,12 +125,12 @@ public class PlannerAndModelLearner {
 
 		if(!safeModel.readModel(safeModelPath)) {
 			LOGGER.fatal("provided path to safe model domain file not existing");
-			return false;
+			return null;
 		}
 
 		if(!unsafeModel.readModel(unsafeModelPath)) {
 			LOGGER.fatal("provided path to unsafe model domain file not existing");
-			return false;
+			return null;
 		}
 
 		TempModel tmpModel  = new TempModel();
@@ -132,6 +144,8 @@ public class PlannerAndModelLearner {
 
 		while (!open.isEmpty()) {
 
+			TestDataAccumulator.getAccumulator().numOfIterations+=1;
+
 			int index = rnd.nextInt(open.size());
 
 			TempModel currTempModel = (TempModel) (open.toArray())[index];
@@ -143,7 +157,7 @@ public class PlannerAndModelLearner {
 
 			writeDomainFile(currModel.reconstructModelString());
 
-			List<String> plan = plan();
+			plan = planForAgent();
 
 			if(plan == null) {
 				Set<TempModel> newModels = ExtendUnsafe(currModel, unsafeModel, currTempModel);
@@ -158,6 +172,11 @@ public class PlannerAndModelLearner {
 
 					if(res.isVerified) {
 						LOGGER.info("GREAT!!");
+
+						if(res.isVerified)
+							num_agents_solved++;
+
+						return plan;
 					}
 					else {
 
@@ -177,11 +196,11 @@ public class PlannerAndModelLearner {
 					}
 				}
 				else
-					return false;
+					return null;
 			}
 		}
 
-		return true;
+		return null;
 	}
 
 	private boolean UpdateSafeUnSafeModels(Model safeModel, Model unsafeModel, List<StateActionState> planSASList) {
@@ -191,7 +210,8 @@ public class PlannerAndModelLearner {
 		String safeModelPath = Globals.OUTPUT_SAFE_MODEL_PATH + "/" + agentName + "/" + domainFileName;
 		String unsafeModelPath = Globals.OUTPUT_UNSAFE_MODEL_PATH + "/" + agentName + "/" + domainFileName;
 
-		learner.learnActionsFromPlan(planSASList,Globals.OUTPUT_SAFE_MODEL_PATH,Globals.OUTPUT_UNSAFE_MODEL_PATH);
+		learner.learnActionsFromPlan(planSASList, Globals.OUTPUT_SAFE_MODEL_PATH, Globals.OUTPUT_UNSAFE_MODEL_PATH, 
+				sequancingTimeTotal, sequancingAmountTotal);
 
 		safeModel = new Model();
 		unsafeModel = new Model();
@@ -425,7 +445,7 @@ public class PlannerAndModelLearner {
 		return res;
 	}
 
-	private List<String> plan() {
+	private List<String> planForAgent() {
 
 		LOGGER.info("Planning for agent");
 
@@ -437,10 +457,31 @@ public class PlannerAndModelLearner {
 		int recursionLevel = -1;
 		double timeLimitMin = 0.1666;
 
+		long planningStartTime = System.currentTimeMillis();
+
 		MADLAPlanner planner = new MADLAPlanner(agentDomainPath, agentProblemPath, agentADDLPath,
 				heuristic, recursionLevel, timeLimitMin, agentList, agentName);
 
 		List<String> result = planner.plan();
+
+		if(planner.isTimeout)
+			num_agents_timeout++;
+
+		if(planner.isNotSolved)
+			num_agents_not_solved++;
+
+		long planningFinishTime = System.currentTimeMillis();
+
+		TestDataAccumulator.getAccumulator().totalPlaningTimeMs += planningFinishTime - planningStartTime;
+
+		Long agentPlanningTimes = TestDataAccumulator.getAccumulator().agentPlanningTimeMs.get(agentName);
+
+		if(agentPlanningTimes == null) 
+			agentPlanningTimes = planningFinishTime - planningStartTime;
+		else
+			agentPlanningTimes += planningFinishTime - planningStartTime;
+
+		TestDataAccumulator.getAccumulator().agentPlanningTimeMs.put(agentName, agentPlanningTimes);		
 
 		if(!FileDeleter.deleteTempFiles()) {
 			LOGGER.info("Deleting Temporary files failure");
@@ -475,6 +516,8 @@ public class PlannerAndModelLearner {
 
 		LOGGER.info("generate SAS List from plan");
 
+		long sequancingStartTime = System.currentTimeMillis();
+
 		String problemFilesPath = Globals.INPUT_GROUNDED_PATH;
 
 		PlanToStateActionState plan2SAS = new PlanToStateActionState(domainFileName, problemFileName, problemFilesPath);
@@ -490,6 +533,11 @@ public class PlannerAndModelLearner {
 			LOGGER.info("Deleting Temporary files failure");
 			return null;	
 		}
+
+		long sequancingEndTime = System.currentTimeMillis();
+
+		sequancingTimeTotal = sequancingEndTime - sequancingStartTime;
+		sequancingAmountTotal = res.size();
 
 		return res;
 	}

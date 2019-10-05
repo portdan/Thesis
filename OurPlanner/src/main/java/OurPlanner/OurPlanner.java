@@ -36,7 +36,7 @@ public class OurPlanner implements Creator  {
 
 	public VerificationModel verificationModel = VerificationModel.GroundedModel;
 	public PlanningModel planningModel = PlanningModel.SafeModel;
-	
+
 	private TraceLearner learner = null;
 
 	private File tracesFile = null;
@@ -125,13 +125,16 @@ public class OurPlanner implements Creator  {
 		}
 		 */
 
-		//runPlanningAlgorithm();
-
-		runPlanningAlgorithmWithModelUpdating();
+		/*
+		runPlanningAlgorithm();
 
 		TestDataAccumulator.getAccumulator().numOfAgentsSolved = num_agents_solved;
 		TestDataAccumulator.getAccumulator().numOfAgentsTimeout = num_agents_timeout;
 		TestDataAccumulator.getAccumulator().numOfAgentsNotSolved = num_agents_not_solved;		
+
+		 */
+
+		runPlanningAlgorithmWithModelUpdating();
 
 		if(!copyOutputFolder()) {
 			LOGGER.info("Coping output folder failure");
@@ -328,6 +331,8 @@ public class OurPlanner implements Creator  {
 
 			if(verifyPlan(leaderAgentPlan, isLearning, verificationModel)) {
 
+				LogLearningTimes();
+
 				TestDataAccumulator.getAccumulator().solvingAgent = currentLeaderAgent;
 				TestDataAccumulator.getAccumulator().planLength= leaderAgentPlan.size();
 
@@ -346,14 +351,8 @@ public class OurPlanner implements Creator  {
 
 		List<String> leaderAgentPlan = null;
 
-		long learningStartTime = System.currentTimeMillis();
-
 		if(numOftraces>0)
 			learnSafeAndUnSafeModelsFromTraces();
-
-		long learningFinishTime = System.currentTimeMillis();
-
-		TestDataAccumulator.getAccumulator().totalLearningTimeMs = learningFinishTime - learningStartTime;
 
 		while(!availableLeaders.isEmpty()) {
 
@@ -361,17 +360,24 @@ public class OurPlanner implements Creator  {
 
 			LOGGER.info("Current Leader Agent " + currentLeaderAgent);
 
-			long planningStartTime = System.currentTimeMillis();
+			PlannerAndModelLearner plannerAndLearner = new PlannerAndModelLearner(currentLeaderAgent, agentList,
+					domainFileName, problemFileName, learner);
 
-			leaderAgentPlan = planAndLearnModels(currentLeaderAgent);
+			leaderAgentPlan = plannerAndLearner.planAndLearn();
 
-			long planningFinishTime = System.currentTimeMillis();
+			TestDataAccumulator.getAccumulator().numOfAgentsSolved = plannerAndLearner.num_agents_solved;
+			TestDataAccumulator.getAccumulator().numOfAgentsTimeout = plannerAndLearner.num_agents_timeout;
+			TestDataAccumulator.getAccumulator().numOfAgentsNotSolved = plannerAndLearner.num_agents_not_solved;		
 
-			TestDataAccumulator.getAccumulator().totalPlaningTimeMs += planningFinishTime - planningStartTime;
-			TestDataAccumulator.getAccumulator().agentPlanningTimeMs.put(currentLeaderAgent, planningFinishTime - planningStartTime);
+			LogLearningTimes();
 
-			if(leaderAgentPlan != null)
+			if(leaderAgentPlan != null) {
+
+				TestDataAccumulator.getAccumulator().solvingAgent = currentLeaderAgent;
+				TestDataAccumulator.getAccumulator().planLength= leaderAgentPlan.size();
+
 				return true;
+			}
 		}
 
 		LOGGER.fatal("No more available leaders. No solution!");
@@ -379,14 +385,17 @@ public class OurPlanner implements Creator  {
 		return false;
 	}
 
-	private List<String> planAndLearnModels(String agentName) {
+	private void LogLearningTimes() {
+		for (String agentName : agentList) {
 
-		PlannerAndModelLearner asd = new PlannerAndModelLearner(agentName, agentList,
-				domainFileName, problemFileName, learner);
-		
-		asd.test();
+			long agentLearningTime = 0;
 
-		return null;
+			for (String otherAgentName : agentList) 
+				if(!otherAgentName.equals(agentName))
+					agentLearningTime += learner.agentLearningTimes.get(otherAgentName);
+
+			TestDataAccumulator.getAccumulator().agentLearningTimeMs.put(agentName, agentLearningTime);
+		}
 	}
 
 	private boolean learnSafeAndUnSafeModelsFromTraces() {

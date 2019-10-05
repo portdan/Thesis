@@ -64,6 +64,9 @@ public class TraceLearner {
 		this.numOfTracesToUse = numOfTracesToUse;
 		this.tracesLearinigInterval = tracesLearinigInterval;
 
+		for (String agent : agentList) 
+			agentLearningTimes.put(agent,(long) 0);
+
 		logInput();
 	}
 
@@ -93,16 +96,13 @@ public class TraceLearner {
 
 		LOGGER.info("Learning new actions");
 
-		TestDataAccumulator.getAccumulator().trainingSize = 0;
-
+		TestDataAccumulator.getAccumulator().initialTrainingSize = 0;
+		
 		sasSequencer = new StateActionStateSequencer(agentList, 
 				problemFiles, domainFileName, problemFileName, trajectoryFiles);
 
 		DEGenerator = new DeleteEffectGenerator (problemFiles,
 				domainFileName, problemFileName);
-
-		for (String agentName : agentList) 
-			agentLearningTimes.put(agentName,(long) 0);
 
 		while(!sasSequencer.StopSequencing) {
 
@@ -115,6 +115,8 @@ public class TraceLearner {
 			long sequancingTimeTotal = sequancingEndTime - sequancingStartTime;
 
 			long sequancingAmountTotal = sasList.size();
+
+			TestDataAccumulator.getAccumulator().initialTrainingSize += sequancingAmountTotal;			
 
 			while(!sasList.isEmpty())
 			{	
@@ -141,24 +143,15 @@ public class TraceLearner {
 			}
 		}
 
-		for (String agentName : agentList) {
-
-			long agentLearningTime = 0;
-
-			for (String otherAgentName : agentList) 
-				if(!otherAgentName.equals(agentName))
-					agentLearningTime += agentLearningTimes.get(otherAgentName);
-
-			TestDataAccumulator.getAccumulator().agentLearningTimeMs.put(agentName, agentLearningTime);
-		}
-
 		return writeNewSafeLearnedProblemFiles() && writeNewUnSafeLearnedProblemFiles();
 	}
 
 	public boolean learnActionsFromPlan(List<StateActionState> planSASList, String pathToSafeModel,
-			String pathUnSafeModel) {
+			String pathUnSafeModel, long sequancingTimeTotal, long sequancingAmountTotal) {
 
 		LOGGER.info("Learning new actions from plan");
+
+		TestDataAccumulator.getAccumulator().addedTrainingSize += planSASList.size();
 
 		DEGenerator = new DeleteEffectGenerator (problemFiles,
 				domainFileName, problemFileName);
@@ -166,6 +159,8 @@ public class TraceLearner {
 		List<StateActionState> sasList = new ArrayList<StateActionState>(planSASList); 
 
 		while(!sasList.isEmpty()) {
+
+			long learningStartTime = System.currentTimeMillis();
 
 			StateActionState firstValue = (StateActionState)sasList.get(0);
 
@@ -179,6 +174,11 @@ public class TraceLearner {
 			addActionToOwnerLink(actionName, actionOwnerName);
 
 			learnPreconditionAndEffects(DEGenerator, actionName, sasListForAction);
+
+			long learningFinishTime = System.currentTimeMillis();
+
+			addAgentLearningTime(sequancingTimeTotal, sequancingAmountTotal, learningStartTime,
+					actionOwnerName, sasListForAction, learningFinishTime);
 
 			sasList.removeAll(sasListForAction);
 
@@ -196,11 +196,16 @@ public class TraceLearner {
 		long relativeLeariningTime = learningFinishTime - learningStartTime;
 
 		Long currentLeariningTime  = agentLearningTimes.get(actionOwnerName);
+		long addedLeariningTime = 0;
 
 		if(currentLeariningTime == null)
-			agentLearningTimes.put(actionOwnerName, relativeLeariningTime + relativeSequancingTime);
+			addedLeariningTime = relativeLeariningTime + relativeSequancingTime;
 		else
-			agentLearningTimes.put(actionOwnerName, currentLeariningTime + relativeLeariningTime + relativeSequancingTime);
+			addedLeariningTime = currentLeariningTime + relativeLeariningTime + relativeSequancingTime;
+
+		agentLearningTimes.put(actionOwnerName, addedLeariningTime);
+
+		TestDataAccumulator.getAccumulator().totalLearningTimeMs += relativeLeariningTime + relativeSequancingTime;
 	}
 
 	private void addActionToOwnerLink(String actionName, String actionOwnerName) {

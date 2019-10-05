@@ -31,7 +31,9 @@ public class TestDataAccumulator {
 	public long totalTimeMs = 0;
 	public long totalLearningTimeMs = 0;
 	public long totalPlaningTimeMs = 0;
-	public int trainingSize = 0;
+	public int initialTrainingSize = 0;
+	public int addedTrainingSize = 0;
+	public int numOfIterations = 0;
 	public int numOfAgentsSolved = 0;
 	public int numOfAgentsTimeout = 0;
 	public int numOfAgentsNotSolved = 0;
@@ -68,7 +70,9 @@ public class TestDataAccumulator {
 		sb.append("Domain").append(sep);
 		sb.append("Problem").append(sep);
 		sb.append("Agents").append(sep);
-		sb.append("Training Size").append(sep);
+		sb.append("Initial Training Size").append(sep);
+		sb.append("Added Training Size").append(sep);
+		sb.append("Number of Iterations").append(sep);
 		sb.append("Solved").append(sep);
 		sb.append("Timeout").append(sep);
 		sb.append("Not Solved").append(sep);
@@ -93,7 +97,9 @@ public class TestDataAccumulator {
 		sb.append(domain).append(sep);
 		sb.append(problem).append(sep);
 		sb.append(agentNames.size()).append(sep);
-		sb.append(trainingSize).append(sep);
+		sb.append(initialTrainingSize).append(sep);
+		sb.append(addedTrainingSize).append(sep);
+		sb.append(numOfIterations).append(sep);
 		sb.append(numOfAgentsSolved).append(sep);
 		sb.append(numOfAgentsTimeout).append(sep);
 		sb.append(numOfAgentsNotSolved).append(sep);
