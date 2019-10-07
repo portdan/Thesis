@@ -1,9 +1,11 @@
 package problemGenerator.FileGenerator;
 
 import java.io.IOException;
+import java.lang.ProcessBuilder.Redirect;
 import java.util.ArrayList;
 import java.util.List;
 
+import problemGenerator.ExecCommand;
 import problemGenerator.StateActionState;
 
 public class SASGenerator extends FileGenerator{
@@ -14,6 +16,16 @@ public class SASGenerator extends FileGenerator{
 
 		generateFile(folderPath, fileName, FILE_TYPE);
 	}
+
+	public void mixOutputFile() throws IOException, InterruptedException{
+
+		String filePath = outFile.getPath(); 				
+
+		String cmd = "shuf " + filePath + " --output=" + filePath;
+		new ExecCommand(cmd);
+
+	}
+
 
 	public void appendSASList(List<StateActionState> sasList, int traceCounter) throws IOException {	
 

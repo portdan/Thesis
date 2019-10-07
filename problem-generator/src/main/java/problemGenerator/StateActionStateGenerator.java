@@ -360,10 +360,18 @@ public class StateActionStateGenerator implements Creator {
 
 		LOGGER.info("total number of traces generated: " + problemCounter);
 
+		try {
+			sasGenerator.mixOutputFile();
+		} catch (IOException | InterruptedException e) {
+			e.printStackTrace();
+		}
+
 		delelteTemporaryFiles();
 
 		deleteSasFile();
 	}
+
+
 	private void delelteTemporaryFiles() {
 
 		LOGGER.info("Deleting temporary files");
