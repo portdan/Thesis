@@ -105,10 +105,12 @@ def run_tests(config):
         
         solved_threshold = planner.search_solved_threshold(problem.problemName, problem.minTracesToUse, problem.maxTracesToUse)
         
-        planner.plan_range_traces(problem.problemName, 0, max(0, solved_threshold -1), problem.unsolvedRangeSplit)
-         
-        planner.plan_range_traces(problem.problemName, solved_threshold, problem.maxTracesToUse, problem.solvedRangeSplit)        
+        planner.plan_and_learn_range_traces(problem.problemName, 0, max(0, solved_threshold), problem.unsolvedRangeSplit)
         
+        #planner.plan_range_traces(problem.problemName, 0, max(0, solved_threshold -1), problem.unsolvedRangeSplit)
+         
+        #planner.plan_range_traces(problem.problemName, solved_threshold, problem.maxTracesToUse, problem.solvedRangeSplit)        
+                
         grounder.delete_output()
         generator.delete_output()
       

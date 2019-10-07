@@ -16,6 +16,9 @@ from utils.Utils import clear_directory,copy_tree
 import logging
 logger = logging.getLogger(__name__)
 
+planning_mode = "Planning"
+planning_and_learning_mode = "PlanningAndLearning"
+
 
 class Planner(object):
     '''
@@ -50,7 +53,7 @@ class Planner(object):
             preprocess_runner_script.write(preprocess_script_path)
             preprocess_runner_script.write(preprocess_sas_file_input)
 
-    def prepere_planning_config(self, problem_name, num_of_traces_to_use):
+    def prepere_planning_config(self, problem_name, num_of_traces_to_use, planner_mode):
      
         logger.info("prepere_planning_config")
         
@@ -71,7 +74,8 @@ class Planner(object):
         planner_config.agentsFileName = problem_name.split(".")[0] + ".agents"
         planner_config.verificationModel = self.config.problemPlannerVerificationModel
         planner_config.planningModel = self.config.problemPlannerPlanningModel
-        
+        planner_config.plannerMode = planner_mode
+
         self.planner_output_folder = self.config.outputDestination + "/" + problem_name + "/" + self.config.problemPlannerOutputDestination
 
         planner_config.outputCopyDirPath = self.planner_output_folder
@@ -114,11 +118,11 @@ class Planner(object):
     def delete_output(self):
         clear_directory(self.config.problemPlannerOutput)
 
-    def plan(self, problem_name, num_of_traces_to_use):
+    def plan(self, problem_name, num_of_traces_to_use, planner_mode):
            
         logger.info("plan")
         
-        self.prepere_planning_config(problem_name, num_of_traces_to_use)
+        self.prepere_planning_config(problem_name, num_of_traces_to_use, planner_mode)
         
         self.run_planning()   
         
@@ -141,6 +145,24 @@ class Planner(object):
         for traces_amount in range_splited:
             if traces_amount not in self.tested_amounts:    
                 self.plan(problem_name, traces_amount)
+                
+    def plan_and_learn_range_traces(self,problem_name, range_start, range_end, range_split):
+    
+        if (range_end-range_start) < range_split:
+            range_step = 1
+        else:
+            range_step = (range_end-range_start) // range_split 
+            
+        range_splited = list(range(range_start, range_end, range_step))
+        
+        if range_end not in range_splited:
+            range_splited.append(range_end)
+        
+        # test between 0 - solved_threshold
+        
+        for traces_amount in range_splited:
+            #if traces_amount not in self.tested_amounts:    
+            self.plan(problem_name, traces_amount, planning_and_learning_mode)
 
         
     def search_solved_threshold(self, problem_name, min_traces, max_traces):
@@ -156,7 +178,7 @@ class Planner(object):
     
             current_traces_amount = math.ceil((min_traces + max_traces) / 2)
                         
-            self.plan(problem_name, current_traces_amount)
+            self.plan(problem_name, current_traces_amount, planning_mode)
             agents, solved, timeout = self.get_ourplanner_results(self.test_output_CSV_file_path)
             
             solved_counter += solved

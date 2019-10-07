@@ -10,12 +10,11 @@ class PlannerConfig(object):
     '''
     def __init__(self, agentsFileName : str, domainFileName : str, inputAgentsDirName : str, inputDirPath : str, 
                 inputGoundedDirName : str, inputLocalViewDirName : str, inputTracesDirName : str, 
-                numOfTracesToUse : int, outputClosedDirPath : str, outputCopyDirPath : str, outputDirPath : str,
-                outputExpandedSafeDirName : str, outputExpandedUnSafeDirName : str, outputOpenDirName : str, 
+                numOfTracesToUse : int, outputSoundModelLearningDirName : str, outputCopyDirPath : str, outputDirPath : str, 
                 outputSASFileName : str, outputSafeModelLearningDirName : str, outputTempDirPath : str, 
                 outputUnSafeModelLearningDirName : str, planningModel : str, problemFileName : str, 
                 pythonScriptsPath : str, testOutputCSVFilePath : str, tracesLearinigInterval : int, 
-                verificationModel : str): 
+                verificationModel : str, plannerMode : str): 
         '''
         Constructor
         '''
@@ -28,12 +27,9 @@ class PlannerConfig(object):
         self.inputLocalViewDirName = inputLocalViewDirName
         self.inputTracesDirName = inputTracesDirName
         self.numOfTracesToUse = numOfTracesToUse
-        self.outputClosedDirPath = outputClosedDirPath
+        self.outputSoundModelLearningDirName = outputSoundModelLearningDirName
         self.outputCopyDirPath = outputCopyDirPath
         self.outputDirPath = outputDirPath
-        self.outputExpandedSafeDirName = outputExpandedSafeDirName
-        self.outputExpandedUnSafeDirName = outputExpandedUnSafeDirName
-        self.outputOpenDirName = outputOpenDirName
         self.outputSASFileName = outputSASFileName
         self.outputSafeModelLearningDirName = outputSafeModelLearningDirName
         self.outputTempDirPath = outputTempDirPath
@@ -44,3 +40,4 @@ class PlannerConfig(object):
         self.testOutputCSVFilePath = testOutputCSVFilePath
         self.tracesLearinigInterval = tracesLearinigInterval
         self.verificationModel = verificationModel
+        self.plannerMode = plannerMode
