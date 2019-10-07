@@ -36,6 +36,7 @@ public class OurPlanner implements Creator  {
 
 	public VerificationModel verificationModel = VerificationModel.GroundedModel;
 	public PlanningModel planningModel = PlanningModel.SafeModel;
+	public PlannerMode plannerMode = PlannerMode.Planning;
 
 	private TraceLearner learner = null;
 
@@ -125,16 +126,15 @@ public class OurPlanner implements Creator  {
 		}
 		 */
 
-		/*
-		runPlanningAlgorithm();
+		if(plannerMode == PlannerMode.Planning) {
+			runPlanningAlgorithm();
 
-		TestDataAccumulator.getAccumulator().numOfAgentsSolved = num_agents_solved;
-		TestDataAccumulator.getAccumulator().numOfAgentsTimeout = num_agents_timeout;
-		TestDataAccumulator.getAccumulator().numOfAgentsNotSolved = num_agents_not_solved;		
-
-		 */
-
-		runPlanningAlgorithmWithModelUpdating();
+			TestDataAccumulator.getAccumulator().numOfAgentsSolved = num_agents_solved;
+			TestDataAccumulator.getAccumulator().numOfAgentsTimeout = num_agents_timeout;
+			TestDataAccumulator.getAccumulator().numOfAgentsNotSolved = num_agents_not_solved;	
+		}
+		else if(plannerMode == PlannerMode.PlanningAndLearning)
+			runPlanningAlgorithmWithModelUpdating();
 
 		if(!copyOutputFolder()) {
 			LOGGER.info("Coping output folder failure");
@@ -266,6 +266,8 @@ public class OurPlanner implements Creator  {
 
 		planningModel = configuration.planningModel;
 
+		plannerMode = configuration.plannerMode;
+
 		return true;
 	}
 
@@ -279,16 +281,12 @@ public class OurPlanner implements Creator  {
 
 		int rounds = 1;
 
-		long learningStartTime = System.currentTimeMillis();
-
 		boolean isLearning = false;
 
 		if(numOftraces>0)
 			isLearning = learnSafeAndUnSafeModelsFromTraces();
 
-		long learningFinishTime = System.currentTimeMillis();
-
-		TestDataAccumulator.getAccumulator().totalLearningTimeMs = learningFinishTime - learningStartTime;
+		TestDataAccumulator.getAccumulator().numOfIterations = 1;
 
 		while(leaderAgentPlan == null) {
 
@@ -327,11 +325,11 @@ public class OurPlanner implements Creator  {
 			TestDataAccumulator.getAccumulator().agentPlanningTimeMs.put(currentLeaderAgent, planningFinishTime - planningStartTime);
 
 			if(leaderAgentPlan == null)
-				continue;		
+				continue;	
+			
+			LogLearningTimes();
 
 			if(verifyPlan(leaderAgentPlan, isLearning, verificationModel)) {
-
-				LogLearningTimes();
 
 				TestDataAccumulator.getAccumulator().solvingAgent = currentLeaderAgent;
 				TestDataAccumulator.getAccumulator().planLength= leaderAgentPlan.size();
@@ -529,7 +527,7 @@ public class OurPlanner implements Creator  {
 		String agentADDLPath = Globals.OUTPUT_TEMP_PATH + "/" + problemFileName.split("\\.")[0] + ".addl";
 		String heuristic = "saFF-glcl";
 		int recursionLevel = -1;
-		double timeLimitMin = 1;
+		double timeLimitMin = 0.2;
 
 		//agentDomainPath = groundedFolder + "/" + domainFileName;
 

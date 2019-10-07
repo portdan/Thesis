@@ -108,7 +108,8 @@ public class TraceLearner {
 
 			long sequancingStartTime = System.currentTimeMillis();
 
-			List<StateActionState> sasList = sasSequencer.generateSequencesFromSASTraces(numOfTracesToUse, tracesLearinigInterval);
+			//List<StateActionState> sasList = sasSequencer.generateSequencesFromSASTraces(numOfTracesToUse, tracesLearinigInterval);
+			List<StateActionState> sasList = sasSequencer.generateSequencesFromSASTraces2(numOfTracesToUse, tracesLearinigInterval);
 
 			long sequancingEndTime = System.currentTimeMillis();
 

@@ -132,4 +132,60 @@ public class StateActionStateSequencer {
 
 		return trajectorySequences;
 	}
+	
+	public List<StateActionState> generateSequencesFromSASTraces2(int numOfTracesToUse, int tracesInterval) {
+
+		LOGGER.info("Generating sequences from SAS traces");
+
+		List<StateActionState> trajectorySequences = new ArrayList<StateActionState>();
+
+		File[] TrajDir = trajectoryFiles.listFiles();
+
+		int traceNumber = 0;
+
+		if (TrajDir != null) {
+
+			File tracesFile = TrajDir[0];
+
+			try(BufferedReader br = new BufferedReader(new FileReader(tracesFile))) {
+
+				for (int i = 0; i < lastTraceLine; i++)
+					br.readLine();
+
+				for(String line; (line = br.readLine()) != null; ) {
+
+					if(line.startsWith("StateActionState")) {
+						
+						if(traceNumber >= tracesInterval) {
+							break;
+						}
+						else if(lastTrace >= numOfTracesToUse){
+							StopSequencing = true;
+							break;
+						}
+						else {
+							lastTrace++;
+							traceNumber++;
+						}
+						
+						StateActionState sas = new StateActionState(line);
+						trajectorySequences.add(sas);
+					}
+
+					lastTraceLine++;
+				}
+
+				if(br.read() == -1)
+					StopSequencing = true;
+			}
+			catch (Exception e) {
+				trajectorySequences.clear();
+				return trajectorySequences;
+			}
+
+		}
+
+		return trajectorySequences;
+	}
+
 }

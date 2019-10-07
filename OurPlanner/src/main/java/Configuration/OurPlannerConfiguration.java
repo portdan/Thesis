@@ -1,5 +1,6 @@
 package Configuration;
 
+import OurPlanner.PlannerMode;
 import OurPlanner.PlanningModel;
 import OurPlanner.VerificationModel;
 
@@ -13,12 +14,9 @@ public class OurPlannerConfiguration {
 	public String inputLocalViewDirName;
 	public String inputTracesDirName;
 	public int numOfTracesToUse;
-	public String outputClosedDirPath;
+	public String outputSoundModelLearningDirName;
 	public String outputCopyDirPath;
 	public String outputDirPath;
-	public String outputExpandedSafeDirName;
-	public String outputExpandedUnSafeDirName;
-	public String outputOpenDirName;
 	public String outputSASFileName;
 	public String outputSafeModelLearningDirName;
 	public String outputTempDirPath;
@@ -29,4 +27,5 @@ public class OurPlannerConfiguration {
 	public String testOutputCSVFilePath;
 	public int tracesLearinigInterval;
 	public VerificationModel verificationModel;
+	public PlannerMode plannerMode;
 }

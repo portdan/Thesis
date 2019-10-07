@@ -455,7 +455,7 @@ public class PlannerAndModelLearner {
 
 		String heuristic = "saFF-glcl";
 		int recursionLevel = -1;
-		double timeLimitMin = 0.1666;
+		double timeLimitMin = 0.2;
 
 		long planningStartTime = System.currentTimeMillis();
 
