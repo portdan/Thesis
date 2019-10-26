@@ -6,7 +6,7 @@
   "inputGoundedDirName": "Grounded", 
   "inputLocalViewDirName": "LocalView", 
   "inputTracesDirName": "Traces", 
-  "numOfTracesToUse": 10, 
+  "numOfTracesToUse": 0, 
   "outputCopyDirPath": "/home/daniel/Work/WorkSpace/Thesis/OurPlannerTester/Output/probLOGISTICS-4-0.pddl/OurPlanner", 
   "outputDirPath": "/home/daniel/Work/WorkSpace/Thesis/OurPlanner/Output", 
   "outputSASFileName": "output.sas", 
@@ -20,6 +20,7 @@
   "pythonScriptsPath": "/home/daniel/Work/WorkSpace/Thesis/OurPlanner/Scripts", 
   "testOutputCSVFilePath": "/home/daniel/Work/WorkSpace/Thesis/OurPlannerTester/Output/output.csv", 
   "tracesLearinigInterval": 500, 
+  "timeoutInMS": 1800000, 
   "verificationModel": "GroundedModel"
 }
 

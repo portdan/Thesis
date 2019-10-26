@@ -23,6 +23,8 @@ public class TraceLearner {
 
 	private final static Logger LOGGER = Logger.getLogger(TraceLearner.class);
 
+	private final boolean KNOWN_EFFECTS = true;
+
 	private List<String> agentList = null;
 
 	private File trajectoryFiles = null;
@@ -92,18 +94,20 @@ public class TraceLearner {
 
 	}
 
-	public boolean learnNewActions() {
+	public boolean learnSafeAndUnSafeModels() {
 
 		LOGGER.info("Learning new actions");
 
 		TestDataAccumulator.getAccumulator().initialTrainingSize = 0;
-		
+
 		sasSequencer = new StateActionStateSequencer(agentList, 
 				problemFiles, domainFileName, problemFileName, trajectoryFiles);
 
 		DEGenerator = new DeleteEffectGenerator (problemFiles,
 				domainFileName, problemFileName);
 
+		generateActionsForModels(KNOWN_EFFECTS);
+		
 		while(!sasSequencer.StopSequencing) {
 
 			long sequancingStartTime = System.currentTimeMillis();
@@ -133,7 +137,7 @@ public class TraceLearner {
 
 				addActionToOwnerLink(actionName, actionOwnerName);
 
-				learnPreconditionAndEffects(DEGenerator, actionName, sasListForAction);
+				learnPreconditionAndEffectsOfAction(actionName, sasListForAction, KNOWN_EFFECTS);
 
 				long learningFinishTime = System.currentTimeMillis();
 
@@ -147,7 +151,7 @@ public class TraceLearner {
 		return writeNewSafeLearnedProblemFiles() && writeNewUnSafeLearnedProblemFiles();
 	}
 
-	public boolean learnActionsFromPlan(List<StateActionState> planSASList, String pathToSafeModel,
+	public boolean expandSafeAndUnSafeModelsWithPlan(List<StateActionState> planSASList, String pathToSafeModel,
 			String pathUnSafeModel, long sequancingTimeTotal, long sequancingAmountTotal) {
 
 		LOGGER.info("Learning new actions from plan");
@@ -174,7 +178,7 @@ public class TraceLearner {
 
 			addActionToOwnerLink(actionName, actionOwnerName);
 
-			learnPreconditionAndEffects(DEGenerator, actionName, sasListForAction);
+			learnPreconditionAndEffectsOfAction(actionName, sasListForAction, KNOWN_EFFECTS);
 
 			long learningFinishTime = System.currentTimeMillis();
 
@@ -186,6 +190,69 @@ public class TraceLearner {
 		}
 
 		return writeNewSafeLearnedProblemFiles() && writeNewUnSafeLearnedProblemFiles();
+	}
+
+	private String getActionOwnerFromAction(String actionStr) {
+
+		LOGGER.info("Extracting aftion owner from action " + actionStr);
+
+		if(actionStr.contains(Globals.PARAMETER_INDICATION))
+			actionStr = actionStr.replace(Globals.PARAMETER_INDICATION, " ");
+
+		String[] split = actionStr.split(" ");
+
+		String label = split[0];
+
+		split = label.split(Globals.AGENT_INDICATION);
+
+		return split[split.length-1];		
+	}
+
+	private void generateActionsForModels(boolean knownEffects) {
+
+		LOGGER.info("Adding unseen actions");
+
+		Set<String> allFacts = DEGenerator.generateAllFacts();
+		Set<String> actionLabels = DEGenerator.generateAllActionLabels();
+
+		for (String actionLabel : actionLabels) {
+
+			String actionOwner = getActionOwnerFromAction(actionLabel);
+
+			addActionToOwnerLink(actionLabel, actionOwner);
+
+			// SAFE MODEL //
+			Set<String> safePre = new HashSet<String>(allFacts);
+			Set<String> safeEff = new HashSet<String>();
+
+			if(knownEffects)
+				safeEff = DEGenerator.generateActionEffectsWithDeleteEffects(actionLabel);
+
+			safePre = formatFacts(safePre);
+			safeEff = formatFacts(safeEff);
+
+			agentLearnedSafeActionsPreconditions.put(actionLabel, safePre);
+			agentLearnedSafeActionsEffects.put(actionLabel, safeEff);
+			// SAFE MODEL //
+
+
+			// UNSAFE MODEL //
+			Set<String> unsafePre = new HashSet<String>();
+			Set<String> unsafeEff = null;
+
+			if(knownEffects)
+				unsafeEff = DEGenerator.generateActionEffectsWithDeleteEffects(actionLabel);
+			else {
+				unsafeEff = new HashSet<String>(allFacts);
+			}
+
+			unsafePre = formatFacts(unsafePre);
+			unsafeEff = formatFacts(unsafeEff);
+
+			agentLearnedUnSafeActionsPreconditions.put(actionLabel, unsafePre);
+			agentLearnedUnSafeActionsEffects.put(actionLabel, unsafeEff);
+			// UNSAFE MODEL //
+		}
 	}
 
 	private void addAgentLearningTime(long sequancingTimeTotal, long sequancingAmountTotal, long learningStartTime,
@@ -223,15 +290,19 @@ public class TraceLearner {
 		agentActions.add(actionName);
 	}
 
-	private void learnPreconditionAndEffects(DeleteEffectGenerator DEGenerator, String actionName, 
-			List<StateActionState> sasListForAction) {
+	private void learnPreconditionAndEffectsOfAction(String actionName, 
+			List<StateActionState> sasListForAction, boolean knownEffects) {
 
 		// SAFE MODEL //
 		LOGGER.info("Learning safe preconditions and effects");
 
 		Set<String> safePre = learnSafePreconditions(sasListForAction);
-		//Set<String> safeEff = learnSafeEffects(sasListForAction);
-		Set<String> safeEff = DEGenerator.generateAllEffects(actionName);
+		Set<String> safeEff = null;
+
+		if(knownEffects)
+			safeEff = DEGenerator.generateActionEffects(actionName);
+		else
+			safeEff = learnSafeEffects(sasListForAction);
 
 		safeEff.addAll(DEGenerator.generateDeleteEffects(actionName,safePre,safeEff));
 
@@ -264,8 +335,13 @@ public class TraceLearner {
 		LOGGER.info("Learning unsafe preconditions and effects");
 
 		Set<String> unsafePre = learnUnSafePreconditions(sasListForAction);
-		//Set<String> unsafeEff = learnUnSafeEffects(sasListForAction);
-		Set<String> unsafeEff = DEGenerator.generateAllEffects(actionName);
+
+		Set<String> unsafeEff = null;
+
+		if(knownEffects)
+			unsafeEff = DEGenerator.generateActionEffects(actionName);
+		else
+			unsafeEff = learnUnSafeEffects(sasListForAction);
 
 		unsafeEff.addAll(DEGenerator.generateDeleteEffects(actionName,unsafePre,unsafeEff));
 
@@ -325,6 +401,8 @@ public class TraceLearner {
 			formattedFact = formattedFact.replace(")", "");
 
 			formattedFact = formattedFact.trim();
+			
+			formattedFact = '(' + formattedFact + ')';
 
 			if(formattedFact.startsWith(Globals.NONE_KEYWORD)) {
 				//formatted.addAll(formatNONEFact(formattedFact, isNegated));
@@ -332,7 +410,7 @@ public class TraceLearner {
 			}
 			else {
 				if (isNegated)
-					formattedFact = "not (" + formattedFact + ")";
+					formattedFact = "(not " + formattedFact + ")";
 
 				formatted.add(formattedFact);
 			}
@@ -604,7 +682,7 @@ public class TraceLearner {
 			rep += "\t\t()\n";
 		else
 			for (String p : pre)
-				rep += "\t\t(" + p + ")\n";
+				rep += "\t\t" + p + "\n";
 		if (pre.size() > 1)
 			rep += "\t)\n";
 		if (eff.size() > 1)
@@ -615,7 +693,7 @@ public class TraceLearner {
 			rep += "\t\t()\n";
 		else
 			for (String e : eff) 
-				rep += "\t\t(" + e + ")\n";
+				rep += "\t\t" + e + "\n";
 		if (eff.size() > 1)
 			rep += "\t)\n";
 		rep += ")\n";

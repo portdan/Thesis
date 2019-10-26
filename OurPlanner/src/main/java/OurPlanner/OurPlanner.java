@@ -18,6 +18,7 @@ import PlannerAndLearner.PlannerAndModelLearner;
 import Utils.FileDeleter;
 import Utils.VerificationResult;
 import cz.agents.alite.creator.Creator;
+import cz.agents.dimaptools.experiment.DataAccumulator;
 
 public class OurPlanner implements Creator  {
 
@@ -39,6 +40,8 @@ public class OurPlanner implements Creator  {
 	public PlannerMode plannerMode = PlannerMode.Planning;
 
 	private TraceLearner learner = null;
+	
+	private int timeoutInMS = 0;
 
 	private File tracesFile = null;
 	private File outputTestFile = null;
@@ -59,6 +62,8 @@ public class OurPlanner implements Creator  {
 	private int num_agents_solved = 0;
 	private int num_agents_not_solved = 0;
 	private int num_agents_timeout = 0;
+	
+	long startTimeMs = 0;
 
 	@Override
 	public void create() {
@@ -71,7 +76,7 @@ public class OurPlanner implements Creator  {
 
 		LOGGER.setLevel(Level.INFO);
 
-		long startTime = System.currentTimeMillis();
+		startTimeMs = System.currentTimeMillis();
 
 		LOGGER.info("OurPlanner start");
 
@@ -148,9 +153,9 @@ public class OurPlanner implements Creator  {
 		}
 		 */
 
-		long finishTime = System.currentTimeMillis();
+		long finishTimeMs = System.currentTimeMillis();
 
-		TestDataAccumulator.getAccumulator().totalTimeMs = finishTime-startTime;
+		TestDataAccumulator.getAccumulator().totalTimeMs = finishTimeMs-startTimeMs;
 
 		TestDataAccumulator.getAccumulator().writeOutput();
 
@@ -267,6 +272,8 @@ public class OurPlanner implements Creator  {
 		planningModel = configuration.planningModel;
 
 		plannerMode = configuration.plannerMode;
+		
+		timeoutInMS = configuration.timeoutInMS;
 
 		return true;
 	}
@@ -283,13 +290,19 @@ public class OurPlanner implements Creator  {
 
 		boolean isLearning = false;
 
-		if(numOftraces>0)
+		if(numOftraces>=0)
 			isLearning = learnSafeAndUnSafeModelsFromTraces();
 
 		TestDataAccumulator.getAccumulator().numOfIterations = 1;
 
 		while(leaderAgentPlan == null) {
-
+			
+	        if(System.currentTimeMillis() - startTimeMs > timeoutInMS)
+	        {
+				LOGGER.fatal("TIMEOUT!");
+				break;
+			}
+	        
 			LOGGER.info("Round " + rounds + " - Start!");
 			rounds++;
 
@@ -326,7 +339,7 @@ public class OurPlanner implements Creator  {
 
 			if(leaderAgentPlan == null)
 				continue;	
-			
+
 			LogLearningTimes();
 
 			if(verifyPlan(leaderAgentPlan, isLearning, verificationModel)) {
@@ -349,10 +362,16 @@ public class OurPlanner implements Creator  {
 
 		List<String> leaderAgentPlan = null;
 
-		if(numOftraces>0)
+		if(numOftraces>=0)
 			learnSafeAndUnSafeModelsFromTraces();
 
 		while(!availableLeaders.isEmpty()) {
+			
+			if(System.currentTimeMillis() - startTimeMs > timeoutInMS)
+	        {
+				LOGGER.fatal("TIMEOUT!");
+				break;
+			}
 
 			currentLeaderAgent = pickLeader();
 
@@ -403,7 +422,7 @@ public class OurPlanner implements Creator  {
 		learner = new TraceLearner(agentList,tracesFile, groundedFile, localViewFile, 
 				domainFileName, problemFileName, numOftraces, tracesLearinigInterval);	
 
-		boolean isLearned = learner.learnNewActions();
+		boolean isLearned = learner.learnSafeAndUnSafeModels();
 
 		if(!FileDeleter.deleteTempFiles()) {
 			LOGGER.info("Deleting Temporary files failure");

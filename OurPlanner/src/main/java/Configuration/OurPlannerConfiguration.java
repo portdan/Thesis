@@ -14,6 +14,7 @@ public class OurPlannerConfiguration {
 	public String inputLocalViewDirName;
 	public String inputTracesDirName;
 	public int numOfTracesToUse;
+	public int timeoutInMS;
 	public String outputSoundModelLearningDirName;
 	public String outputCopyDirPath;
 	public String outputDirPath;

@@ -140,8 +140,6 @@ public class PlannerAndModelLearner {
 
 		open.add(tmpModel);
 
-		Model referanceModel = new Model(safeModel);
-
 		while (!open.isEmpty()) {
 
 			TestDataAccumulator.getAccumulator().numOfIterations+=1;
@@ -151,9 +149,11 @@ public class PlannerAndModelLearner {
 			TempModel currTempModel = (TempModel) (open.toArray())[index];
 
 			open.remove(currTempModel);
-			closed.add(currTempModel);			
+			closed.add(currTempModel);	
 
-			Model currModel = referanceModel.extendModel(currTempModel);
+			Model currModel = null;
+
+			currModel = unsafeModel.extendModel(currTempModel);
 
 			writeDomainFile(currModel.reconstructModelString());
 
@@ -185,14 +185,14 @@ public class PlannerAndModelLearner {
 
 						planSASList.remove(res.lastActionIndex);						
 
-						UpdateOpenListModels(referanceModel, open, closed, planSASList, failedActionSAS);
+						UpdateOpenListModels(safeModel, open, closed, planSASList, failedActionSAS);
 						UpdateSafeUnSafeModels(safeModel, unsafeModel, planSASList);
 
-						if(res.lastActionIndex > 0) {
-							Set<TempModel> newModels = ExtendSafe(currModel, safeModel, currTempModel, failedActionSAS);
-							open.addAll(newModels);		
-							open.removeAll(closed);
-						}
+						//if(res.lastActionIndex > 0) {
+						Set<TempModel> newModels = ExtendSafe(currModel, safeModel, currTempModel, failedActionSAS);
+						open.addAll(newModels);		
+						open.removeAll(closed);
+						//}
 					}
 				}
 				else
@@ -210,7 +210,7 @@ public class PlannerAndModelLearner {
 		String safeModelPath = Globals.OUTPUT_SAFE_MODEL_PATH + "/" + agentName + "/" + domainFileName;
 		String unsafeModelPath = Globals.OUTPUT_UNSAFE_MODEL_PATH + "/" + agentName + "/" + domainFileName;
 
-		learner.learnActionsFromPlan(planSASList, Globals.OUTPUT_SAFE_MODEL_PATH, Globals.OUTPUT_UNSAFE_MODEL_PATH, 
+		learner.expandSafeAndUnSafeModelsWithPlan(planSASList, Globals.OUTPUT_SAFE_MODEL_PATH, Globals.OUTPUT_UNSAFE_MODEL_PATH, 
 				sequancingTimeTotal, sequancingAmountTotal);
 
 		safeModel = new Model();
@@ -316,6 +316,7 @@ public class PlannerAndModelLearner {
 		Set<String> safePreconditions = new LinkedHashSet<String>(preconditions);
 
 		preconditions = failedActionSAS.pre;
+
 		Set<String> statePreconditions = new LinkedHashSet<String>(failedActionSAS.pre);
 
 		statePreconditions = formatFacts(statePreconditions);
@@ -333,7 +334,7 @@ public class PlannerAndModelLearner {
 			if(tempAction == null)
 				tempAction = new TempAction();
 
-			if(!tempAction.preconditionsSub.contains(pre)) {
+			if(!tempAction.preconditionsAdd.contains(pre) && !tempAction.preconditionsSub.contains(pre)) {
 
 				tempAction.name = failedActionName;
 
@@ -428,7 +429,7 @@ public class PlannerAndModelLearner {
 				if(tempAction == null)
 					tempAction = new TempAction();
 
-				if(!tempAction.preconditionsSub.contains(pre)) {
+				if(!tempAction.preconditionsSub.contains(pre) && !tempAction.preconditionsAdd.contains(pre)) {
 
 					tempAction.name = action.name;
 

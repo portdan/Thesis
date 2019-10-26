@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -19,6 +20,7 @@ import cz.agents.dimaptools.model.Action;
 import cz.agents.dimaptools.model.Domain;
 import cz.agents.dimaptools.model.Problem;
 import cz.agents.dimaptools.model.SuperState;
+import gnu.trove.TIntObjectIterator;
 
 
 public class DeleteEffectGenerator {
@@ -70,15 +72,70 @@ public class DeleteEffectGenerator {
 		LOGGER.info("problemFiles: " + problemFiles);
 	}
 
-	public Set<String> generateAllEffects(String actionName) {
+	public Set<String> generateAllFacts() {
 
-		LOGGER.info("Generating all effects for action " + actionName );
+		LOGGER.info("Generating all facts");
+
+		Set<String> res = new HashSet<String>();
+
+		for (Object valName : Domain.valNames.getValues()) 
+			res.add(valName.toString());
+
+		return res;
+	}
+
+	public Set<String> generateAllActionLabels() {
+
+		LOGGER.info("Generating all action names");
+
+		Set<String> res = new HashSet<String>();
+
+		for (Action action : problem.getAllActions()) 
+			res.add(action.getSimpleLabel());
+
+		return res;
+	}
+	
+	public Set<String> generateActionEffectsWithDeleteEffects(String actionName) {
+
+		LOGGER.info("Generating effects with delete effects for action " + actionName );
+
+		Set<String> eff = generateActionEffects(actionName);		
+		Set<String> pre = generateActionPreconditions(actionName);	
+		
+		eff.addAll(generateDeleteEffects(actionName, pre, eff));
+
+		return eff;
+	}
+
+	public Set<String> generateActionEffects(String actionName) {
+
+		LOGGER.info("Generating effects for action " + actionName );
 
 		Set<String> res = new HashSet<String>();		
 
 		Action action = getActionFromName(problem, actionName);
 
 		SuperState eff = action.getEffect();
+
+		for (int valNum : eff.getValues()) {
+			if(valNum>=0) {
+				res.add(Domain.valNames.get(valNum).toString());
+			}
+		}
+
+		return res;
+	}
+	
+	public Set<String> generateActionPreconditions(String actionName) {
+
+		LOGGER.info("Generating preconditions for action " + actionName );
+
+		Set<String> res = new HashSet<String>();		
+
+		Action action = getActionFromName(problem, actionName);
+
+		SuperState eff = action.getPrecondition();
 
 		for (int valNum : eff.getValues()) {
 			if(valNum>=0) {
