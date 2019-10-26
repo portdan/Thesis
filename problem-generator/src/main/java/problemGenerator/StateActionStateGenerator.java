@@ -349,7 +349,8 @@ public class StateActionStateGenerator implements Creator {
 				endStates.add(humenizedEndState);
 
 				try {
-					sasGenerator.appendSASList(sasList, problemCounter);
+					//sasGenerator.appendSASList(sasList, problemCounter);
+					sasGenerator.appendSASList(sasList);
 				} catch (IOException e) {
 					e.printStackTrace();
 				}

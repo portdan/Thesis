@@ -126,11 +126,11 @@ public class StateActionStateRandomWalker {
 	}
 
 	private static void addFactToOut(Map<Integer, Set<Integer>> varDomains, Set<String> out, int[] values, int var) {
-		
+
 		String newVal = Domain.valNames.get(values[var]).toString();
 
 		if(newVal.startsWith("NONE")) {
-			
+
 			for (int val : varDomains.get(var)) {
 				newVal = Domain.valNames.get(val).toString();
 
@@ -208,8 +208,13 @@ public class StateActionStateRandomWalker {
 
 				String actionName = randomAction.getSimpleLabel();
 
-				StateActionState sas = new StateActionState(getStateFacts(pre), actionName, randomAction.getOwner(),
-						getStateFacts(current), trace_number);
+				Set<String> preFacts = getStateFacts(pre);
+				Set<String> postFacts = getStateFacts(current);
+
+				//preFacts = formatFacts(preFacts);
+				//postFacts = formatFacts(postFacts);
+
+				StateActionState sas = new StateActionState(preFacts, actionName, randomAction.getOwner(), postFacts, trace_number);
 
 				sasList.add(sas);
 			}
@@ -243,4 +248,54 @@ public class StateActionStateRandomWalker {
 
 		return out;
 	}
+
+	private static Set<String> formatFacts(Set<String> facts) {
+
+		LOGGER.info("Formatting facts");
+
+		Set<String> formatted = new HashSet<String>();
+
+		for (String fact : facts) {
+
+			int startIndex = 0;
+			int endIndex = fact.length();
+
+			boolean isNegated = false;
+			String formattedFact = fact;
+
+			if(formattedFact.startsWith("not")) {
+				isNegated = !isNegated;
+				startIndex = formattedFact.indexOf('(');
+				endIndex = formattedFact.lastIndexOf(')');			
+				formattedFact = formattedFact.substring(startIndex+1,endIndex);
+			}
+
+			if(formattedFact.startsWith("Negated")) {
+				isNegated = !isNegated;
+				formattedFact = formattedFact.replace("Negated", "");
+			}
+
+			formattedFact = formattedFact.replace("(", " ");
+			formattedFact = formattedFact.replace(",", "");
+			formattedFact = formattedFact.replace(")", "");
+
+			formattedFact = formattedFact.trim();
+			
+			formattedFact = '(' + formattedFact + ')';
+
+			if(formattedFact.startsWith("NONE")) {
+				//formatted.addAll(formatNONEFact(formattedFact, isNegated));
+				//formatted.add(formattedFact);
+			}
+			else {
+				if (isNegated)
+					formattedFact = "not (" + formattedFact + ")";
+
+				formatted.add(formattedFact);
+			}
+		}
+
+		return formatted;
+	}
+
 }

@@ -26,6 +26,29 @@ public class SASGenerator extends FileGenerator{
 
 	}
 
+	public void appendSASList(List<StateActionState> sasList) throws IOException {	
+
+		StringBuilder sb = new StringBuilder();
+		List<String> sasListStr = new ArrayList<String>();
+
+		String traceStart = sb.toString();
+		sasListStr.add(traceStart);
+
+		for (int i = 0; i < sasList.size(); i++) {
+
+			sb.setLength(0);
+
+			sb.append(sasList.get(i).toString());
+			sb.append("\n");
+
+			String sasStr = sb.toString();
+
+			sasListStr.add(sasStr);
+		}
+
+		writeToFile(sasListStr);
+	}
+
 
 	public void appendSASList(List<StateActionState> sasList, int traceCounter) throws IOException {	
 
@@ -56,7 +79,6 @@ public class SASGenerator extends FileGenerator{
 
 		writeToFile(sasListStr);
 	}
-
 
 	public void appendSASList(List<StateActionState> sasList, String actionName) throws IOException {	
 
