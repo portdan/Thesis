@@ -18,7 +18,10 @@ import PlannerAndLearner.PlannerAndModelLearner;
 import Utils.FileDeleter;
 import Utils.VerificationResult;
 import cz.agents.alite.creator.Creator;
-import cz.agents.dimaptools.experiment.DataAccumulator;
+import enums.IterationMethod;
+import enums.PlannerMode;
+import enums.PlanningModel;
+import enums.VerificationModel;
 
 public class OurPlanner implements Creator  {
 
@@ -38,9 +41,10 @@ public class OurPlanner implements Creator  {
 	public VerificationModel verificationModel = VerificationModel.GroundedModel;
 	public PlanningModel planningModel = PlanningModel.SafeModel;
 	public PlannerMode plannerMode = PlannerMode.Planning;
+	public IterationMethod iterationMethod = IterationMethod.Random;
 
 	private TraceLearner learner = null;
-	
+
 	private int timeoutInMS = 0;
 
 	private File tracesFile = null;
@@ -62,7 +66,7 @@ public class OurPlanner implements Creator  {
 	private int num_agents_solved = 0;
 	private int num_agents_not_solved = 0;
 	private int num_agents_timeout = 0;
-	
+
 	long startTimeMs = 0;
 
 	@Override
@@ -136,7 +140,7 @@ public class OurPlanner implements Creator  {
 
 			TestDataAccumulator.getAccumulator().numOfAgentsSolved = num_agents_solved;
 			TestDataAccumulator.getAccumulator().numOfAgentsTimeout = num_agents_timeout;
-			TestDataAccumulator.getAccumulator().numOfAgentsNotSolved = num_agents_not_solved;	
+			TestDataAccumulator.getAccumulator().numOfAgentsNotSolved = num_agents_not_solved;				
 		}
 		else if(plannerMode == PlannerMode.PlanningAndLearning)
 			runPlanningAlgorithmWithModelUpdating();
@@ -272,7 +276,9 @@ public class OurPlanner implements Creator  {
 		planningModel = configuration.planningModel;
 
 		plannerMode = configuration.plannerMode;
-		
+
+		iterationMethod = configuration.iterationMethod;
+
 		timeoutInMS = configuration.timeoutInMS;
 
 		return true;
@@ -289,20 +295,21 @@ public class OurPlanner implements Creator  {
 		int rounds = 1;
 
 		boolean isLearning = false;
-
+		boolean isTimeout = false;
 		if(numOftraces>=0)
 			isLearning = learnSafeAndUnSafeModelsFromTraces();
 
 		TestDataAccumulator.getAccumulator().numOfIterations = 1;
 
 		while(leaderAgentPlan == null) {
-			
-	        if(System.currentTimeMillis() - startTimeMs > timeoutInMS)
-	        {
+
+			if(System.currentTimeMillis() - startTimeMs > timeoutInMS)
+			{
+				isTimeout= true;
 				LOGGER.fatal("TIMEOUT!");
 				break;
 			}
-	        
+
 			LOGGER.info("Round " + rounds + " - Start!");
 			rounds++;
 
@@ -344,12 +351,18 @@ public class OurPlanner implements Creator  {
 
 			if(verifyPlan(leaderAgentPlan, isLearning, verificationModel)) {
 
+				TestDataAccumulator.getAccumulator().finishStatus = "SOLVED";
 				TestDataAccumulator.getAccumulator().solvingAgent = currentLeaderAgent;
 				TestDataAccumulator.getAccumulator().planLength= leaderAgentPlan.size();
 
 				return true;
 			}
 		}
+
+		if(isTimeout)
+			TestDataAccumulator.getAccumulator().finishStatus = "TIMEOUT";
+		else
+			TestDataAccumulator.getAccumulator().finishStatus = "NOT SOLVED";
 
 		return false;
 	}
@@ -362,13 +375,16 @@ public class OurPlanner implements Creator  {
 
 		List<String> leaderAgentPlan = null;
 
+		boolean isTimeout = false;
+
 		if(numOftraces>=0)
 			learnSafeAndUnSafeModelsFromTraces();
 
 		while(!availableLeaders.isEmpty()) {
-			
+
 			if(System.currentTimeMillis() - startTimeMs > timeoutInMS)
-	        {
+			{
+				isTimeout=true;
 				LOGGER.fatal("TIMEOUT!");
 				break;
 			}
@@ -378,7 +394,10 @@ public class OurPlanner implements Creator  {
 			LOGGER.info("Current Leader Agent " + currentLeaderAgent);
 
 			PlannerAndModelLearner plannerAndLearner = new PlannerAndModelLearner(currentLeaderAgent, agentList,
-					domainFileName, problemFileName, learner);
+					domainFileName, problemFileName, learner, iterationMethod, startTimeMs, timeoutInMS);
+			
+			TestDataAccumulator.getAccumulator().addedTrainingSize = 0;
+			TestDataAccumulator.getAccumulator().numOfIterations = 0;
 
 			leaderAgentPlan = plannerAndLearner.planAndLearn();
 
@@ -390,14 +409,25 @@ public class OurPlanner implements Creator  {
 
 			if(leaderAgentPlan != null) {
 
+				TestDataAccumulator.getAccumulator().finishStatus = "SOLVED";
 				TestDataAccumulator.getAccumulator().solvingAgent = currentLeaderAgent;
 				TestDataAccumulator.getAccumulator().planLength= leaderAgentPlan.size();
 
 				return true;
 			}
+			
+			if(plannerAndLearner.isTimeout)
+			{
+				isTimeout=true;
+				LOGGER.fatal("TIMEOUT!");
+				break;
+			}
 		}
 
-		LOGGER.fatal("No more available leaders. No solution!");
+		if(isTimeout)
+			TestDataAccumulator.getAccumulator().finishStatus = "TIMEOUT";
+		else
+			TestDataAccumulator.getAccumulator().finishStatus = "NOT SOLVED";
 
 		return false;
 	}

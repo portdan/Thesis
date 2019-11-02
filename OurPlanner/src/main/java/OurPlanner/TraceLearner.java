@@ -45,9 +45,13 @@ public class TraceLearner {
 	Map<String, Set<String>> agentLearnedSafeActionsEffects = new HashMap<String,Set<String>>();
 	Map<String, Set<String>> agentLearnedUnSafeActionsPreconditions = new HashMap<String,Set<String>>();
 	Map<String, Set<String>> agentLearnedUnSafeActionsEffects = new HashMap<String,Set<String>>();
+	public Set<String> LearnedActionsNames = new HashSet<String>();
 
 	StateActionStateSequencer sasSequencer = null;
 	DeleteEffectGenerator DEGenerator = null;
+	
+	public boolean IsSafeModelUpdated = false;
+	public boolean IsUnSafeModelUpdated = false;
 
 	public TraceLearner(List<String> agentList , String agentName, File trajectoryFiles ,
 			File problemFiles , File localViewFiles ,String domainFileName ,String problemFileName, 
@@ -97,6 +101,9 @@ public class TraceLearner {
 	public boolean learnSafeAndUnSafeModels() {
 
 		LOGGER.info("Learning new actions");
+		
+		IsSafeModelUpdated = false;
+		IsUnSafeModelUpdated = false;
 
 		TestDataAccumulator.getAccumulator().initialTrainingSize = 0;
 
@@ -133,7 +140,9 @@ public class TraceLearner {
 
 				LOGGER.info("Learning action: " + actionName);
 
-				List<StateActionState> sasListForAction = getAllStateActionStateWithAction(sasList, actionName);	
+				List<StateActionState> sasListForAction = getAllStateActionStateWithAction(sasList, actionName);
+				
+				LearnedActionsNames.add(actionName);
 
 				addActionToOwnerLink(actionName, actionOwnerName);
 
@@ -155,6 +164,9 @@ public class TraceLearner {
 			String pathUnSafeModel, long sequancingTimeTotal, long sequancingAmountTotal) {
 
 		LOGGER.info("Learning new actions from plan");
+		
+		IsSafeModelUpdated = false;
+		IsUnSafeModelUpdated = false;
 
 		TestDataAccumulator.getAccumulator().addedTrainingSize += planSASList.size();
 
@@ -174,7 +186,9 @@ public class TraceLearner {
 
 			LOGGER.info("Learning action: " + actionName);
 
-			List<StateActionState> sasListForAction = getAllStateActionStateWithAction(sasList, actionName);	
+			List<StateActionState> sasListForAction = getAllStateActionStateWithAction(sasList, actionName);
+			
+			LearnedActionsNames.add(actionName);
 
 			addActionToOwnerLink(actionName, actionOwnerName);
 
@@ -292,7 +306,7 @@ public class TraceLearner {
 
 	private void learnPreconditionAndEffectsOfAction(String actionName, 
 			List<StateActionState> sasListForAction, boolean knownEffects) {
-
+		
 		// SAFE MODEL //
 		LOGGER.info("Learning safe preconditions and effects");
 
@@ -317,7 +331,7 @@ public class TraceLearner {
 			agentLearnedSafeActionsPreconditions.put(actionName, safePreSet);
 		}
 
-		safePreSet.retainAll(safePre);
+		IsSafeModelUpdated |= safePreSet.retainAll(safePre);
 
 		Set<String> safeEffSet = agentLearnedSafeActionsEffects.get(actionName);
 
@@ -327,7 +341,7 @@ public class TraceLearner {
 			agentLearnedSafeActionsEffects.put(actionName, safeEffSet);
 		}
 
-		safeEffSet.addAll(safeEff);
+		IsSafeModelUpdated |= safeEffSet.addAll(safeEff);
 		// SAFE MODEL //
 
 
@@ -356,7 +370,7 @@ public class TraceLearner {
 			agentLearnedUnSafeActionsPreconditions.put(actionName, unSafePreSet);
 		}
 
-		unSafePreSet.addAll(unsafePre);
+		IsUnSafeModelUpdated |= unSafePreSet.addAll(unsafePre);
 
 		Set<String> unSafeEffSet = agentLearnedUnSafeActionsEffects.get(actionName);
 
@@ -366,8 +380,8 @@ public class TraceLearner {
 			agentLearnedUnSafeActionsEffects.put(actionName, unSafeEffSet);
 		}
 
-		unSafeEffSet.retainAll(unsafeEff);
-		// UNSAFE MODEL //
+		IsUnSafeModelUpdated |= unSafeEffSet.retainAll(unsafeEff);
+		// UNSAFE MODEL //		
 	}
 
 	private Set<String> formatFacts(Set<String> facts) {

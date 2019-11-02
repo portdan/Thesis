@@ -1,8 +1,9 @@
 package Configuration;
 
-import OurPlanner.PlannerMode;
-import OurPlanner.PlanningModel;
-import OurPlanner.VerificationModel;
+import enums.IterationMethod;
+import enums.PlannerMode;
+import enums.PlanningModel;
+import enums.VerificationModel;
 
 public class OurPlannerConfiguration {
 
@@ -29,4 +30,6 @@ public class OurPlannerConfiguration {
 	public int tracesLearinigInterval;
 	public VerificationModel verificationModel;
 	public PlannerMode plannerMode;
+	public IterationMethod iterationMethod;
+
 }

@@ -1,13 +1,14 @@
 {
-  "agentsFileName": "probLOGISTICS-4-0.agents", 
+  "agentsFileName": "probLOGISTICS-4-3.agents", 
   "domainFileName": "domain.pddl", 
   "inputAgentsDirName": "Agent", 
   "inputDirPath": "/home/daniel/Work/WorkSpace/Thesis/OurPlanner/Input", 
   "inputGoundedDirName": "Grounded", 
   "inputLocalViewDirName": "LocalView", 
   "inputTracesDirName": "Traces", 
+  "iterationMethod": "Random", 
   "numOfTracesToUse": 0, 
-  "outputCopyDirPath": "/home/daniel/Work/WorkSpace/Thesis/OurPlannerTester/Output/probLOGISTICS-4-0.pddl/OurPlanner", 
+  "outputCopyDirPath": "/home/daniel/Work/WorkSpace/Thesis/OurPlannerTester/Output/probLOGISTICS-4-3.pddl/OurPlanner", 
   "outputDirPath": "/home/daniel/Work/WorkSpace/Thesis/OurPlanner/Output", 
   "outputSASFileName": "output.sas", 
   "outputSafeModelLearningDirName": "SafeModel", 
@@ -16,11 +17,11 @@
   "outputUnSafeModelLearningDirName": "UnSafeModel", 
   "plannerMode": "PlanningAndLearning", 
   "planningModel": "SafeModel", 
-  "problemFileName": "probLOGISTICS-4-0.pddl", 
+  "problemFileName": "probLOGISTICS-4-3.pddl", 
   "pythonScriptsPath": "/home/daniel/Work/WorkSpace/Thesis/OurPlanner/Scripts", 
   "testOutputCSVFilePath": "/home/daniel/Work/WorkSpace/Thesis/OurPlannerTester/Output/output.csv", 
-  "tracesLearinigInterval": 500, 
   "timeoutInMS": 1800000, 
+  "tracesLearinigInterval": 500, 
   "verificationModel": "GroundedModel"
 }
 

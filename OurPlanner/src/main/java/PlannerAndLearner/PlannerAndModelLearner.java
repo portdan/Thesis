@@ -24,6 +24,7 @@ import OurPlanner.TestDataAccumulator;
 import OurPlanner.TraceLearner;
 import Utils.FileDeleter;
 import Utils.VerificationResult;
+import enums.IterationMethod;
 
 public class PlannerAndModelLearner {
 
@@ -46,8 +47,22 @@ public class PlannerAndModelLearner {
 	public int num_agents_not_solved = 0;
 	public int num_agents_timeout = 0;
 
+	private long startTimeMs = 0;
+	private long timeoutInMS = 0;
+
+	private IterationMethod iterationMethod = IterationMethod.Random;
+
+	private boolean useSafeModel = true;
+
+	private int index = -1;
+	
+	public boolean isTimeout = false;
+	
+	Model safeModel = null;
+	Model unsafeModel = null;
+
 	public PlannerAndModelLearner(String agentName, List<String> agentList, String domainFileName,
-			String problemFileName, TraceLearner learner) {
+			String problemFileName, TraceLearner learner, IterationMethod iterationMethod, long startTimeMs, int timeoutInMS) {
 
 		LOGGER.setLevel(Level.INFO);
 
@@ -58,6 +73,9 @@ public class PlannerAndModelLearner {
 		this.domainFileName = domainFileName;
 		this.problemFileName = problemFileName;
 		this.learner = learner;
+		this.startTimeMs = startTimeMs;
+		this.timeoutInMS = timeoutInMS;
+		this.iterationMethod = iterationMethod;
 
 		logInput();
 	}
@@ -70,6 +88,7 @@ public class PlannerAndModelLearner {
 		LOGGER.info("agentList: " + agentList);
 		LOGGER.info("domainFileName: " + domainFileName);
 		LOGGER.info("problemFileName: " + problemFileName);
+		LOGGER.info("iterationMethod: " + iterationMethod);
 	}
 
 	private boolean copyProblemFiles() {
@@ -109,9 +128,6 @@ public class PlannerAndModelLearner {
 
 		List<String> plan = null;
 
-		TestDataAccumulator.getAccumulator().addedTrainingSize = 0;
-		TestDataAccumulator.getAccumulator().numOfIterations = 0;
-
 		if(!copyProblemFiles()) {
 			LOGGER.info("Coping domain file failure");
 			return null;
@@ -120,8 +136,8 @@ public class PlannerAndModelLearner {
 		String safeModelPath = Globals.OUTPUT_SAFE_MODEL_PATH + "/" + agentName + "/" + domainFileName;
 		String unsafeModelPath = Globals.OUTPUT_UNSAFE_MODEL_PATH + "/" + agentName + "/" + domainFileName;
 
-		Model safeModel = new Model();
-		Model unsafeModel = new Model();
+		safeModel = new Model();
+		unsafeModel = new Model();
 
 		if(!safeModel.readModel(safeModelPath)) {
 			LOGGER.fatal("provided path to safe model domain file not existing");
@@ -140,11 +156,23 @@ public class PlannerAndModelLearner {
 
 		open.add(tmpModel);
 
+		if(iterationMethod == IterationMethod.BFS)
+			index = 0;
+		else if(iterationMethod == IterationMethod.DFS)
+			index = open.size() - 1;
+
 		while (!open.isEmpty()) {
+
+			if(System.currentTimeMillis() - startTimeMs > timeoutInMS){
+				LOGGER.fatal("TIMEOUT!");
+				isTimeout = true;
+				return null;
+			}
 
 			TestDataAccumulator.getAccumulator().numOfIterations+=1;
 
-			int index = rnd.nextInt(open.size());
+			if(iterationMethod == IterationMethod.Random)
+				index = rnd.nextInt(open.size());
 
 			TempModel currTempModel = (TempModel) (open.toArray())[index];
 
@@ -153,14 +181,24 @@ public class PlannerAndModelLearner {
 
 			Model currModel = null;
 
+			/*
+			if(useSafeModel) {
+				currModel = safeModel.extendModel(currTempModel);
+				useSafeModel = false;
+			}
+			else
+				currModel = unsafeModel.extendModel(currTempModel);
+			*/
+			
 			currModel = unsafeModel.extendModel(currTempModel);
+
 
 			writeDomainFile(currModel.reconstructModelString());
 
 			plan = planForAgent();
 
 			if(plan == null) {
-				Set<TempModel> newModels = ExtendUnsafe(currModel, unsafeModel, currTempModel);
+				Set<TempModel> newModels = ExtendUnsafe(currModel,currTempModel);
 				open.addAll(newModels);
 				open.removeAll(closed);
 			}
@@ -185,11 +223,11 @@ public class PlannerAndModelLearner {
 
 						planSASList.remove(res.lastActionIndex);						
 
-						UpdateOpenListModels(safeModel, open, closed, planSASList, failedActionSAS);
-						UpdateSafeUnSafeModels(safeModel, unsafeModel, planSASList);
+						UpdateOpenListModels(open, closed, planSASList, failedActionSAS);
+						useSafeModel = UpdateModels(planSASList);
 
 						//if(res.lastActionIndex > 0) {
-						Set<TempModel> newModels = ExtendSafe(currModel, safeModel, currTempModel, failedActionSAS);
+						Set<TempModel> newModels = ExtendSafe(currModel, currTempModel, failedActionSAS);
 						open.addAll(newModels);		
 						open.removeAll(closed);
 						//}
@@ -203,7 +241,7 @@ public class PlannerAndModelLearner {
 		return null;
 	}
 
-	private boolean UpdateSafeUnSafeModels(Model safeModel, Model unsafeModel, List<StateActionState> planSASList) {
+	private boolean UpdateModels(List<StateActionState> planSASList) {
 
 		LOGGER.info("Updating safe and unsafe models with new plan training set");
 
@@ -213,23 +251,13 @@ public class PlannerAndModelLearner {
 		learner.expandSafeAndUnSafeModelsWithPlan(planSASList, Globals.OUTPUT_SAFE_MODEL_PATH, Globals.OUTPUT_UNSAFE_MODEL_PATH, 
 				sequancingTimeTotal, sequancingAmountTotal);
 
-		safeModel = new Model();
-		unsafeModel = new Model();
+		safeModel.readModel(safeModelPath);
+		unsafeModel.readModel(unsafeModelPath);
 
-		if(!safeModel.readModel(safeModelPath)) {
-			LOGGER.fatal("provided path to safe model domain file not existing");
-			return false;
-		}
-
-		if(!unsafeModel.readModel(unsafeModelPath)) {
-			LOGGER.fatal("provided path to unsafe model domain file not existing");
-			return false;
-		}
-
-		return true;
+		return learner.IsSafeModelUpdated || learner.IsUnSafeModelUpdated;
 	}
 
-	private boolean UpdateOpenListModels(Model model, Set<TempModel> open, Set<TempModel> closed,
+	private boolean UpdateOpenListModels(Set<TempModel> open, Set<TempModel> closed,
 			List<StateActionState> planSASList, StateActionState failedActionSAS) {
 
 		LOGGER.info("Updating open list models with new plan training set");
@@ -238,11 +266,12 @@ public class PlannerAndModelLearner {
 
 		for (TempModel tempModel : open) {
 
-			Model testedModel = model.extendModel(tempModel);
+			Model testedModel = safeModel.extendModel(tempModel);
 
 			// remove open list models that does not allow OK actions
 			for (StateActionState sas : planSASList) {				
-				if(!sas.actionOwner.equals(agentName)) {
+				if(!sas.actionOwner.equals(agentName) && 
+						learner.LearnedActionsNames.contains(sas.action)) {
 
 					Action modelAction = testedModel.actions.get(sas.action); 
 
@@ -267,7 +296,8 @@ public class PlannerAndModelLearner {
 				}
 			}
 
-			if(!failedActionSAS.actionOwner.equals(agentName)) {
+			if(!failedActionSAS.actionOwner.equals(agentName) && 
+					learner.LearnedActionsNames.contains(failedActionSAS.action)) {
 
 				// remove open list models that allow failed actions
 				Action modelAction = testedModel.actions.get(failedActionSAS.action);
@@ -300,7 +330,7 @@ public class PlannerAndModelLearner {
 	}
 
 
-	private Set<TempModel> ExtendSafe(Model currModel, Model safeModel, TempModel currTempModel,
+	private Set<TempModel> ExtendSafe(Model currModel, TempModel currTempModel,
 			StateActionState failedActionSAS) {
 
 		LOGGER.info("Extending the model towards the Safe Model");
@@ -322,7 +352,7 @@ public class PlannerAndModelLearner {
 		statePreconditions = formatFacts(statePreconditions);
 
 		safePreconditions.removeAll(statePreconditions);
-		preconditions = new LinkedHashSet<String>(safePreconditions);			 
+		preconditions = new LinkedHashSet<String>(safePreconditions);		 
 
 		for (String pre : preconditions) {
 
@@ -398,8 +428,7 @@ public class PlannerAndModelLearner {
 		return formatted;
 	}
 
-	private Set<TempModel> ExtendUnsafe(Model currModel, Model unsafeModel,
-			TempModel currTempModel) {
+	private Set<TempModel> ExtendUnsafe(Model currModel, TempModel currTempModel) {
 
 		LOGGER.info("Extending the model towards the Unsafe Model");
 

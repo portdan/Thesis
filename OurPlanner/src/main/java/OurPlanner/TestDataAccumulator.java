@@ -39,6 +39,7 @@ public class TestDataAccumulator {
 	public int numOfAgentsNotSolved = 0;
 	public int planLength = 0;
 	public String solvingAgent = "";
+	public String finishStatus = "";
 
 	private String outFileName = null;
 
@@ -73,6 +74,7 @@ public class TestDataAccumulator {
 		sb.append("Initial Training Size").append(sep);
 		sb.append("Added Training Size").append(sep);
 		sb.append("Number of Iterations").append(sep);
+		sb.append("Status").append(sep);
 		sb.append("Solved").append(sep);
 		sb.append("Timeout").append(sep);
 		sb.append("Not Solved").append(sep);
@@ -100,6 +102,7 @@ public class TestDataAccumulator {
 		sb.append(initialTrainingSize).append(sep);
 		sb.append(addedTrainingSize).append(sep);
 		sb.append(numOfIterations).append(sep);
+		sb.append(finishStatus).append(sep);
 		sb.append(numOfAgentsSolved).append(sep);
 		sb.append(numOfAgentsTimeout).append(sep);
 		sb.append(numOfAgentsNotSolved).append(sep);

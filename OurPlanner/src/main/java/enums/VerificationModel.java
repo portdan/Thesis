@@ -1,13 +1,13 @@
 /**
  * 
  */
-package OurPlanner;
+package enums;
 
 /**
  * @author daniel
  *
  */
-public enum PlanningModel {
+public enum VerificationModel {
 	SafeModel,
 	UnSafeModel,
 	GroundedModel

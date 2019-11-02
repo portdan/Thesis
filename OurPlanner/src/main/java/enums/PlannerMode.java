@@ -1,7 +1,7 @@
 /**
  * 
  */
-package OurPlanner;
+package enums;
 
 /**
  * @author daniel
