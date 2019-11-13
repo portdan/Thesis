@@ -6,7 +6,7 @@
   "inputGoundedDirName": "Grounded", 
   "inputLocalViewDirName": "LocalView", 
   "inputTracesDirName": "Traces", 
-  "iterationMethod": "Random", 
+  "iterationMethod": "Heuristic", 
   "numOfTracesToUse": 0, 
   "outputCopyDirPath": "/home/daniel/Work/WorkSpace/Thesis/OurPlannerTester/Output/probLOGISTICS-4-3.pddl/OurPlanner", 
   "outputDirPath": "/home/daniel/Work/WorkSpace/Thesis/OurPlanner/Output", 

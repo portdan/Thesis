@@ -143,7 +143,7 @@ public class Model {
 			ind++;
 			line = content.get(ind);
 
-			if (line.startsWith("\t)")) {
+			if (line.startsWith("\t)") || line.startsWith(")")) {
 				break;
 			}
 			else	{	

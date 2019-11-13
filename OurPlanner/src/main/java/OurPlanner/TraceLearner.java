@@ -49,9 +49,11 @@ public class TraceLearner {
 
 	StateActionStateSequencer sasSequencer = null;
 	DeleteEffectGenerator DEGenerator = null;
-	
+
 	public boolean IsSafeModelUpdated = false;
 	public boolean IsUnSafeModelUpdated = false;
+
+	Map<String, Map<String, Integer>> actionsPreconditionsScore= new HashMap<String, Map<String, Integer>>();
 
 	public TraceLearner(List<String> agentList , String agentName, File trajectoryFiles ,
 			File problemFiles , File localViewFiles ,String domainFileName ,String problemFileName, 
@@ -101,7 +103,7 @@ public class TraceLearner {
 	public boolean learnSafeAndUnSafeModels() {
 
 		LOGGER.info("Learning new actions");
-		
+
 		IsSafeModelUpdated = false;
 		IsUnSafeModelUpdated = false;
 
@@ -113,8 +115,13 @@ public class TraceLearner {
 		DEGenerator = new DeleteEffectGenerator (problemFiles,
 				domainFileName, problemFileName);
 
-		generateActionsForModels(KNOWN_EFFECTS);
-		
+		Set<String> actionLabels = DEGenerator.generateAllActionLabels();
+		Set<String> allFacts = DEGenerator.generateAllFacts();
+
+		generateActionsForModels(KNOWN_EFFECTS, allFacts, actionLabels);
+
+		initializeActionsPreconditionsScore(formatFacts(allFacts), actionLabels);
+
 		while(!sasSequencer.StopSequencing) {
 
 			long sequancingStartTime = System.currentTimeMillis();
@@ -141,7 +148,7 @@ public class TraceLearner {
 				LOGGER.info("Learning action: " + actionName);
 
 				List<StateActionState> sasListForAction = getAllStateActionStateWithAction(sasList, actionName);
-				
+
 				LearnedActionsNames.add(actionName);
 
 				addActionToOwnerLink(actionName, actionOwnerName);
@@ -153,18 +160,34 @@ public class TraceLearner {
 				addAgentLearningTime(sequancingTimeTotal, sequancingAmountTotal, learningStartTime,
 						actionOwnerName, sasListForAction, learningFinishTime);
 
+				updateActionPriconditionsScore(actionName, sasListForAction);
+
 				sasList.removeAll(sasListForAction);
 			}
 		}
 
 		return writeNewSafeLearnedProblemFiles() && writeNewUnSafeLearnedProblemFiles();
 	}
+	
+	private void initializeActionsPreconditionsScore(Set<String> allFacts, Set<String> actionLabels) {
+
+		for (String actionLabel : actionLabels) {
+
+			Map<String, Integer> factScore = new HashMap<String, Integer>();
+
+			for (String fact : allFacts)
+				factScore.put(fact, 0);
+
+			actionsPreconditionsScore.put(actionLabel, factScore);
+		}
+
+	}
 
 	public boolean expandSafeAndUnSafeModelsWithPlan(List<StateActionState> planSASList, String pathToSafeModel,
 			String pathUnSafeModel, long sequancingTimeTotal, long sequancingAmountTotal) {
 
 		LOGGER.info("Learning new actions from plan");
-		
+
 		IsSafeModelUpdated = false;
 		IsUnSafeModelUpdated = false;
 
@@ -187,7 +210,7 @@ public class TraceLearner {
 			LOGGER.info("Learning action: " + actionName);
 
 			List<StateActionState> sasListForAction = getAllStateActionStateWithAction(sasList, actionName);
-			
+
 			LearnedActionsNames.add(actionName);
 
 			addActionToOwnerLink(actionName, actionOwnerName);
@@ -199,11 +222,28 @@ public class TraceLearner {
 			addAgentLearningTime(sequancingTimeTotal, sequancingAmountTotal, learningStartTime,
 					actionOwnerName, sasListForAction, learningFinishTime);
 
+			updateActionPriconditionsScore(actionName, sasListForAction);
+
 			sasList.removeAll(sasListForAction);
 
 		}
 
 		return writeNewSafeLearnedProblemFiles() && writeNewUnSafeLearnedProblemFiles();
+	}
+
+	private void updateActionPriconditionsScore(String actionName, List<StateActionState> sasListForAction) {
+
+		Map<String, Integer> factScore = actionsPreconditionsScore.get(actionName);
+
+		for (StateActionState sas : sasListForAction) {
+
+			Set<String> preFormatted = formatFacts(sas.pre);
+
+			for (String pre : preFormatted) {
+				factScore.put(pre, factScore.get(pre)+1);
+			}
+
+		}
 	}
 
 	private String getActionOwnerFromAction(String actionStr) {
@@ -222,12 +262,9 @@ public class TraceLearner {
 		return split[split.length-1];		
 	}
 
-	private void generateActionsForModels(boolean knownEffects) {
+	private void generateActionsForModels(boolean knownEffects, Set<String> allFacts, Set<String> actionLabels) {
 
 		LOGGER.info("Adding unseen actions");
-
-		Set<String> allFacts = DEGenerator.generateAllFacts();
-		Set<String> actionLabels = DEGenerator.generateAllActionLabels();
 
 		for (String actionLabel : actionLabels) {
 
@@ -241,6 +278,9 @@ public class TraceLearner {
 
 			if(knownEffects)
 				safeEff = DEGenerator.generateActionEffectsWithDeleteEffects(actionLabel);
+
+			//safePre = formatFacts(safePre);
+			//safeEff = formatFacts(safeEff);
 
 			safePre = formatFacts(safePre);
 			safeEff = formatFacts(safeEff);
@@ -259,6 +299,9 @@ public class TraceLearner {
 			else {
 				unsafeEff = new HashSet<String>(allFacts);
 			}
+
+			//unsafePre = formatFacts(unsafePre);
+			//unsafeEff = formatFacts(unsafeEff);
 
 			unsafePre = formatFacts(unsafePre);
 			unsafeEff = formatFacts(unsafeEff);
@@ -306,7 +349,7 @@ public class TraceLearner {
 
 	private void learnPreconditionAndEffectsOfAction(String actionName, 
 			List<StateActionState> sasListForAction, boolean knownEffects) {
-		
+
 		// SAFE MODEL //
 		LOGGER.info("Learning safe preconditions and effects");
 
@@ -319,6 +362,9 @@ public class TraceLearner {
 			safeEff = learnSafeEffects(sasListForAction);
 
 		safeEff.addAll(DEGenerator.generateDeleteEffects(actionName,safePre,safeEff));
+
+		//safePre = formatFacts(safePre);
+		//safeEff = formatFacts(safeEff);
 
 		safePre = formatFacts(safePre);
 		safeEff = formatFacts(safeEff);
@@ -359,7 +405,10 @@ public class TraceLearner {
 
 		unsafeEff.addAll(DEGenerator.generateDeleteEffects(actionName,unsafePre,unsafeEff));
 
-		unsafePre = formatFacts(unsafePre);
+		//unsafePre = formatFacts(unsafePre);
+		//unsafeEff = formatFacts(unsafeEff);
+
+		unsafePre = formatFacts(unsafePre); 
 		unsafeEff = formatFacts(unsafeEff);
 
 		Set<String> unSafePreSet = agentLearnedUnSafeActionsPreconditions.get(actionName);
@@ -415,7 +464,7 @@ public class TraceLearner {
 			formattedFact = formattedFact.replace(")", "");
 
 			formattedFact = formattedFact.trim();
-			
+
 			formattedFact = '(' + formattedFact + ')';
 
 			if(formattedFact.startsWith(Globals.NONE_KEYWORD)) {
@@ -785,5 +834,9 @@ public class TraceLearner {
 		}
 
 		return res;
+	}
+
+	public Map<String, Integer> getActionPreconditionsScore(String actionName) {
+		return actionsPreconditionsScore.get(actionName);
 	}
 }

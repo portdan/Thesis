@@ -6,6 +6,7 @@ import java.nio.charset.Charset;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
@@ -52,12 +53,12 @@ public class PlannerAndModelLearner {
 
 	private IterationMethod iterationMethod = IterationMethod.Random;
 
-	private boolean useSafeModel = true;
+	//	private boolean useSafeModel = true;
 
 	private int index = -1;
-	
+
 	public boolean isTimeout = false;
-	
+
 	Model safeModel = null;
 	Model unsafeModel = null;
 
@@ -173,34 +174,35 @@ public class PlannerAndModelLearner {
 
 			if(iterationMethod == IterationMethod.Random)
 				index = rnd.nextInt(open.size());
+			else if(iterationMethod == IterationMethod.Heuristic)
+				index = getBestHeuristicIndex(open.toArray());
 
 			TempModel currTempModel = (TempModel) (open.toArray())[index];
 
 			open.remove(currTempModel);
 			closed.add(currTempModel);	
 
+			/*
 			Model currModel = null;
 
-			/*
 			if(useSafeModel) {
 				currModel = safeModel.extendModel(currTempModel);
 				useSafeModel = false;
 			}
 			else
 				currModel = unsafeModel.extendModel(currTempModel);
-			*/
-			
-			currModel = unsafeModel.extendModel(currTempModel);
+			 */
 
+			Model currModel = unsafeModel.extendModel(currTempModel);
 
 			writeDomainFile(currModel.reconstructModelString());
 
 			plan = planForAgent();
 
 			if(plan == null) {
-				Set<TempModel> newModels = ExtendUnsafe(currModel,currTempModel);
+				/*Set<TempModel> newModels = ExtendUnsafe(currModel,currTempModel);
 				open.addAll(newModels);
-				open.removeAll(closed);
+				open.removeAll(closed);*/
 			}
 			else {
 
@@ -223,11 +225,12 @@ public class PlannerAndModelLearner {
 
 						planSASList.remove(res.lastActionIndex);						
 
-						UpdateOpenListModels(open, closed, planSASList, failedActionSAS);
-						useSafeModel = UpdateModels(planSASList);
+						//useSafeModel = UpdateModels(planSASList);
+						UpdateModels(planSASList);
+						FilterOpenListModels(open, closed, planSASList, failedActionSAS);
 
 						//if(res.lastActionIndex > 0) {
-						Set<TempModel> newModels = ExtendSafe(currModel, currTempModel, failedActionSAS);
+						Set<TempModel> newModels = ExtendSafe(currTempModel, failedActionSAS);
 						open.addAll(newModels);		
 						open.removeAll(closed);
 						//}
@@ -239,6 +242,26 @@ public class PlannerAndModelLearner {
 		}
 
 		return null;
+	}
+
+	private int getBestHeuristicIndex(Object[] open) {
+
+		int bestIndex = 0;
+		int bestHeuristic = 0;
+
+		for (int i = 0; i < open.length; i++) {
+
+			TempModel tm = (TempModel) open[i];
+			int h = calculateTempModelScore(tm);
+
+			if(h > bestHeuristic) {
+				bestHeuristic = h;
+				bestIndex = i;
+			}
+		}
+
+		return bestIndex;
+
 	}
 
 	private boolean UpdateModels(List<StateActionState> planSASList) {
@@ -257,7 +280,7 @@ public class PlannerAndModelLearner {
 		return learner.IsSafeModelUpdated || learner.IsUnSafeModelUpdated;
 	}
 
-	private boolean UpdateOpenListModels(Set<TempModel> open, Set<TempModel> closed,
+	private boolean FilterOpenListModels(Set<TempModel> open, Set<TempModel> closed,
 			List<StateActionState> planSASList, StateActionState failedActionSAS) {
 
 		LOGGER.info("Updating open list models with new plan training set");
@@ -266,17 +289,18 @@ public class PlannerAndModelLearner {
 
 		for (TempModel tempModel : open) {
 
-			Model testedModel = safeModel.extendModel(tempModel);
+			Model testedModel = unsafeModel.extendModel(tempModel);
 
 			// remove open list models that does not allow OK actions
 			for (StateActionState sas : planSASList) {				
-				if(!sas.actionOwner.equals(agentName) && 
-						learner.LearnedActionsNames.contains(sas.action)) {
+				if(!sas.actionOwner.equals(agentName) 
+						//&& learner.LearnedActionsNames.contains(sas.action)
+						){
 
 					Action modelAction = testedModel.actions.get(sas.action); 
-
 					Set<String> modelActionPre = new LinkedHashSet<String>(modelAction.preconditions);
 
+					/*
 					Set<String> modelActionEff = new LinkedHashSet<String>(modelAction.effects);
 
 					Set<String> verifiedActionPre = new LinkedHashSet<String>(sas.pre);
@@ -287,17 +311,33 @@ public class PlannerAndModelLearner {
 
 					verifiedActionEff.removeAll(verifiedActionPre);
 
+
 					if(!verifiedActionPre.containsAll(modelActionPre)) {
 						toRemove.add(tempModel);
 					}
-					/*else if(modelActionEff.containsAll(planActionEff)) {
+
+					/*
+					 else if(modelActionEff.containsAll(planActionEff)) {
 						toRemove.add(tempModel);
-					}*/
+					}
+
+					 */
+
+
+					Action safeModelAction = safeModel.actions.get(sas.action); 					
+					Set<String> safeModelActionPre = new LinkedHashSet<String>(safeModelAction.preconditions);
+
+					if(!safeModelActionPre.containsAll(modelActionPre)) {
+						toRemove.add(tempModel);
+					}
+
 				}
 			}
 
-			if(!failedActionSAS.actionOwner.equals(agentName) && 
-					learner.LearnedActionsNames.contains(failedActionSAS.action)) {
+			/*
+			if(!failedActionSAS.actionOwner.equals(agentName) 
+					//&& learner.LearnedActionsNames.contains(failedActionSAS.action)
+					) {
 
 				// remove open list models that allow failed actions
 				Action modelAction = testedModel.actions.get(failedActionSAS.action);
@@ -317,10 +357,14 @@ public class PlannerAndModelLearner {
 				if(failedActionPre.containsAll(modelActionPre)) {
 					toRemove.add(tempModel);
 				}
-				/*else if(!modelActionEff.containsAll(failedActionEff)) { 
-					toRemove.add(tempModel);
-				}*/
+
+				//else if(!modelActionEff.containsAll(failedActionEff)) { 
+				//	toRemove.add(tempModel);
+				//}
 			}
+			 */
+
+
 		}
 
 		open.removeAll(toRemove);
@@ -330,8 +374,7 @@ public class PlannerAndModelLearner {
 	}
 
 
-	private Set<TempModel> ExtendSafe(Model currModel, TempModel currTempModel,
-			StateActionState failedActionSAS) {
+	private Set<TempModel> ExtendSafe(TempModel currTempModel, StateActionState failedActionSAS) {
 
 		LOGGER.info("Extending the model towards the Safe Model");
 
@@ -346,7 +389,6 @@ public class PlannerAndModelLearner {
 		Set<String> safePreconditions = new LinkedHashSet<String>(preconditions);
 
 		preconditions = failedActionSAS.pre;
-
 		Set<String> statePreconditions = new LinkedHashSet<String>(failedActionSAS.pre);
 
 		statePreconditions = formatFacts(statePreconditions);
@@ -586,5 +628,41 @@ public class PlannerAndModelLearner {
 		}
 
 		return true;
+	}
+
+	private int calculateModelScore(Model model) {
+
+		int score = 0;
+
+		for (Entry<String, Action> pair : model.actions.entrySet()) {
+
+			String actionName = pair.getKey();
+			Action action = pair.getValue();
+
+			Map<String, Integer> actionPreconditionScore = learner.getActionPreconditionsScore(actionName);
+
+			if(actionPreconditionScore != null)
+				for (String pre : action.preconditions)
+					score += actionPreconditionScore.get(pre);
+
+		}
+
+		return score;
+	}
+
+	private int calculateTempModelScore(TempModel tempModel) {
+
+		int score = 0;
+
+		for (TempAction tempAct : tempModel.tempActions) {
+
+			Map<String, Integer> actionPreconditionScore = learner.getActionPreconditionsScore(tempAct.name);
+
+			if(actionPreconditionScore != null)
+				for (String pre : tempAct.preconditionsAdd)
+					score += actionPreconditionScore.get(pre);
+		}
+
+		return score;
 	}
 }

@@ -8,6 +8,7 @@ package enums;
  *
  */
 public enum IterationMethod {
+	Heuristic,
 	Random,
 	BFS,
 	DFS

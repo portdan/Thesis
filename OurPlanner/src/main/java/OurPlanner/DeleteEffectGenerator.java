@@ -189,7 +189,7 @@ public class DeleteEffectGenerator {
 							if(valStr.startsWith(Globals.NEGATED_KEYWORD))
 								res.add(valStr.replace(Globals.NEGATED_KEYWORD, ""));
 							else
-								res.add("not ( "+ valStr +")");
+								res.add("not ("+ valStr +")");
 						}
 					}
 				}

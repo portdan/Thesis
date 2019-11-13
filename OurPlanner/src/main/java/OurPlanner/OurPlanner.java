@@ -59,7 +59,8 @@ public class OurPlanner implements Creator  {
 	private List<String> availableLeaders= null;
 
 	// uses seed so agent order is same
-	private	Random rnd = new Random(SEED);
+	//private	Random rnd = new Random(SEED);
+	private	Random rnd = new Random();
 
 	private int numOftraces = 0;
 	private int tracesLearinigInterval = 0;
@@ -395,7 +396,7 @@ public class OurPlanner implements Creator  {
 
 			PlannerAndModelLearner plannerAndLearner = new PlannerAndModelLearner(currentLeaderAgent, agentList,
 					domainFileName, problemFileName, learner, iterationMethod, startTimeMs, timeoutInMS);
-			
+
 			TestDataAccumulator.getAccumulator().addedTrainingSize = 0;
 			TestDataAccumulator.getAccumulator().numOfIterations = 0;
 
@@ -415,7 +416,7 @@ public class OurPlanner implements Creator  {
 
 				return true;
 			}
-			
+
 			if(plannerAndLearner.isTimeout)
 			{
 				isTimeout=true;
