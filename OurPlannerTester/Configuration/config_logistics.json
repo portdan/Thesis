@@ -1,0 +1,44 @@
+{
+  "domainName": "domain.pddl", 
+  "domainPath": "/home/daniel/Desktop/RESULTS2", 
+  "originDestination": "Origin", 
+  "outputDestination": "/home/daniel/Work/WorkSpace/Thesis/OurPlannerTester/Output", 
+  "problemGeneratorConfig": "/home/daniel/Work/WorkSpace/Thesis/problem-generator/Configuration/config.json", 
+  "problemGeneratorCreator": "problemGenerator.StateActionStateGenerator", 
+  "problemGeneratorInput": "/home/daniel/Work/WorkSpace/Thesis/problem-generator/Input", 
+  "problemGeneratorJAR": "/home/daniel/Work/WorkSpace/Thesis/problem-generator/target/problem-generator-0.0.1-SNAPSHOT-jar-with-dependencies.jar", 
+  "problemGeneratorOutput": "/home/daniel/Work/WorkSpace/Thesis/problem-generator/Output", 
+  "problemGeneratorOutputDestination": "ProblemGenerator", 
+  "problemGrounderConfig": "/home/daniel/Work/WorkSpace/Thesis/ProblemGrounder/Configuration/config.json", 
+  "problemGrounderCreator": "ProblemGrounder.ProblemGrounder", 
+  "problemGrounderInput": "/home/daniel/Work/WorkSpace/Thesis/ProblemGrounder/Input", 
+  "problemGrounderJAR": "/home/daniel/Work/WorkSpace/Thesis/ProblemGrounder/target/ProblemGrounder-0.0.1-SNAPSHOT-jar-with-dependencies.jar", 
+  "problemGrounderOutput": "/home/daniel/Work/WorkSpace/Thesis/ProblemGrounder/Output", 
+  "problemGrounderOutputDestination": "ProblemGrounder", 
+  "problemPlannerConfig": "/home/daniel/Work/WorkSpace/Thesis/OurPlanner/Configuration/config.json", 
+  "problemPlannerCreator": "OurPlanner.OurPlanner", 
+  "problemPlannerInput": "/home/daniel/Work/WorkSpace/Thesis/OurPlanner/Input", 
+  "problemPlannerJAR": "/home/daniel/Work/WorkSpace/Thesis/OurPlanner/target/OurPlanner-0.0.1-SNAPSHOT-jar-with-dependencies.jar", 
+  "problemPlannerOutput": "/home/daniel/Work/WorkSpace/Thesis/OurPlanner/Output", 
+  "problemPlannerOutputDestination": "OurPlanner", 
+  "problemPlannerPlanningModel": "SafeModel", 
+  "problemPlannerVerificationModel": "GroundedModel", 
+  "problems": [
+    {
+      "maxTracesToUse": 500, 
+      "minTracesToUse": 0, 
+      "problemName": "probLOGISTICS-4-1.pddl", 
+      "solvedRangeSplit": 5, 
+      "unsolvedRangeSplit": 5
+    }, 
+    {
+      "maxTracesToUse": 500, 
+      "minTracesToUse": 0, 
+      "problemName": "probLOGISTICS-4-2.pddl", 
+      "solvedRangeSplit": 5, 
+      "unsolvedRangeSplit": 5
+    }, 
+  ], 
+  "problemsPath": "/home/daniel/Desktop/RESULTS2"
+}
+

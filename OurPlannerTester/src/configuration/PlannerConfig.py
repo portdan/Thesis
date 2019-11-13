@@ -14,7 +14,7 @@ class PlannerConfig(object):
                 outputSASFileName : str, outputSafeModelLearningDirName : str, outputTempDirPath : str, 
                 outputUnSafeModelLearningDirName : str, planningModel : str, problemFileName : str, 
                 pythonScriptsPath : str, testOutputCSVFilePath : str, tracesLearinigInterval : int, 
-                verificationModel : str, plannerMode : str): 
+                verificationModel : str, plannerMode : str, timeoutInMS : int, iterationMethod : str): 
         '''
         Constructor
         '''
@@ -41,3 +41,5 @@ class PlannerConfig(object):
         self.tracesLearinigInterval = tracesLearinigInterval
         self.verificationModel = verificationModel
         self.plannerMode = plannerMode
+        self.timeoutInMS = timeoutInMS
+        self.iterationMethod = iterationMethod

@@ -160,7 +160,7 @@ class Planner(object):
         
         # test between 0 - solved_threshold
         
-        for traces_amount in range_splited:
+        for traces_amount in reversed(range_splited):
             #if traces_amount not in self.tested_amounts:    
             self.plan(problem_name, traces_amount, planning_and_learning_mode)
 
