@@ -8,7 +8,10 @@ package enums;
  *
  */
 public enum IterationMethod {
-	Heuristic,
+	PlanLengthAndReliabilityHeuristic,
+	GoalProximityHeuristic,
+	ReliabilityHeuristic,
+	PlanLengthHeuristic,
 	Random,
 	BFS,
 	DFS

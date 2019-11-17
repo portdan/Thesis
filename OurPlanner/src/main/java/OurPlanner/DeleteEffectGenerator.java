@@ -71,6 +71,21 @@ public class DeleteEffectGenerator {
 		LOGGER.info("problemFileName: " + problemFileName);
 		LOGGER.info("problemFiles: " + problemFiles);
 	}
+	
+	public Set<String> generateGoalFacts(){
+		
+		LOGGER.info("Generating goal facts");
+
+		Set<String> res = new HashSet<String>();
+		
+		for (int valNum : problem.goalSuperState.getValues()) {
+			if(valNum>=0) {
+				res.add(Domain.valNames.get(valNum).toString());
+			}
+		}
+
+		return res;
+	}
 
 	public Set<String> generateAllFacts() {
 

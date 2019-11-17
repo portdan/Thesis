@@ -3,6 +3,8 @@ package PlannerAndLearner;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -23,6 +25,7 @@ import OurPlanner.PlanVerifier;
 import OurPlanner.StateActionState;
 import OurPlanner.TestDataAccumulator;
 import OurPlanner.TraceLearner;
+import Utils.ArrayUtils;
 import Utils.FileDeleter;
 import Utils.VerificationResult;
 import enums.IterationMethod;
@@ -40,6 +43,7 @@ public class PlannerAndModelLearner {
 	private List<String> agentList = null;
 
 	private TraceLearner learner = null;
+	private Set<String> goalFacts;
 
 	private long sequancingTimeTotal = 0;
 	private long sequancingAmountTotal = 0;
@@ -63,7 +67,8 @@ public class PlannerAndModelLearner {
 	Model unsafeModel = null;
 
 	public PlannerAndModelLearner(String agentName, List<String> agentList, String domainFileName,
-			String problemFileName, TraceLearner learner, IterationMethod iterationMethod, long startTimeMs, int timeoutInMS) {
+			String problemFileName, TraceLearner learner, Set<String> goalFacts, IterationMethod iterationMethod,
+			long startTimeMs, int timeoutInMS) {
 
 		LOGGER.setLevel(Level.INFO);
 
@@ -77,6 +82,7 @@ public class PlannerAndModelLearner {
 		this.startTimeMs = startTimeMs;
 		this.timeoutInMS = timeoutInMS;
 		this.iterationMethod = iterationMethod;
+		this.goalFacts = goalFacts;
 
 		logInput();
 	}
@@ -150,17 +156,12 @@ public class PlannerAndModelLearner {
 			return null;
 		}
 
-		TempModel tmpModel  = new TempModel();
+		ModelSearchNode searchNode = new ModelSearchNode(null, new TempModel());
 
-		Set<TempModel> open = new LinkedHashSet<TempModel>();
-		Set<TempModel> closed = new LinkedHashSet<TempModel>();
+		Set<ModelSearchNode> open = new LinkedHashSet<ModelSearchNode>();
+		Set<ModelSearchNode> closed = new LinkedHashSet<ModelSearchNode>();
 
-		open.add(tmpModel);
-
-		if(iterationMethod == IterationMethod.BFS)
-			index = 0;
-		else if(iterationMethod == IterationMethod.DFS)
-			index = open.size() - 1;
+		open.add(searchNode);
 
 		while (!open.isEmpty()) {
 
@@ -172,15 +173,30 @@ public class PlannerAndModelLearner {
 
 			TestDataAccumulator.getAccumulator().numOfIterations+=1;
 
-			if(iterationMethod == IterationMethod.Random)
+			switch (iterationMethod) {
+			case BFS:
+				index = 0;
+				break;
+			case DFS:
+				index = open.size() - 1;
+				break;
+			case Random:
 				index = rnd.nextInt(open.size());
-			else if(iterationMethod == IterationMethod.Heuristic)
-				index = getBestHeuristicIndex(open.toArray());
+				break;
+			case GoalProximityHeuristic:
+			case ReliabilityHeuristic:
+			case PlanLengthHeuristic:
+			case PlanLengthAndReliabilityHeuristic:
+			default:
+				index = getBestHeuristicIndex(open.toArray(), iterationMethod);
 
-			TempModel currTempModel = (TempModel) (open.toArray())[index];
+				break;
+			}
 
-			open.remove(currTempModel);
-			closed.add(currTempModel);	
+			searchNode = (ModelSearchNode) (open.toArray())[index];
+
+			open.remove(searchNode);
+			closed.add(searchNode);	
 
 			/*
 			Model currModel = null;
@@ -193,7 +209,7 @@ public class PlannerAndModelLearner {
 				currModel = unsafeModel.extendModel(currTempModel);
 			 */
 
-			Model currModel = unsafeModel.extendModel(currTempModel);
+			Model currModel = unsafeModel.extendModel(searchNode.getTempModel());
 
 			writeDomainFile(currModel.reconstructModelString());
 
@@ -223,14 +239,17 @@ public class PlannerAndModelLearner {
 						List<StateActionState> planSASList = planToSASList(plan, res.lastActionIndex);
 						StateActionState failedActionSAS = planSASList.get(res.lastActionIndex);
 
-						planSASList.remove(res.lastActionIndex);						
+						planSASList.remove(res.lastActionIndex);
 
+						searchNode.setPlanSASList(planSASList);
+						searchNode.calcGoalProximity(goalFacts);
+						
 						//useSafeModel = UpdateModels(planSASList);
 						UpdateModels(planSASList);
 						FilterOpenListModels(open, closed, planSASList, failedActionSAS);
 
 						//if(res.lastActionIndex > 0) {
-						Set<TempModel> newModels = ExtendSafe(currTempModel, failedActionSAS);
+						Set<ModelSearchNode> newModels = ExtendSafe(searchNode, failedActionSAS);
 						open.addAll(newModels);		
 						open.removeAll(closed);
 						//}
@@ -244,24 +263,43 @@ public class PlannerAndModelLearner {
 		return null;
 	}
 
-	private int getBestHeuristicIndex(Object[] open) {
+	private int getBestHeuristicIndex(Object[] open, IterationMethod method) {
 
 		int bestIndex = 0;
-		int bestHeuristic = 0;
+
+		int[] rh = new int[open.length];
+		int[] gph = new int[open.length];
+		int[] plh = new int[open.length];
 
 		for (int i = 0; i < open.length; i++) {
+			ModelSearchNode sn = (ModelSearchNode) open[i];
+			
+			rh[i] = sn.getReliabilityHeuristic(learner.actionsPreconditionsScore);
+			gph[i] = sn.getGoalProximityHeuristic();
+			plh[i] = sn.getPlanLengthHeuristic();
+		}
 
-			TempModel tm = (TempModel) open[i];
-			int h = calculateTempModelScore(tm);
+		if(method == IterationMethod.GoalProximityHeuristic)
+			bestIndex = ArrayUtils.findIndexOfMax(gph);
+		
+		if(method == IterationMethod.ReliabilityHeuristic)
+			bestIndex = ArrayUtils.findIndexOfMax(rh);
 
-			if(h > bestHeuristic) {
-				bestHeuristic = h;
-				bestIndex = i;
-			}
+		if(method == IterationMethod.PlanLengthHeuristic)
+			bestIndex = ArrayUtils.findIndexOfMax(plh);
+		
+		if(method == IterationMethod.PlanLengthAndReliabilityHeuristic) {
+			
+			List<Integer> indices = ArrayUtils.findIndicesOfMax(plh);
+			
+			int[] plarh = ArrayUtils.subsetByIndices(rh, indices);
+			
+			int bestPLaRH = ArrayUtils.findIndexOfMax(plarh);
+		
+			bestIndex = indices.get(bestPLaRH);
 		}
 
 		return bestIndex;
-
 	}
 
 	private boolean UpdateModels(List<StateActionState> planSASList) {
@@ -280,16 +318,16 @@ public class PlannerAndModelLearner {
 		return learner.IsSafeModelUpdated || learner.IsUnSafeModelUpdated;
 	}
 
-	private boolean FilterOpenListModels(Set<TempModel> open, Set<TempModel> closed,
+	private boolean FilterOpenListModels(Set<ModelSearchNode> open, Set<ModelSearchNode> closed,
 			List<StateActionState> planSASList, StateActionState failedActionSAS) {
 
 		LOGGER.info("Updating open list models with new plan training set");
 
-		Set<TempModel> toRemove = new LinkedHashSet<TempModel>();
+		Set<ModelSearchNode> toRemove = new LinkedHashSet<ModelSearchNode>();
 
-		for (TempModel tempModel : open) {
+		for (ModelSearchNode searchModel : open) {
 
-			Model testedModel = unsafeModel.extendModel(tempModel);
+			Model testedModel = unsafeModel.extendModel(searchModel.getTempModel());
 
 			// remove open list models that does not allow OK actions
 			for (StateActionState sas : planSASList) {				
@@ -328,7 +366,7 @@ public class PlannerAndModelLearner {
 					Set<String> safeModelActionPre = new LinkedHashSet<String>(safeModelAction.preconditions);
 
 					if(!safeModelActionPre.containsAll(modelActionPre)) {
-						toRemove.add(tempModel);
+						toRemove.add(searchModel);
 					}
 
 				}
@@ -374,11 +412,11 @@ public class PlannerAndModelLearner {
 	}
 
 
-	private Set<TempModel> ExtendSafe(TempModel currTempModel, StateActionState failedActionSAS) {
+	private Set<ModelSearchNode> ExtendSafe(ModelSearchNode searchNode, StateActionState failedActionSAS) {
 
 		LOGGER.info("Extending the model towards the Safe Model");
 
-		Set<TempModel> res = new LinkedHashSet<TempModel>();
+		Set<ModelSearchNode> res = new LinkedHashSet<ModelSearchNode>();
 		Set<String> preconditions = null;
 
 		String failedActionName = failedActionSAS.action;
@@ -398,7 +436,7 @@ public class PlannerAndModelLearner {
 
 		for (String pre : preconditions) {
 
-			TempModel tempModel = new TempModel(currTempModel);
+			TempModel tempModel = new TempModel(searchNode.getTempModel());
 
 			//TempAction tempAction = tempModel.getTempActionByName(failedActionName);
 			TempAction tempAction = tempModel.popTempActionByName(failedActionName);
@@ -414,7 +452,9 @@ public class PlannerAndModelLearner {
 
 				tempModel.tempActions.add(tempAction);
 
-				res.add(tempModel);
+				ModelSearchNode newSearchNode = new ModelSearchNode(searchNode, tempModel);
+
+				res.add(newSearchNode);
 			}
 		}
 
@@ -628,41 +668,5 @@ public class PlannerAndModelLearner {
 		}
 
 		return true;
-	}
-
-	private int calculateModelScore(Model model) {
-
-		int score = 0;
-
-		for (Entry<String, Action> pair : model.actions.entrySet()) {
-
-			String actionName = pair.getKey();
-			Action action = pair.getValue();
-
-			Map<String, Integer> actionPreconditionScore = learner.getActionPreconditionsScore(actionName);
-
-			if(actionPreconditionScore != null)
-				for (String pre : action.preconditions)
-					score += actionPreconditionScore.get(pre);
-
-		}
-
-		return score;
-	}
-
-	private int calculateTempModelScore(TempModel tempModel) {
-
-		int score = 0;
-
-		for (TempAction tempAct : tempModel.tempActions) {
-
-			Map<String, Integer> actionPreconditionScore = learner.getActionPreconditionsScore(tempAct.name);
-
-			if(actionPreconditionScore != null)
-				for (String pre : tempAct.preconditionsAdd)
-					score += actionPreconditionScore.get(pre);
-		}
-
-		return score;
 	}
 }

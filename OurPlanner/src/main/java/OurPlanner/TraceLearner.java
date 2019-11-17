@@ -53,7 +53,7 @@ public class TraceLearner {
 	public boolean IsSafeModelUpdated = false;
 	public boolean IsUnSafeModelUpdated = false;
 
-	Map<String, Map<String, Integer>> actionsPreconditionsScore= new HashMap<String, Map<String, Integer>>();
+	public Map<String, Map<String, Integer>> actionsPreconditionsScore= new HashMap<String, Map<String, Integer>>();
 
 	public TraceLearner(List<String> agentList , String agentName, File trajectoryFiles ,
 			File problemFiles , File localViewFiles ,String domainFileName ,String problemFileName, 
@@ -835,8 +835,8 @@ public class TraceLearner {
 
 		return res;
 	}
-
-	public Map<String, Integer> getActionPreconditionsScore(String actionName) {
-		return actionsPreconditionsScore.get(actionName);
+	
+	public Set<String> getGoalFacts() {
+		return DEGenerator.generateGoalFacts();
 	}
 }
