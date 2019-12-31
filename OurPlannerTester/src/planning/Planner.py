@@ -9,6 +9,7 @@ import subprocess
 import shutil
 import csv
 import math
+import os
 
 from configuration import PlannerConfig
 from utils.Utils import clear_directory,copy_tree
@@ -19,6 +20,18 @@ logger = logging.getLogger(__name__)
 planning_mode = "Planning"
 planning_and_learning_mode = "PlanningAndLearning"
 
+Monte_Carlo_Reliability_Heuristic = "Monte_Carlo_Reliability_Heuristic"
+Monte_Carlo_Plan_Length_Heuristic = "Monte_Carlo_Plan_Length_Heuristic"
+Monte_Carlo_Goal_Proximity_Heuristic = "Monte_Carlo_Goal_Proximity_Heuristic"
+    
+Plan_Length_And_Reliability_Heuristic = "Plan_Length_And_Reliability_Heuristic"
+Goal_Proximity_Heuristic = "Goal_Proximity_Heuristic"
+Reliability_Heuristic = "Reliability_Heuristic"
+Plan_Length_Heuristic = "Plan_Length_Heuristic"
+Random = "Random"
+BFS = "BFS"
+DFS = "DFS"
+Single_Iteration = "Single_Iteration"
 
 class Planner(object):
     '''
@@ -32,7 +45,8 @@ class Planner(object):
         
         self.config = config
         self.planner_output_folder = None
-        self.test_output_CSV_file_path = None
+        self.planner_traces_folder_path = None
+        self.planner_ssv_file_path = None
         self.tested_amounts = None
         self.log_output = log_output
         
@@ -53,7 +67,7 @@ class Planner(object):
             preprocess_runner_script.write(preprocess_script_path)
             preprocess_runner_script.write(preprocess_sas_file_input)
 
-    def prepere_planning_config(self, problem_name, num_of_traces_to_use, planner_mode):
+    def prepere_planning_config(self, problem_name, num_of_traces_to_use, planner_mode, experiment_details, timeoutInMS, planner_iteration_method = None, C_value = 2):
      
         logger.info("prepere_planning_config")
         
@@ -63,9 +77,7 @@ class Planner(object):
         
         with open(self.config.problemPlannerConfig, 'r') as plannerConfigJson:
             planner_config = pyckson.load(PlannerConfig, plannerConfigJson)
-            
-        self.test_output_CSV_file_path = planner_config.testOutputCSVFilePath
-            
+                        
         self.preprocess_runner_script_write(planner_config)
             
         planner_config.domainFileName = self.config.domainName
@@ -75,11 +87,21 @@ class Planner(object):
         planner_config.verificationModel = self.config.problemPlannerVerificationModel
         planner_config.planningModel = self.config.problemPlannerPlanningModel
         planner_config.plannerMode = planner_mode
+        planner_config.testOutputCSVFilePath = self.config.outputDestination + "/" + problem_name.split(".")[0] + ".csv"
+        planner_config.experimentDetails = experiment_details
+        planner_config.timeoutInMS = timeoutInMS
+
+        if planner_iteration_method is not None:
+            planner_config.iterationMethod = planner_iteration_method
+            
+        planner_config.cValue = C_value
 
         self.planner_output_folder = self.config.outputDestination + "/" + problem_name + "/" + self.config.problemPlannerOutputDestination
+        self.planner_traces_folder_path = self.config.problemPlannerInput + "/" + planner_config.inputTracesDirName
+        self.planner_ssv_file_path = planner_config.testOutputCSVFilePath;
 
         planner_config.outputCopyDirPath = self.planner_output_folder
-        
+
         with open(self.config.problemPlannerConfig, 'w+') as plannerConfigJson:
             pyckson.dump(planner_config, plannerConfigJson)
             
@@ -118,16 +140,17 @@ class Planner(object):
     def delete_output(self):
         clear_directory(self.config.problemPlannerOutput)
 
-    def plan(self, problem_name, num_of_traces_to_use, planner_mode):
+    def plan(self, problem_name, num_of_traces_to_use, planner_mode, experiment_details, timeoutInMS, planner_iteration_method=None, C_value = 2):
            
         logger.info("plan")
         
-        self.prepere_planning_config(problem_name, num_of_traces_to_use, planner_mode)
+        self.prepere_planning_config(problem_name, num_of_traces_to_use, planner_mode, experiment_details, timeoutInMS, planner_iteration_method, C_value)
         
         self.run_planning()   
         
         self.delete_output()
-        
+       
+    '''    
     def plan_range_traces(self,problem_name, range_start, range_end, range_split):
     
         if (range_end-range_start) < range_split:
@@ -163,12 +186,57 @@ class Planner(object):
         for traces_amount in reversed(range_splited):
             #if traces_amount not in self.tested_amounts:    
             self.plan(problem_name, traces_amount, planning_and_learning_mode)
-
+      
+    '''  
+            
+    def plan_and_learn_by_iteration_method(self,problem_config, problem_name, solved_threshold):
+            
+        experiment_setup = problem_config.experimentSetup    
         
-    def search_solved_threshold(self, problem_name, min_traces, max_traces):
+        thresholdTimeoutInMS = problem_config.thresholdSearchSetup.timeoutInMS
+        experimentTimeoutInMS = problem_config.experimentSetup.timeoutInMS
+
+                    
+        experiment_traces_amounts = [int(t * solved_threshold) for t in experiment_setup.amountOfTraces]
+        experiment_traces_amounts.sort(reverse=True)
+        
+        experiment_counter = 0
+        
+        for traces_amount in experiment_traces_amounts:
+            
+            experiment_counter+=1
+    
+            for i in range(0 , experiment_setup.numberOfExperiments):
+                
+                #self.write_line_to_ourplanner_results("Experiment #" + str(i) + " - number of traces used: " + str(traces_amount))      
+                
+                experiment_details = "Experiment #" + str(experiment_counter + i) + " - traces: " + str(traces_amount)
+                  
+                shuffled_traces_copy_path = self.planner_output_folder + "/" + experiment_details
+                self.shuffle_traces(shuffled_traces_copy_path)
+                                                
+                self.plan(problem_name, traces_amount, planning_mode, experiment_details, thresholdTimeoutInMS, Single_Iteration)
+                agents, solved, timeout = self.get_ourplanner_results()
+                
+                if solved == 0:     
+                    self.plan(problem_name, traces_amount, planning_and_learning_mode, experiment_details, experimentTimeoutInMS, BFS)
+                    self.plan(problem_name, traces_amount, planning_and_learning_mode, experiment_details, experimentTimeoutInMS, Random)
+                    self.plan(problem_name, traces_amount, planning_and_learning_mode, experiment_details, experimentTimeoutInMS, Plan_Length_And_Reliability_Heuristic)
+                    self.plan(problem_name, traces_amount, planning_and_learning_mode, experiment_details, experimentTimeoutInMS, Monte_Carlo_Reliability_Heuristic, 2)
+                    #self.plan(problem_name, traces_amount, planning_and_learning_mode, experiment_details, experimentTimeoutInMS, Monte_Carlo_Reliability_Heuristic, 100)
+                    self.plan(problem_name, traces_amount, planning_and_learning_mode, experiment_details, experimentTimeoutInMS, Monte_Carlo_Goal_Proximity_Heuristic, 2)
+                    #self.plan(problem_name, traces_amount, planning_and_learning_mode, experiment_details, experimentTimeoutInMS, Monte_Carlo_Goal_Proximity_Heuristic, 100)
+                    self.plan(problem_name, traces_amount, planning_and_learning_mode, experiment_details, experimentTimeoutInMS, Monte_Carlo_Plan_Length_Heuristic, 2)
+                    #self.plan(problem_name, traces_amount, planning_and_learning_mode, experiment_details, experimentTimeoutInMS, Monte_Carlo_Plan_Length_Heuristic, 100)
+
+    def search_solved_threshold(self, problem_config, problem_name, total_num_of_traces):
            
         logger.info("search_solved_threshold")
         
+        min_traces = problem_config.thresholdSearchSetup.minTracesToUse
+        max_traces = total_num_of_traces
+        timeoutInMS = problem_config.thresholdSearchSetup.timeoutInMS
+                
         self.tested_amounts = []
                 
         while min_traces <= max_traces:
@@ -177,9 +245,11 @@ class Planner(object):
             timeout_counter = 0
     
             current_traces_amount = math.ceil((min_traces + max_traces) / 2)
+            
+            details = "Searching threshold"
                         
-            self.plan(problem_name, current_traces_amount, planning_mode)
-            agents, solved, timeout = self.get_ourplanner_results(self.test_output_CSV_file_path)
+            self.plan(problem_name, current_traces_amount, planning_mode, details, timeoutInMS, Single_Iteration)
+            agents, solved, timeout = self.get_ourplanner_results()
             
             solved_counter += solved
             timeout_counter += timeout
@@ -191,15 +261,15 @@ class Planner(object):
             else:
                 min_traces = current_traces_amount + 1
                 
-        return min_traces  
+        return min(min_traces,total_num_of_traces) 
     
-    def get_ourplanner_results(self, test_csv):
+    def get_ourplanner_results(self):
     
         solved = 0
         timeout = 0
         agents = 0
         
-        with open(test_csv, "rt" ) as outputCSV:
+        with open(self.planner_ssv_file_path, "rt" ) as outputCSV:
             reader = csv.reader(outputCSV)
             
             header = next(reader, None)
@@ -215,3 +285,31 @@ class Planner(object):
             agents = int(last[agents_index])
             
         return agents, solved, timeout
+    
+    def write_line_to_ourplanner_results(self, line):
+            
+        with open(self.planner_ssv_file_path, "at" ) as outputCSV:
+            writer = csv.writer(outputCSV, lineterminator = '\n')           
+            writer.writerow([line])
+
+    
+    def shuffle_traces(self, copy_path):
+    
+        logger.info("run shuffle traces")
+                
+        for dirpath, dirnames, filenames in os.walk(self.planner_traces_folder_path):
+            for filename in filenames:
+        
+                trace_file_path = self.planner_traces_folder_path + "/" + filename
+                
+                processList = ['shuf', trace_file_path, '--output=' + trace_file_path]
+                
+                print(', '.join(processList))   
+                
+                process = subprocess.Popen(processList)
+                process.wait()
+                
+        if not os.path.exists(copy_path):
+            os.makedirs(copy_path)
+        
+        copy_tree(self.planner_traces_folder_path, copy_path)

@@ -90,29 +90,35 @@ def run_tests(config):
     planner = Planner(config, log_output=False)
 
     for problem in config.problems:
-        
-        problem_file_path = config.problemsPath + '/' + problem.problemName
-        
-        logger.info("problem_file_path : " + str(problem_file_path))
+        for problem_name in problem.problemNames:
 
-        generate_test_output_folder(origin_domain_file_path, problem.problemName, problem_file_path, config)
-        
-        grounder.ground_problem(origin_domain_file_path, problem.problemName ,problem_file_path)
-        
-        generator.generate_problems_and_traces(grounder.grounded_output_path, problem.problemName, problem.maxTracesToUse)
-        
-        planner.copy_input_files()
-        
-        solved_threshold = planner.search_solved_threshold(problem.problemName, problem.minTracesToUse, problem.maxTracesToUse)
-        
-        planner.plan_and_learn_range_traces(problem.problemName, 0, max(0, solved_threshold -1), problem.unsolvedRangeSplit)
-        
-        #planner.plan_range_traces(problem.problemName, 0, max(0, solved_threshold -1), problem.unsolvedRangeSplit)
-         
-        #planner.plan_range_traces(problem.problemName, solved_threshold, problem.maxTracesToUse, problem.solvedRangeSplit)        
-                
-        grounder.delete_output()
-        generator.delete_output()
+            problem_file_path = config.problemsPath + '/' + problem_name
+            
+            logger.info("problem_file_path : " + str(problem_file_path))
+    
+            generate_test_output_folder(origin_domain_file_path, problem_name, problem_file_path, config)
+            
+            grounder.ground_problem(origin_domain_file_path, problem_name ,problem_file_path)
+            
+            total_num_of_traces = generator.generate_problems_and_traces(grounder.grounded_output_path,
+                                                                          problem_name, problem.thresholdSearchSetup.maxTracesToUse)
+            
+            planner.copy_input_files()
+                    
+            solved_threshold = planner.search_solved_threshold(problem, problem_name, total_num_of_traces)
+            
+            #planner.write_line_to_ourplanner_results("Solved threshold : " + str(solved_threshold))      
+            
+            planner.plan_and_learn_by_iteration_method(problem, problem_name, solved_threshold)
+            
+            #planner.plan_and_learn_range_traces(problem_name, 0, max(0, solved_threshold -1), problem.unsolvedRangeSplit)
+            
+            #planner.plan_range_traces(problem_name, 0, max(0, solved_threshold -1), problem.unsolvedRangeSplit)
+             
+            #planner.plan_range_traces(problem_name, solved_threshold, problem.maxTracesToUse, problem.solvedRangeSplit)        
+                    
+            grounder.delete_output()
+            generator.delete_output()
       
 def main():
     

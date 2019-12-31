@@ -20,6 +20,7 @@ class TesterConfig(object):
                  problemPlannerConfig : str, problemPlannerCreator : str, problemPlannerInput :str, 
         problemPlannerJAR : str, problemPlannerOutput : str, problemPlannerOutputDestination : str,
         problemPlannerVerificationModel : str, problemPlannerPlanningModel : str):
+        
         '''
         Constructor
         '''

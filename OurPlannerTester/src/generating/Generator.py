@@ -7,6 +7,7 @@ Created on Apr 24, 2019
 import pyckson
 import subprocess
 import shutil
+import os
 
 from configuration import GeneratorConfig
 from utils.Utils import clear_directory
@@ -98,6 +99,15 @@ class Generator(object):
         
         self.prepere_to_generate(grounded_output_path, problem_name, num_of_traces_to_generate)
         
-        self.run_generation()   
+        self.run_generation() 
+        
+        total_num_of_traces = 0
+        
+        for dirpath, dirnames, filenames in os.walk(self.config.problemGeneratorOutput):
+            for filename in filenames:
+                str = filename.split("_")[-1]
+                total_num_of_traces = int(str.split(".")[0])
         
         self.copy_generation_output(problem_name)
+        
+        return total_num_of_traces
