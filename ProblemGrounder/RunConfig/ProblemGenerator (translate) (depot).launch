@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <launchConfiguration type="org.python.pydev.debug.regularLaunchConfigurationType">
     <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
-        <listEntry value="/problem-generator/Misc/convert/ma-pddl/ma-to-pddl.py"/>
+        <listEntry value="/problem-generator/Misc/translate/translate.py"/>
     </listAttribute>
     <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
         <listEntry value="1"/>
     </listAttribute>
-    <stringAttribute key="org.eclipse.ui.externaltools.ATTR_LOCATION" value="${workspace_loc:problem-generator/Misc/convert/ma-pddl/ma-to-pddl.py}"/>
+    <stringAttribute key="org.eclipse.ui.externaltools.ATTR_LOCATION" value="${workspace_loc:problem-generator/Misc/translate/translate.py}"/>
     <stringAttribute key="org.eclipse.ui.externaltools.ATTR_OTHER_WORKING_DIRECTORY" value=""/>
-    <stringAttribute key="org.eclipse.ui.externaltools.ATTR_TOOL_ARGUMENTS" value="/home/daniel/Work/WorkSpace/Thesis/problem-generator/Input domain p03-pfile3 /home/daniel/Work/WorkSpace/Thesis/problem-generator/Output/Temp"/>
+    <stringAttribute key="org.eclipse.ui.externaltools.ATTR_TOOL_ARGUMENTS" value="/home/daniel/Work/WorkSpace/Thesis/problem-generator/Output/Temp/domain.pddl /home/daniel/Work/WorkSpace/Thesis/problem-generator/Output/Temp/pfile1.pddl /home/daniel/Work/WorkSpace/Thesis/problem-generator/Output/output.sas"/>
     <stringAttribute key="org.python.pydev.debug.ATTR_INTERPRETER" value="__default"/>
     <stringAttribute key="org.python.pydev.debug.ATTR_PROJECT" value="problem-generator"/>
     <stringAttribute key="process_factory_id" value="org.python.pydev.debug.processfactory.PyProcessFactory"/>

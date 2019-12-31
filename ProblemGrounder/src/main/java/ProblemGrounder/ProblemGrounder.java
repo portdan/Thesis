@@ -1,7 +1,6 @@
 package ProblemGrounder;
 
 import java.io.File;
-import java.lang.ProcessBuilder.Redirect;
 import java.util.Arrays;
 
 import org.apache.log4j.Level;
@@ -120,12 +119,17 @@ public class ProblemGrounder implements Creator {
 
 			LOGGER.info("Running: " + cmd);
 
+			/*
 			ProcessBuilder pb = new ProcessBuilder(scriptPath, conf.domainPath, conf.problemPath, agentsFile.getPath(), outputPath, localViewOutput);
             pb.redirectOutput(Redirect.INHERIT);
             
             Process pr = pb.start();
 
 			pr.waitFor();
+			*/
+			
+			new ExecCommand(cmd);
+
 
 		} catch (Exception e) {
 			LOGGER.fatal(e, e);
@@ -149,12 +153,17 @@ public class ProblemGrounder implements Creator {
 
 			LOGGER.info("Running: " + cmd);
 			
+			/*
 			ProcessBuilder pb = new ProcessBuilder(scriptPath, conf.domainPath, conf.problemPath, outputPath);
             pb.redirectOutput(Redirect.INHERIT);
             
             Process pr = pb.start();
 
 			pr.waitFor();
+			*/
+			
+			new ExecCommand(cmd);
+
 		} 
 		catch (Exception e) {
 			LOGGER.fatal(e, e);

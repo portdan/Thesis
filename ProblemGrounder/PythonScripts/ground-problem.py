@@ -7,6 +7,7 @@ import argparse
 import time
 import copy
 import collections
+import itertools
 
 # from sets import Set
 
@@ -31,6 +32,27 @@ class Predicate(object):
     It can be negated.
     It may contain variables or objects in its arguments.
     """
+    
+    def __lt__(self, other):
+        return self.name < other.name
+    
+    def __le__(self, other):
+        return self.name <= other.name
+
+    def __gt__(self, other):
+        return self.name > other.name
+
+    def __ge__(self, other):
+        return self.name >= other.name
+
+    def __eq__(self, other):
+        return self.name == other.name
+
+    def __ne__(self, other):
+        return self.name != other.name
+    
+    def __hash__(self, *args, **kwargs):
+        return hash(self.name)
 
     def __init__(self, name, args, is_typed, is_negated):
         self.name = name
@@ -87,6 +109,27 @@ class Predicate(object):
 class Action(object):
     """Represents a simple non-temporal action."""
 
+    def __lt__(self, other):
+        return self.name < other.name
+    
+    def __le__(self, other):
+        return self.name <= other.name
+
+    def __gt__(self, other):
+        return self.name > other.name
+
+    def __ge__(self, other):
+        return self.name >= other.name
+
+    def __eq__(self, other):
+        return self.name == other.name
+
+    def __ne__(self, other):
+        return self.name != other.name
+    
+    def __hash__(self, *args, **kwargs):
+        return hash(self.name)
+    
     def __init__(self, name, parameters, precondition, effect):
         self.name = name
         self.parameters = parameters
@@ -149,6 +192,27 @@ class Action(object):
         return self.name  # + str(self.parameters)
 
 class Function(object):
+    
+    def __lt__(self, other):
+        return self.obj_list < other.obj_list
+    
+    def __le__(self, other):
+        return self.obj_list <= other.obj_list
+
+    def __gt__(self, other):
+        return self.obj_list > other.obj_list
+
+    def __ge__(self, other):
+        return self.obj_list >= other.obj_list
+
+    def __eq__(self, other):
+        return self.obj_list == other.obj_list
+
+    def __ne__(self, other):
+        return self.obj_list != other.obj_list
+    
+    def __hash__(self, *args, **kwargs):
+        return hash(self.obj_list)
 
     def __init__(self, obj_list):
         self.obj_list = obj_list
@@ -167,6 +231,27 @@ class Function(object):
 
 class GroundFunction(object):
 
+    def __lt__(self, other):
+        return self.obj_list < other.obj_list
+    
+    def __le__(self, other):
+        return self.obj_list <= other.obj_list
+
+    def __gt__(self, other):
+        return self.obj_list > other.obj_list
+
+    def __ge__(self, other):
+        return self.obj_list >= other.obj_list
+
+    def __eq__(self, other):
+        return self.obj_list == other.obj_list
+
+    def __ne__(self, other):
+        return self.obj_list != other.obj_list
+    
+    def __hash__(self, *args, **kwargs):
+        return hash(self.obj_list)
+    
     def __init__(self, obj_list):
         self.obj_list = obj_list
 
@@ -701,17 +786,30 @@ class Grounder(object):
                 new_types.setdefault(type, []).append(agent)
                 new_types_list.add(type)
                 new_types_list.add(agent)
-                
+                                
                 for action in self.actions:
-                    if action.agent_type == type:
-                        new_action = copy.deepcopy(action);
-                        new_action.name += AGENT_HEADER + agent
-                        new_action.agent_type = agent                    
-                        new_actions.append(new_action) 
+                    #if action.agent_type == type:
+                    for agent_type in self.get_all_sub_types(action.agent_type):
+                        if agent_type == type:
+                            new_action = copy.deepcopy(action)
+                            new_action.name += AGENT_HEADER + agent
+                            new_action.agent_type = agent                    
+                            new_actions.append(new_action)
                         
         self.types = new_types
         self.type_list = new_types_list
         self.actions = new_actions
+    
+    def get_all_sub_types (self, parent_type): 
+        res = [parent_type]
+        
+        if parent_type in self.types:
+            for type in self.types[parent_type]:
+                if type in self.types:
+                    res.extend(self.asadasd(type))
+                res.append(type)
+        
+        return res
     
     def ground_domain_for_agent(self, agent_name):
         """ grounds the unfactored MA-PDDL domain file for a specific agent."""
@@ -734,9 +832,9 @@ class Grounder(object):
         to_write += "\t(:requirements :typing :multi-agent :unfactored-privacy)\n"
         # Types
         to_write += "(:types\n"
-        for type_ in self.types:
+        for type_ in sorted(self.types):
             to_write += "\t"
-            for key in self.types.get(type_):
+            for key in sorted(self.types.get(type_)):
                 to_write += key + " "
             to_write += "- " + type_
             to_write += "\n"
@@ -752,23 +850,23 @@ class Grounder(object):
             to_write += ")\n"
         # Public predicates
         to_write += "(:predicates\n"
-        for predicate in self.agent_predicates[PUBLIC]:
+        for predicate in sorted(self.agent_predicates[PUBLIC]):
             to_write += "\t{}\n".format(predicate.pddl_rep())
-        for agent_type in self.agent_predicates.keys():
+        for agent_type in sorted(self.agent_predicates.keys()):
             if agent_type != PUBLIC and len(self.agent_predicates[agent_type]) > 0:
                 to_write += "\n\t{}\n".format("(:private ?agent - " + agent_type)
-                for predicate in self.agent_predicates[agent_type]:
+                for predicate in sorted(self.agent_predicates[agent_type]):
                     to_write += "\t\t{}\n".format(predicate.pddl_rep())
                 to_write += "\t)\n"
         to_write += ")\n"
         # Functions
         if len(self.functions) > 0:
             to_write += "(:functions\n"
-            for function in self.functions:
+            for function in sorted(self.functions):
                 to_write += "\t{}\n".format(function.pddl_rep())
             to_write += ")\n"
         # Actions
-        for action in self.actions:
+        for action in sorted(self.actions):
             to_write += "\n{}\n".format(action.ma_pddl_rep())
         
         # Endmatter
@@ -783,9 +881,12 @@ class Grounder(object):
 
         for agent_name, object_type_to_name in self.agent_to_objects.items():
             new_object_type_to_name = copy.deepcopy(object_type_to_name) 
-            for object_name in new_object_type_to_name:
+            for object_name in list(new_object_type_to_name):
                 if object_name in self.types_to_agents:
-                    new_object_type_to_name[agent_name] = new_object_type_to_name.pop(object_name)
+                    poped = new_object_type_to_name.pop(object_name)
+                    if agent_name not in new_object_type_to_name:
+                        new_object_type_to_name[agent_name] = []
+                    new_object_type_to_name[agent_name].extend(poped)
                 new_agent_to_objects[agent_name] = new_object_type_to_name
 
         self.agent_to_objects = new_agent_to_objects
@@ -815,30 +916,37 @@ class Grounder(object):
         
         # writing objects. first public than private (per agent)
         
-        for t, objects in self.agent_to_objects[PUBLIC].items():
-            for obj in objects:
+        for t, objects in sorted(self.agent_to_objects[PUBLIC].items()):
+            for obj in sorted(objects):
                 if not t in iter(self.constants.keys()) or not obj in self.constants[t]:
-                    to_write += "\t" + obj + " - " + t + "\n"
+                    if obj in list(itertools.chain.from_iterable(self.types_to_agents.values())):
+                        to_write += "\t" + obj + " - " + obj + "\n"
+                    else:
+                        to_write += "\t" + obj + " - " + t + "\n"
+
                     
-        for agent in self.agent_to_objects:
+        for agent in sorted(self.agent_to_objects):
             if not agent == PUBLIC:
                 to_write += "\n\t(:private " + agent + "\n"
-                for t, objects in self.agent_to_objects[agent].items():
-                    for obj in objects:
+                for t, objects in sorted(self.agent_to_objects[agent].items()):
+                    for obj in sorted(objects):
                         if not t in iter(self.constants.keys()) or not obj in self.constants[t]:
-                            to_write += "\t\t" + obj + " - " + t + "\n"
+                            if obj in list(itertools.chain.from_iterable(self.types_to_agents.values())):
+                                to_write += "\t\t" + obj + " - " + obj + "\n"
+                            else:
+                                to_write += "\t\t" + obj + " - " + t + "\n"
                 to_write += "\t)\n"         
         to_write += ")\n"
         
         to_write += "(:init\n"
-        for predicate in self.init:
+        for predicate in sorted(self.init):
             to_write += "\t{}\n".format(predicate)
-        for function in self.ground_functions:
+        for function in sorted(self.ground_functions):
             to_write += "\t{}\n".format(function)
         to_write += ")\n"
         
         to_write += "(:goal\n\t(and\n"
-        for goal in self.goal:
+        for goal in sorted(self.goal):
             to_write += "\t\t{}\n".format(goal)
         to_write += "\t)\n)\n"
         

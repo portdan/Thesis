@@ -3,7 +3,7 @@
   "domainPath": "/home/daniel/Work/WorkSpace/Thesis/ProblemGrounder/Input/domain.pddl", 
   "groundedOutputPath": "/home/daniel/Work/WorkSpace/Thesis/ProblemGrounder/Output/Grounded", 
   "localViewOutputPath": "/home/daniel/Work/WorkSpace/Thesis/ProblemGrounder/Output/LocalView", 
-  "problemPath": "/home/daniel/Work/WorkSpace/Thesis/ProblemGrounder/Input/probLOGISTICS-6-0.pddl", 
+  "problemPath": "/home/daniel/Work/WorkSpace/Thesis/ProblemGrounder/Input/probLOGISTICS-4-0.pddl", 
   "pythonScriptsPath": "/home/daniel/Work/WorkSpace/Thesis/ProblemGrounder/PythonScripts"
 }
 

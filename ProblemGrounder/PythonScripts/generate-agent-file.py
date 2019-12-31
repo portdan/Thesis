@@ -514,7 +514,7 @@ class PlanningProblem(object):
     # Objects
     to_write += "\t(:agents\n"
     
-    for a in self.agents:
+    for a in sorted(self.agents):
         to_write += "\t\t" + a + " - " + self.get_type_of_object(a) + "\n" 
     
     to_write += "\t)\n"
