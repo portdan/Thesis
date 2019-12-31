@@ -12,10 +12,10 @@ import OurPlanner.Globals;
 
 public class Model {
 
-	Map<String,Action> actions;
-	String startOfModel;
+	public Map<String,Action> actions;
+	public String startOfModel;
 
-	private boolean firstAction;
+	public boolean firstAction;
 
 	public Model(Model model) {
 		this.actions = new LinkedHashMap<String,Action>();
@@ -172,6 +172,7 @@ public class Model {
 			res+=  act.agentLine + '\n';
 			res+=  act.parametersLine + '\n';
 
+			
 			if(act.preconditions.size()>1)
 				res+=  "\t:precondition (and" + '\n';
 			else if(act.preconditions.size()==1)
@@ -181,10 +182,11 @@ public class Model {
 
 			for (String pre : act.preconditions)
 				res += "\t\t" + pre + '\n';
-
+			
 			if(act.preconditions.size()>1)
 				res += "\t)\n";
 
+			
 			if(act.effects.size()>1)
 				res+= "\t:effect (and" + '\n';
 			else if(act.effects.size()==1)
@@ -194,8 +196,11 @@ public class Model {
 
 			for (String eff : act.effects)
 				res += "\t\t" + eff + '\n';
+			
+			if (act.effects.size() > 1)
+				res += "\t)\n";
 
-			res += "\t)\n)\n";
+			res += ")\n";
 		}
 
 		res += ')';

@@ -2,6 +2,7 @@ package Model;
 
 import java.util.*;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 import cz.agents.alite.configurator.ConfigurationInterface;
@@ -91,7 +92,7 @@ public class StateActionStateSASPreprocessor {
 		treatGoalAsPublic = config.getBoolean("treatGoalAsPublic", true);
 		unitCost = config.getBoolean("unitCost", true);
 
-		//		LOGGER.setLevel(Level.INFO);
+		LOGGER.setLevel(Level.INFO);
 
 		LinkedList<String> agents = new LinkedList<String>();
 

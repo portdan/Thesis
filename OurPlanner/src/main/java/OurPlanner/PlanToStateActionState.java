@@ -96,7 +96,9 @@ public class PlanToStateActionState {
 
 		String agentName = getActionOwnerFromAction(actionStr);
 
-		Action action = getActionFromPlan(agentsToProblems.get(agentName), actionStr);
+		Problem problem = agentsToProblems.get(agentName);
+
+		Action action = getActionFromPlan(problem, actionStr);
 
 		State pre = new State(currentState);
 
@@ -104,8 +106,12 @@ public class PlanToStateActionState {
 
 		String actionName = action.getSimpleLabel();
 
-		StateActionState sas = new StateActionState(getStateFacts(pre), 
-				actionName, agentName, getStateFacts(currentState));
+		Map<Integer, Set<Integer>> varDomains = problem.getDomain().getVariableDomains();
+
+		Set<String> preFacts = getStateFacts(pre, varDomains);
+		Set<String> postFacts = getStateFacts(currentState, varDomains);
+
+		StateActionState sas = new StateActionState(preFacts, actionName, agentName, postFacts);
 
 		return sas;
 	}
@@ -164,6 +170,7 @@ public class PlanToStateActionState {
 		}
 	}
 
+	/*
 	private static Set<String> getStateFacts(State state) {
 
 		LOGGER.info("Extracting facts from state " + state);
@@ -183,13 +190,44 @@ public class PlanToStateActionState {
 
 		return out;
 	}
+	 */
+
+	private static Set<String> getStateFacts(State state, Map<Integer, Set<Integer>> varDomains) {
+
+		LOGGER.info("Extracting facts from state " + state);
+
+		Set<String> out = new HashSet<String>();
+
+		int[] values = state.getValues();
+
+		for(int var = 0; var < values.length; ++var){
+			if(var >= 0){
+
+				String newVal = Domain.valNames.get(values[var]).toString();
+
+				if(newVal.startsWith(Globals.NONE_KEYWORD)) {
+					for (int val : varDomains.get(var)) {
+						newVal = Domain.valNames.get(val).toString();
+
+						if(val!=values[var])
+							out.add("Negated" + newVal);
+					}
+				}
+				else
+					out.add(newVal);
+			}
+		}
+
+		return out;
+	}
+
 
 	private boolean generateProblems() {
 
 		LOGGER.info("Generating agent-to-problem mapping");
-		
+
 		agentsToProblems = new HashMap<String, Problem>();
-		
+
 		String agentADDLPath = TEMP_DIR_PATH + "/" + problemFileName.split("\\.")[0] + ".addl";
 
 		if(!runConvert()) {

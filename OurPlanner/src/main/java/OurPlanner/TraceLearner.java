@@ -17,6 +17,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
+import Utils.TestDataAccumulator;
 import cz.agents.dimaptools.model.Domain;
 
 public class TraceLearner {
@@ -36,6 +37,9 @@ public class TraceLearner {
 
 	private int numOfTracesToUse = 0;
 	private int tracesLearinigInterval = 0;
+
+	private int timeoutInMS = 0;
+	private long startTimeMs = 0;
 
 	Map<String, Set<String>> agentLearnedActionNames = new HashMap<String,Set<String>>();
 
@@ -57,7 +61,7 @@ public class TraceLearner {
 
 	public TraceLearner(List<String> agentList , String agentName, File trajectoryFiles ,
 			File problemFiles , File localViewFiles ,String domainFileName ,String problemFileName, 
-			int numOfTracesToUse, int tracesLearinigInterval) {
+			int numOfTracesToUse, int tracesLearinigInterval, long startTimeMs, int timeoutInMS) {
 
 		LOGGER.setLevel(Level.INFO);
 
@@ -71,6 +75,8 @@ public class TraceLearner {
 		this.problemFileName = new String(problemFileName);
 		this.numOfTracesToUse = numOfTracesToUse;
 		this.tracesLearinigInterval = tracesLearinigInterval;
+		this.timeoutInMS = timeoutInMS;
+		this.startTimeMs = startTimeMs;
 
 		for (String agent : agentList) 
 			agentLearningTimes.put(agent,(long) 0);
@@ -79,10 +85,11 @@ public class TraceLearner {
 	}
 
 	public TraceLearner(List<String> agentList, File trajectoryFiles , File problemFiles , File localViewFiles, 
-			String domainFileName ,String problemFileName, int numOfTracesToUse, int tracesLearinigInterval) {
+			String domainFileName ,String problemFileName, int numOfTracesToUse, int tracesLearinigInterval,
+			long startTimeMs, int timeoutInMS) {
 
 		this(agentList, "", trajectoryFiles, problemFiles, localViewFiles, domainFileName, problemFileName, 
-				numOfTracesToUse, tracesLearinigInterval);
+				numOfTracesToUse, tracesLearinigInterval, startTimeMs, timeoutInMS);
 	}
 
 	private void logInput() {
@@ -97,6 +104,8 @@ public class TraceLearner {
 		LOGGER.info("problemFileName: " + problemFileName);
 		LOGGER.info("numOfTracesToUse: " + numOfTracesToUse);
 		LOGGER.info("tracesLearinigInterval: " + tracesLearinigInterval);
+		LOGGER.info("timeoutMS: " + timeoutInMS);
+		LOGGER.info("startTimeMs: " +startTimeMs);
 
 	}
 
@@ -106,8 +115,6 @@ public class TraceLearner {
 
 		IsSafeModelUpdated = false;
 		IsUnSafeModelUpdated = false;
-
-		TestDataAccumulator.getAccumulator().initialTrainingSize = 0;
 
 		sasSequencer = new StateActionStateSequencer(agentList, 
 				problemFiles, domainFileName, problemFileName, trajectoryFiles);
@@ -123,6 +130,11 @@ public class TraceLearner {
 		initializeActionsPreconditionsScore(formatFacts(allFacts), actionLabels);
 
 		while(!sasSequencer.StopSequencing) {
+			
+			if(System.currentTimeMillis() - startTimeMs > timeoutInMS){
+				LOGGER.fatal("TIMEOUT!");
+				return false;
+			}
 
 			long sequancingStartTime = System.currentTimeMillis();
 
@@ -135,10 +147,10 @@ public class TraceLearner {
 
 			long sequancingAmountTotal = sasList.size();
 
-			TestDataAccumulator.getAccumulator().initialTrainingSize += sequancingAmountTotal;			
-
 			while(!sasList.isEmpty())
 			{	
+
+
 				long learningStartTime = System.currentTimeMillis();
 
 				StateActionState firstValue = (StateActionState)sasList.get(0);
@@ -168,7 +180,7 @@ public class TraceLearner {
 
 		return writeNewSafeLearnedProblemFiles() && writeNewUnSafeLearnedProblemFiles();
 	}
-	
+
 	private void initializeActionsPreconditionsScore(Set<String> allFacts, Set<String> actionLabels) {
 
 		for (String actionLabel : actionLabels) {
@@ -191,14 +203,17 @@ public class TraceLearner {
 		IsSafeModelUpdated = false;
 		IsUnSafeModelUpdated = false;
 
-		TestDataAccumulator.getAccumulator().addedTrainingSize += planSASList.size();
-
 		DEGenerator = new DeleteEffectGenerator (problemFiles,
 				domainFileName, problemFileName);
 
 		List<StateActionState> sasList = new ArrayList<StateActionState>(planSASList); 
 
 		while(!sasList.isEmpty()) {
+			
+			if(System.currentTimeMillis() - startTimeMs > timeoutInMS){
+				LOGGER.fatal("TIMEOUT!");
+				return false;
+			}
 
 			long learningStartTime = System.currentTimeMillis();
 
@@ -240,6 +255,7 @@ public class TraceLearner {
 			Set<String> preFormatted = formatFacts(sas.pre);
 
 			for (String pre : preFormatted) {
+
 				factScore.put(pre, factScore.get(pre)+1);
 			}
 
@@ -737,6 +753,7 @@ public class TraceLearner {
 		rep += "\t:agent ?" + actionOwner + " - " + actionOwner + "\n";
 		rep += "\t:parameters ()\n";
 
+
 		if (pre.size() > 1)
 			rep += "\t:precondition (and\n";
 		else
@@ -748,6 +765,9 @@ public class TraceLearner {
 				rep += "\t\t" + p + "\n";
 		if (pre.size() > 1)
 			rep += "\t)\n";
+
+
+
 		if (eff.size() > 1)
 			rep += "\t:effect (and\n";
 		else
@@ -759,8 +779,9 @@ public class TraceLearner {
 				rep += "\t\t" + e + "\n";
 		if (eff.size() > 1)
 			rep += "\t)\n";
-		rep += ")\n";
 
+
+		rep += ")\n";
 		return rep;
 	}
 
@@ -835,7 +856,7 @@ public class TraceLearner {
 
 		return res;
 	}
-	
+
 	public Set<String> getGoalFacts() {
 		return DEGenerator.generateGoalFacts();
 	}

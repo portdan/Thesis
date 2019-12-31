@@ -2,13 +2,13 @@ package PlannerAndLearner;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
+import com.sun.management.OperatingSystemMXBean;
 import java.nio.charset.Charset;
-import java.util.Arrays;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
@@ -20,13 +20,14 @@ import org.apache.log4j.Logger;
 import OurPlanner.Globals;
 import OurPlanner.MADLAPlanner;
 import OurPlanner.PlanToStateActionState;
-import OurPlanner.PlanToStateActionState2;
+import OurPlanner.PlanToStateActionStateResult;
 import OurPlanner.PlanVerifier;
 import OurPlanner.StateActionState;
-import OurPlanner.TestDataAccumulator;
 import OurPlanner.TraceLearner;
 import Utils.ArrayUtils;
 import Utils.FileDeleter;
+import Utils.MCTS;
+import Utils.TestDataAccumulator;
 import Utils.VerificationResult;
 import enums.IterationMethod;
 
@@ -53,9 +54,10 @@ public class PlannerAndModelLearner {
 	public int num_agents_timeout = 0;
 
 	private long startTimeMs = 0;
-	private long timeoutInMS = 0;
+	private double timeoutInMS = 0;
 
-	private IterationMethod iterationMethod = IterationMethod.Random;
+	public int numOfIterations = 0;
+	public int addedTrainingSize = 0;
 
 	//	private boolean useSafeModel = true;
 
@@ -66,9 +68,11 @@ public class PlannerAndModelLearner {
 	Model safeModel = null;
 	Model unsafeModel = null;
 
+	OperatingSystemMXBean OSstatistics = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
+
 	public PlannerAndModelLearner(String agentName, List<String> agentList, String domainFileName,
-			String problemFileName, TraceLearner learner, Set<String> goalFacts, IterationMethod iterationMethod,
-			long startTimeMs, int timeoutInMS) {
+			String problemFileName, TraceLearner learner, Set<String> goalFacts,
+			long startTimeMs, double timeoutInMS) {
 
 		LOGGER.setLevel(Level.INFO);
 
@@ -81,7 +85,6 @@ public class PlannerAndModelLearner {
 		this.learner = learner;
 		this.startTimeMs = startTimeMs;
 		this.timeoutInMS = timeoutInMS;
-		this.iterationMethod = iterationMethod;
 		this.goalFacts = goalFacts;
 
 		logInput();
@@ -95,7 +98,6 @@ public class PlannerAndModelLearner {
 		LOGGER.info("agentList: " + agentList);
 		LOGGER.info("domainFileName: " + domainFileName);
 		LOGGER.info("problemFileName: " + problemFileName);
-		LOGGER.info("iterationMethod: " + iterationMethod);
 	}
 
 	private boolean copyProblemFiles() {
@@ -129,7 +131,7 @@ public class PlannerAndModelLearner {
 	}
 
 
-	public List<String> planAndLearn () {
+	public List<String> planAndLearn (IterationMethod method) {
 
 		LOGGER.info("test");
 
@@ -168,12 +170,15 @@ public class PlannerAndModelLearner {
 			if(System.currentTimeMillis() - startTimeMs > timeoutInMS){
 				LOGGER.fatal("TIMEOUT!");
 				isTimeout = true;
+				num_agents_solved = 0;
+				num_agents_timeout = 1;
+				num_agents_not_solved = 0;
 				return null;
 			}
 
-			TestDataAccumulator.getAccumulator().numOfIterations+=1;
+			numOfIterations += 1;
 
-			switch (iterationMethod) {
+			switch (method) {
 			case BFS:
 				index = 0;
 				break;
@@ -183,12 +188,12 @@ public class PlannerAndModelLearner {
 			case Random:
 				index = rnd.nextInt(open.size());
 				break;
-			case GoalProximityHeuristic:
-			case ReliabilityHeuristic:
-			case PlanLengthHeuristic:
-			case PlanLengthAndReliabilityHeuristic:
+			case Goal_Proximity_Heuristic:
+			case Reliability_Heuristic:
+			case Plan_Length_Heuristic:
+			case Plan_Length_And_Reliability_Heuristic:
 			default:
-				index = getBestHeuristicIndex(open.toArray(), iterationMethod);
+				index = getBestHeuristicIndex(open.toArray(), method);
 
 				break;
 			}
@@ -213,7 +218,10 @@ public class PlannerAndModelLearner {
 
 			writeDomainFile(currModel.reconstructModelString());
 
-			plan = planForAgent();
+		plan = planForAgent();
+
+			LOGGER.info("Garbage collection!");
+			System.gc();
 
 			if(plan == null) {
 				/*Set<TempModel> newModels = ExtendUnsafe(currModel,currTempModel);
@@ -224,26 +232,36 @@ public class PlannerAndModelLearner {
 
 				VerificationResult res = verify(plan);
 
+				LOGGER.info("Garbage collection!");
+				System.gc();
+
 				if(res!=null) {
+
+					if(res.isTimeout) {
+						isTimeout = true;
+						num_agents_solved = 0;
+						num_agents_timeout = 1;
+						num_agents_not_solved = 0;
+						return null;
+					}
 
 					if(res.isVerified) {
 						LOGGER.info("GREAT!!");
 
-						if(res.isVerified)
-							num_agents_solved++;
-
+						num_agents_solved = 1;
+						num_agents_timeout=0;
+						num_agents_not_solved=0;						
 						return plan;
 					}
 					else {
 
-						List<StateActionState> planSASList = planToSASList(plan, res.lastActionIndex);
-						StateActionState failedActionSAS = planSASList.get(res.lastActionIndex);
-
-						planSASList.remove(res.lastActionIndex);
+						PlanToStateActionStateResult result = planToSASList(plan, res.lastActionIndex);
+						List<StateActionState> planSASList = result.getPlanSASList();
+						StateActionState failedActionSAS = result.getFailedActionSAS();
 
 						searchNode.setPlanSASList(planSASList);
 						searchNode.calcGoalProximity(goalFacts);
-						
+
 						//useSafeModel = UpdateModels(planSASList);
 						UpdateModels(planSASList);
 						FilterOpenListModels(open, closed, planSASList, failedActionSAS);
@@ -255,12 +273,146 @@ public class PlannerAndModelLearner {
 						//}
 					}
 				}
-				else
+				else {
+					num_agents_solved = 0;
+					num_agents_timeout = 0;
+					num_agents_not_solved = 1;
 					return null;
+				}
 			}
 		}
 
-		return null;
+		num_agents_solved = 0;
+		num_agents_timeout = 0;
+		num_agents_not_solved = 1;
+		return null;	
+
+	}
+
+	public List<String> planAndLearnMonteCarlo(IterationMethod method, int Cvalue) {
+
+		LOGGER.info("test");
+
+		List<String> plan = null;
+
+		if(!copyProblemFiles()) {
+			LOGGER.info("Coping domain file failure");
+			return null;
+		}		
+
+		String safeModelPath = Globals.OUTPUT_SAFE_MODEL_PATH + "/" + agentName + "/" + domainFileName;
+		String unsafeModelPath = Globals.OUTPUT_UNSAFE_MODEL_PATH + "/" + agentName + "/" + domainFileName;
+
+		safeModel = new Model();
+		unsafeModel = new Model();
+
+		if(!safeModel.readModel(safeModelPath)) {
+			LOGGER.fatal("provided path to safe model domain file not existing");
+			return null;
+		}
+
+		if(!unsafeModel.readModel(unsafeModelPath)) {
+			LOGGER.fatal("provided path to unsafe model domain file not existing");
+			return null;
+		}
+
+		ModelSearchNode searchNodeRoot = new ModelSearchNode(null, new TempModel());
+
+		MCTS mcts = new MCTS(searchNodeRoot, Cvalue);
+
+		while (!isTimeout) {
+
+			if(System.currentTimeMillis() - startTimeMs > timeoutInMS){
+
+				LOGGER.fatal("TIMEOUT!");
+				isTimeout = true;
+				num_agents_solved = 0;
+				num_agents_timeout = 1;
+				num_agents_not_solved = 0;
+				return null;
+			}
+
+			long getCommittedVirtualMemorySize = OSstatistics.getCommittedVirtualMemorySize();
+			long getFreePhysicalMemorySize = OSstatistics.getFreePhysicalMemorySize();
+			long getTotalPhysicalMemorySize = OSstatistics.getTotalPhysicalMemorySize();
+
+			if(getFreePhysicalMemorySize > 0.8*getTotalPhysicalMemorySize) {
+
+				LOGGER.fatal("MEMORY OVER USAGE!");
+				isTimeout = true;
+				num_agents_solved = 0;
+				num_agents_timeout = 1;
+				num_agents_not_solved = 0;
+				return null;
+			}
+
+			numOfIterations += 1;
+
+			ModelSearchNode searchNode = mcts.selectBestNode(searchNodeRoot);
+
+			Model currModel = unsafeModel.extendModel(searchNode.getTempModel());
+
+			writeDomainFile(currModel.reconstructModelString());
+
+			plan = planForAgent();
+
+			if(plan == null) {
+				//mcts.backpropogateNode(searchNode, searchNode.getReliabilityHeuristic(learner.actionsPreconditionsScore));					
+				mcts.removeNode(searchNode);
+			}
+			else {
+
+				VerificationResult res = verify(plan);
+
+				if(res!=null) {
+
+					if(res.isTimeout) {
+						continue;
+					}
+					if(res.isVerified) {
+						LOGGER.info("GREAT!!");
+						num_agents_solved = 1;
+						num_agents_timeout=0;
+						num_agents_not_solved=0;
+						return plan;
+					}
+					else {
+
+						PlanToStateActionStateResult result = planToSASList(plan, res.lastActionIndex);
+						List<StateActionState> planSASList = result.getPlanSASList();
+						StateActionState failedActionSAS = result.getFailedActionSAS();
+
+						searchNode.setPlanSASList(planSASList);
+						searchNode.calcGoalProximity(goalFacts);
+
+						UpdateModels(planSASList);
+						FilterMCTSModels(mcts, searchNodeRoot, planSASList);
+
+						Set<ModelSearchNode> newModels = ExtendSafe(searchNode, failedActionSAS);
+
+						if(newModels.isEmpty())
+							mcts.removeNode(searchNode);
+						else {
+							searchNode.setChildren(new ArrayList<ModelSearchNode>(newModels));
+
+							//mcts.backpropogateNode(searchNode, calcHueristicAverage(searchNode));
+							mcts.backpropogateNode(searchNode, calcNodeHeuristic(searchNode, method), 1);					
+						}
+					}
+				}
+				else {
+					num_agents_solved = 0;
+					num_agents_timeout = 0;
+					num_agents_not_solved = 1;
+					return null;
+				}
+			}
+		}
+
+		num_agents_solved = 0;
+		num_agents_timeout = 0;
+		num_agents_not_solved = 1;
+		return null;	
 	}
 
 	private int getBestHeuristicIndex(Object[] open, IterationMethod method) {
@@ -273,49 +425,73 @@ public class PlannerAndModelLearner {
 
 		for (int i = 0; i < open.length; i++) {
 			ModelSearchNode sn = (ModelSearchNode) open[i];
-			
+
 			rh[i] = sn.getReliabilityHeuristic(learner.actionsPreconditionsScore);
 			gph[i] = sn.getGoalProximityHeuristic();
 			plh[i] = sn.getPlanLengthHeuristic();
 		}
 
-		if(method == IterationMethod.GoalProximityHeuristic)
+		if(method == IterationMethod.Goal_Proximity_Heuristic)
 			bestIndex = ArrayUtils.findIndexOfMax(gph);
-		
-		if(method == IterationMethod.ReliabilityHeuristic)
+
+		if(method == IterationMethod.Reliability_Heuristic)
 			bestIndex = ArrayUtils.findIndexOfMax(rh);
 
-		if(method == IterationMethod.PlanLengthHeuristic)
+		if(method == IterationMethod.Plan_Length_Heuristic)
 			bestIndex = ArrayUtils.findIndexOfMax(plh);
-		
-		if(method == IterationMethod.PlanLengthAndReliabilityHeuristic) {
-			
+
+		if(method == IterationMethod.Plan_Length_And_Reliability_Heuristic) {
+
 			List<Integer> indices = ArrayUtils.findIndicesOfMax(plh);
-			
+
 			int[] plarh = ArrayUtils.subsetByIndices(rh, indices);
-			
+
 			int bestPLaRH = ArrayUtils.findIndexOfMax(plarh);
-		
+
 			bestIndex = indices.get(bestPLaRH);
 		}
 
 		return bestIndex;
 	}
 
+	private int calcNodeHeuristic(ModelSearchNode searchNode, IterationMethod method) {
+
+
+		if(method == IterationMethod.Goal_Proximity_Heuristic)
+			return searchNode.getGoalProximityHeuristic();
+		if(method == IterationMethod.Reliability_Heuristic)
+			return searchNode.getReliabilityHeuristic(learner.actionsPreconditionsScore);
+		if(method == IterationMethod.Plan_Length_Heuristic)
+			return searchNode.getPlanLengthHeuristic();
+
+		return 0;
+	}
+
 	private boolean UpdateModels(List<StateActionState> planSASList) {
 
 		LOGGER.info("Updating safe and unsafe models with new plan training set");
 
+		boolean res = false;
+
 		String safeModelPath = Globals.OUTPUT_SAFE_MODEL_PATH + "/" + agentName + "/" + domainFileName;
 		String unsafeModelPath = Globals.OUTPUT_UNSAFE_MODEL_PATH + "/" + agentName + "/" + domainFileName;
 
-		learner.expandSafeAndUnSafeModelsWithPlan(planSASList, Globals.OUTPUT_SAFE_MODEL_PATH, Globals.OUTPUT_UNSAFE_MODEL_PATH, 
-				sequancingTimeTotal, sequancingAmountTotal);
+		if(planSASList.size() > 0) {
+			learner.expandSafeAndUnSafeModelsWithPlan(planSASList, Globals.OUTPUT_SAFE_MODEL_PATH, Globals.OUTPUT_UNSAFE_MODEL_PATH, 
+					sequancingTimeTotal, sequancingAmountTotal);
 
-		safeModel.readModel(safeModelPath);
-		unsafeModel.readModel(unsafeModelPath);
+			addedTrainingSize += planSASList.size();
 
-		return learner.IsSafeModelUpdated || learner.IsUnSafeModelUpdated;
+			safeModel.readModel(safeModelPath);
+			unsafeModel.readModel(unsafeModelPath);
+
+			res =  learner.IsSafeModelUpdated || learner.IsUnSafeModelUpdated;
+		}
+
+		LOGGER.info("Garbage collection!");
+		System.gc();
+
+		return res;
 	}
 
 	private boolean FilterOpenListModels(Set<ModelSearchNode> open, Set<ModelSearchNode> closed,
@@ -411,6 +587,44 @@ public class PlannerAndModelLearner {
 		return true;
 	}
 
+	public void FilterMCTSModels(MCTS mcts, ModelSearchNode node, List<StateActionState> planSASList) {
+
+		LOGGER.info("Updating search nodes models with new plan training set");
+
+		if(node.getChildren() == null)
+			return;
+
+		Set<ModelSearchNode> toRemove = new LinkedHashSet<ModelSearchNode>();
+
+		for (ModelSearchNode child : node.getChildren()) {
+
+			Model testedModel = unsafeModel.extendModel(child.getTempModel());
+
+			// remove open list models that does not allow OK actions
+			for (StateActionState sas : planSASList) {				
+				if(!sas.actionOwner.equals(agentName)){
+
+					Action modelAction = testedModel.actions.get(sas.action); 
+					Set<String> modelActionPre = new LinkedHashSet<String>(modelAction.preconditions);
+
+					Action safeModelAction = safeModel.actions.get(sas.action); 					
+					Set<String> safeModelActionPre = new LinkedHashSet<String>(safeModelAction.preconditions);
+
+					if(!safeModelActionPre.containsAll(modelActionPre)) {
+						toRemove.add(child);
+					}
+				}
+			}
+		}
+
+		for (ModelSearchNode nodeToRemove : toRemove) {
+			mcts.removeNode(nodeToRemove);
+		}
+
+		for (ModelSearchNode child : node.getChildren()) {
+			FilterMCTSModels(mcts, child, planSASList);
+		}
+	}
 
 	private Set<ModelSearchNode> ExtendSafe(ModelSearchNode searchNode, StateActionState failedActionSAS) {
 
@@ -567,7 +781,7 @@ public class PlannerAndModelLearner {
 
 		String heuristic = "saFF-glcl";
 		int recursionLevel = -1;
-		double timeLimitMin = 0.2;
+		double timeLimitMin = 0.125;
 
 		long planningStartTime = System.currentTimeMillis();
 
@@ -576,11 +790,11 @@ public class PlannerAndModelLearner {
 
 		List<String> result = planner.plan();
 
-		if(planner.isTimeout)
+		/*if(planner.isTimeout)
 			num_agents_timeout++;
 
 		if(planner.isNotSolved)
-			num_agents_not_solved++;
+			num_agents_not_solved++;*/
 
 		long planningFinishTime = System.currentTimeMillis();
 
@@ -611,10 +825,29 @@ public class PlannerAndModelLearner {
 
 		boolean useGrounded = true;
 
+		long verifingStartTime = System.currentTimeMillis();
+		
+		long verifingTimeoutMS = (long)timeoutInMS - TestDataAccumulator.getAccumulator().agentPlanningTimeMs.get(agentName) - TestDataAccumulator.getAccumulator().agentLearningTimeMs.get(agentName);
+		
+		//verifingTimeoutMS = 5000;
+		
 		PlanVerifier planVerifier = new PlanVerifier(agentList,domainFileName,problemFileName,
-				problemFilesPath, useGrounded);		
-
+				verifingTimeoutMS,problemFilesPath, useGrounded);	
+		
 		VerificationResult res = planVerifier.verifyPlan(plan,0);
+
+		long verifingFinishTime = System.currentTimeMillis();
+
+		TestDataAccumulator.getAccumulator().totalVerifingTimeMs += verifingFinishTime - verifingStartTime;
+		
+		Long agentVerifingTime = TestDataAccumulator.getAccumulator().agentVerifingTimeMs.get(agentName);
+		
+		if(agentVerifingTime == null) 
+			agentVerifingTime = verifingFinishTime - verifingStartTime;
+		else
+			agentVerifingTime += verifingFinishTime - verifingStartTime;
+		
+		TestDataAccumulator.getAccumulator().agentVerifingTimeMs.put(agentName, agentVerifingTime);
 
 		if(!FileDeleter.deleteTempFiles()) {
 			LOGGER.info("Deleting Temporary files failure");
@@ -624,7 +857,7 @@ public class PlannerAndModelLearner {
 		return res;
 	}
 
-	private List<StateActionState> planToSASList(List<String> plan, int lastActionIndex) {
+	private PlanToStateActionStateResult planToSASList(List<String> plan, int lastActionIndex) {
 
 		LOGGER.info("generate SAS List from plan");
 
@@ -634,24 +867,23 @@ public class PlannerAndModelLearner {
 
 		PlanToStateActionState plan2SAS = new PlanToStateActionState(domainFileName, problemFileName, problemFilesPath);
 
-		problemFilesPath = Globals.OUTPUT_SOUND_MODEL_PATH;
-		PlanToStateActionState2 plan2SAS2 = new PlanToStateActionState2(domainFileName, problemFileName,
-				problemFilesPath, agentName);
+		List<StateActionState> planSASList = plan2SAS.generateSASList(plan, lastActionIndex);
 
-		List<StateActionState> res = plan2SAS.generateSASList(plan, lastActionIndex);
-		//List<StateActionState> res = plan2SAS2.generateSASList(plan, lastActionIndex);
+		StateActionState failedActionSAS = planSASList.get(lastActionIndex);
+
+		planSASList.remove(lastActionIndex);
+
+		long sequancingEndTime = System.currentTimeMillis();
+
+		sequancingTimeTotal = sequancingEndTime - sequancingStartTime;
+		sequancingAmountTotal = planSASList.size() + 1;
 
 		if(!FileDeleter.deleteTempFiles()) {
 			LOGGER.info("Deleting Temporary files failure");
 			return null;	
 		}
 
-		long sequancingEndTime = System.currentTimeMillis();
-
-		sequancingTimeTotal = sequancingEndTime - sequancingStartTime;
-		sequancingAmountTotal = res.size();
-
-		return res;
+		return new PlanToStateActionStateResult(planSASList, failedActionSAS);
 	}
 
 	private boolean writeDomainFile(String newDomainString) {

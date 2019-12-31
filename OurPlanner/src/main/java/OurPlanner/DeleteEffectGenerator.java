@@ -5,8 +5,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -20,7 +20,6 @@ import cz.agents.dimaptools.model.Action;
 import cz.agents.dimaptools.model.Domain;
 import cz.agents.dimaptools.model.Problem;
 import cz.agents.dimaptools.model.SuperState;
-import gnu.trove.TIntObjectIterator;
 
 
 public class DeleteEffectGenerator {
@@ -45,6 +44,9 @@ public class DeleteEffectGenerator {
 	public Problem problem = null;
 	public StateActionStateSASPreprocessor preprocessor = null;
 
+	private Map<String, Set<String>> NONEVarToValLookup = new HashMap<String,Set<String>>();
+	private Map<String, String> NONEValToVarLookup = new HashMap<String,String>();
+
 	public DeleteEffectGenerator(File problemFiles,String domainFileName, String problemFileName) {
 
 		LOGGER.setLevel(Level.INFO);
@@ -61,6 +63,8 @@ public class DeleteEffectGenerator {
 		String problemPath = problemFiles.getPath() + "/" + problemFileName;
 
 		problem = generateProblem(domainPath, problemPath);
+
+		generateNONEVarLookup();
 	}
 
 	private void logInput() {
@@ -71,16 +75,50 @@ public class DeleteEffectGenerator {
 		LOGGER.info("problemFileName: " + problemFileName);
 		LOGGER.info("problemFiles: " + problemFiles);
 	}
-	
+
+	private void generateNONEVarLookup() {
+
+		Map<Integer, Set<Integer>> varDomains = problem.getDomain().getVariableDomains();
+
+		for (int var = 0; var < varDomains.size(); var++) {
+			for (int val : varDomains.get(var)) {
+
+				String NONEVal = Domain.valNames.get(val).toString();
+
+				if(NONEVal.startsWith(Globals.NONE_KEYWORD)) {
+
+					Set<String> lookup = new HashSet<String>();
+					NONEVarToValLookup.put(NONEVal, lookup);
+
+					for (int otherVal : varDomains.get(var)) {
+						if(val!=otherVal) {
+							String negatedNewVal = "Negated" + Domain.valNames.get(otherVal).toString();
+							lookup.add(negatedNewVal);
+
+							NONEValToVarLookup.put(negatedNewVal, NONEVal);
+						}
+					}
+				}
+			}
+		}
+
+	}
+
 	public Set<String> generateGoalFacts(){
-		
+
 		LOGGER.info("Generating goal facts");
 
 		Set<String> res = new HashSet<String>();
-		
+
 		for (int valNum : problem.goalSuperState.getValues()) {
 			if(valNum>=0) {
-				res.add(Domain.valNames.get(valNum).toString());
+
+				String valName = Domain.valNames.get(valNum).toString();
+
+				if(NONEVarToValLookup.containsKey(valName))
+					res.addAll(NONEVarToValLookup.get(valName));
+				else
+					res.add(valName.toString());
 			}
 		}
 
@@ -94,7 +132,10 @@ public class DeleteEffectGenerator {
 		Set<String> res = new HashSet<String>();
 
 		for (Object valName : Domain.valNames.getValues()) 
-			res.add(valName.toString());
+			if(NONEVarToValLookup.containsKey(valName))
+				res.addAll(NONEVarToValLookup.get(valName));
+			else
+				res.add(valName.toString());
 
 		return res;
 	}
@@ -110,14 +151,14 @@ public class DeleteEffectGenerator {
 
 		return res;
 	}
-	
+
 	public Set<String> generateActionEffectsWithDeleteEffects(String actionName) {
 
 		LOGGER.info("Generating effects with delete effects for action " + actionName );
 
 		Set<String> eff = generateActionEffects(actionName);		
 		Set<String> pre = generateActionPreconditions(actionName);	
-		
+
 		eff.addAll(generateDeleteEffects(actionName, pre, eff));
 
 		return eff;
@@ -134,14 +175,19 @@ public class DeleteEffectGenerator {
 		SuperState eff = action.getEffect();
 
 		for (int valNum : eff.getValues()) {
-			if(valNum>=0) {
-				res.add(Domain.valNames.get(valNum).toString());
+			if(valNum>=0) {				
+				String valName = Domain.valNames.get(valNum).toString();
+
+				if(NONEVarToValLookup.containsKey(valName))
+					res.addAll(NONEVarToValLookup.get(valName));
+				else
+					res.add(valName.toString());
 			}
 		}
 
 		return res;
 	}
-	
+
 	public Set<String> generateActionPreconditions(String actionName) {
 
 		LOGGER.info("Generating preconditions for action " + actionName );
@@ -154,8 +200,12 @@ public class DeleteEffectGenerator {
 
 		for (int valNum : eff.getValues()) {
 			if(valNum>=0) {
-				res.add(Domain.valNames.get(valNum).toString());
-			}
+				String valName = Domain.valNames.get(valNum).toString();
+
+				if(NONEVarToValLookup.containsKey(valName))
+					res.addAll(NONEVarToValLookup.get(valName));
+				else
+					res.add(valName.toString());			}
 		}
 
 		return res;
@@ -183,7 +233,7 @@ public class DeleteEffectGenerator {
 					int preVal = getFactValByString(preFact);
 					int preVar = getFactVarByVal(problem, preVal);
 
-					if(effVar == preVar) {
+					if(effVar == preVar) { 
 						res.add("not ("+ preFact +")");
 						isExistsBoth = true;
 					}
@@ -201,10 +251,11 @@ public class DeleteEffectGenerator {
 
 							String valStr = Domain.valNames.get(val).toString();
 
-							if(valStr.startsWith(Globals.NEGATED_KEYWORD))
-								res.add(valStr.replace(Globals.NEGATED_KEYWORD, ""));
-							else
-								res.add("not ("+ valStr +")");
+							if(!valStr.startsWith(Globals.NONE_KEYWORD))
+								if(valStr.startsWith(Globals.NEGATED_KEYWORD))
+									res.add(valStr.replace(Globals.NEGATED_KEYWORD, ""));
+								else
+									res.add("not ("+ valStr +")");
 						}
 					}
 				}

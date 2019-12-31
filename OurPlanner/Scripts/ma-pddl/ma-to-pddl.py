@@ -14,6 +14,28 @@ verbose = False
 
 
 class Predicate(object):
+    
+  def __lt__(self, other):
+    return self.name < other.name
+
+  def __le__(self, other):
+    return self.name <= other.name
+
+  def __gt__(self, other):
+    return self.name > other.name
+
+  def __ge__(self, other):
+    return self.name >= other.name
+
+  def __eq__(self, other):
+    return self.name == other.name
+
+  def __ne__(self, other):
+    return self.name != other.name
+    
+  def __hash__(self, *args, **kwargs):
+    return hash(self.name)
+
   """A loose interpretation of a predicate used for all similar collections.
 
   Without a name it is a parameter list.
@@ -55,9 +77,29 @@ class Predicate(object):
   def __repr__(self):
     return self.pddl_rep()
 
-
-
 class Action(object):
+    
+  def __lt__(self, other):
+    return self.name < other.name
+
+  def __le__(self, other):
+    return self.name <= other.name
+
+  def __gt__(self, other):
+    return self.name > other.name
+
+  def __ge__(self, other):
+    return self.name >= other.name
+
+  def __eq__(self, other):
+    return self.name == other.name
+
+  def __ne__(self, other):
+    return self.name != other.name
+    
+  def __hash__(self, *args, **kwargs):
+    return hash(self.name)
+
   """Represents a simple non-temporal action."""
   def __init__(self, name, parameters, precondition, effect):
     self.name = name
@@ -100,6 +142,28 @@ class Action(object):
     return self.name #+ str(self.parameters)
 
 class Function(object):
+  
+  def __lt__(self, other):
+    return self.obj_list < other.obj_list
+
+  def __le__(self, other):
+    return self.obj_list <= other.obj_list
+
+  def __gt__(self, other):
+    return self.obj_list > other.obj_list
+
+  def __ge__(self, other):
+    return self.obj_list >= other.obj_list
+
+  def __eq__(self, other):
+    return self.obj_list == other.obj_list
+
+  def __ne__(self, other):
+    return self.obj_list != other.obj_list
+    
+  def __hash__(self, *args, **kwargs):
+    return hash(self.obj_list)
+  
   def __init__(self, obj_list):
     self.obj_list = obj_list
 
@@ -116,6 +180,28 @@ class Function(object):
     return self.pddl_rep()
 
 class GroundFunction(object):
+  
+  def __lt__(self, other):
+    return self.obj_list < other.obj_list
+
+  def __le__(self, other):
+    return self.obj_list <= other.obj_list
+
+  def __gt__(self, other):
+    return self.obj_list > other.obj_list
+
+  def __ge__(self, other):
+    return self.obj_list >= other.obj_list
+
+  def __eq__(self, other):
+    return self.obj_list == other.obj_list
+
+  def __ne__(self, other):
+    return self.obj_list != other.obj_list
+    
+  def __hash__(self, *args, **kwargs):
+    return hash(self.obj_list)
+  
   def __init__(self, obj_list):
     self.obj_list = obj_list
 
@@ -224,9 +310,13 @@ class PlanningProblem(object):
             #word is type
             for element in obj_list:
               if not word in self.type_list:
-                self.types.setdefault('object', []).append(word)
+                if 'object' not in self.types.keys():
+                  self.types['object'] = set()
+                self.types['object'].add(word)
                 self.type_list.add(word)
-              self.types.setdefault(word, []).append(element)
+              if word not in self.types.keys():  
+                self.types[word] = set()
+              self.types[word].add(element) 
               self.type_list.add(element)
               self.type_list.add(word)
             is_obj_list = True
@@ -541,14 +631,14 @@ class PlanningProblem(object):
     to_write = "(define (domain " + self.domain + ")\n"
     #Requirements
     to_write += "\t(:requirements"
-    for r in self.requirements:
+    for r in sorted(self.requirements):
       to_write += " :"+r
     to_write += ")\n"
     #Types
     to_write += "(:types\n"
-    for type_ in self.types:
+    for type_ in sorted(self.types):
       to_write += "\t"
-      for key in self.types.get(type_):
+      for key in sorted(self.types.get(type_)):
         to_write += key + " "
       to_write += "- " + type_
       to_write += "\n"
@@ -556,25 +646,25 @@ class PlanningProblem(object):
     #Constants
     if len(self.constants) > 0:
       to_write += "(:constants\n"
-      for t in self.constants.keys():
+      for t in sorted(self.constants.keys()):
         to_write += "\t"
-        for c in self.constants[t]:
+        for c in sorted(self.constants[t]):
           to_write += c + " "
         to_write += " - " + t + "\n" 
       to_write += ")\n"
     #Public predicates
     to_write += "(:predicates\n"
-    for predicate in self.predicates:
+    for predicate in sorted(self.predicates):
       to_write += "\t{}\n".format(predicate.pddl_rep())
     to_write += ")\n"
     #Functions
     if len(self.functions) > 0:
       to_write += "(:functions\n"
-      for function in self.functions:
+      for function in sorted(self.functions):
         to_write += "\t{}\n".format(function.pddl_rep())
       to_write += ")\n"
     #Actions
-    for action in self.actions:
+    for action in sorted(self.actions):
       to_write += "\n{}\n".format(action.pddl_rep())
     
     #Endmatter
@@ -588,17 +678,17 @@ class PlanningProblem(object):
     to_write += "(:domain " + self.domain + ")\n"
     #Objects
     to_write += "(:objects\n"
-    for obj in self.object_list:
+    for obj in sorted(self.object_list):
       to_write += "\t" + obj + " - " + self.get_type_of_object(obj) + "\n"
     to_write += ")\n"
     to_write += "(:init\n"
-    for predicate in self.init:
+    for predicate in sorted(self.init):
       to_write += "\t{}\n".format(predicate)
-    for function in self.ground_functions:
+    for function in sorted(self.ground_functions):
       to_write += "\t{}\n".format(function)
     to_write += ")\n"
     to_write += "(:goal\n\t(and\n"
-    for goal in self.goal:
+    for goal in sorted(self.goal):
       to_write += "\t\t{}\n".format(goal)
     to_write += "\t)\n)\n"
     if self.metric:
@@ -614,7 +704,7 @@ class PlanningProblem(object):
     to_write += "(:domain " + self.domain + ")\n"
     #Objects
     to_write += "(:agents"
-    for obj in self.agents:
+    for obj in sorted(self.agents):
       to_write += " " + obj 
     to_write += ")\n"
     to_write += ")"
@@ -624,7 +714,7 @@ class PlanningProblem(object):
   def write_agent_list(self, output_file):
     file_ = open(output_file, 'w')
     to_write = ""
-    for obj in self.agents:
+    for obj in sorted(self.agents):
       to_write += obj + "\n"
     file_.write(to_write)
     file_.close()
@@ -653,9 +743,3 @@ if __name__ == "__main__":
     pp.write_pddl_problem(sys.argv[4] + "/" + sys.argv[3] + ".pddl")
     pp.write_addl(sys.argv[4] + "/" + sys.argv[3] + ".addl")
     pp.write_agent_list(sys.argv[4] + "/" + sys.argv[3] + ".agents")
-
-    
-
-
-
-

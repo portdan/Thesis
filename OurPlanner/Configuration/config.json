@@ -1,13 +1,15 @@
 {
   "agentsFileName": "probLOGISTICS-4-0.agents", 
+  "cValue": 2, 
   "domainFileName": "domain.pddl", 
+  "experimentDetails": "Experiment #1 - traces: 684", 
   "inputAgentsDirName": "Agent", 
   "inputDirPath": "/home/daniel/Work/WorkSpace/Thesis/OurPlanner/Input", 
   "inputGoundedDirName": "Grounded", 
   "inputLocalViewDirName": "LocalView", 
   "inputTracesDirName": "Traces", 
-  "iterationMethod": "GoalProximityHeuristic", 
-  "numOfTracesToUse": 0, 
+  "iterationMethod": "Monte_Carlo_Plan_Length_Heuristic", 
+  "numOfTracesToUse": 684, 
   "outputCopyDirPath": "/home/daniel/Work/WorkSpace/Thesis/OurPlannerTester/Output/probLOGISTICS-4-0.pddl/OurPlanner", 
   "outputDirPath": "/home/daniel/Work/WorkSpace/Thesis/OurPlanner/Output", 
   "outputSASFileName": "output.sas", 
@@ -19,8 +21,8 @@
   "planningModel": "SafeModel", 
   "problemFileName": "probLOGISTICS-4-0.pddl", 
   "pythonScriptsPath": "/home/daniel/Work/WorkSpace/Thesis/OurPlanner/Scripts", 
-  "testOutputCSVFilePath": "/home/daniel/Work/WorkSpace/Thesis/OurPlannerTester/Output/output.csv", 
-  "timeoutInMS": 1800000, 
+  "testOutputCSVFilePath": "/home/daniel/Work/WorkSpace/Thesis/OurPlannerTester/Output/probLOGISTICS-4-0.csv", 
+  "timeoutInMS": 300000, 
   "tracesLearinigInterval": 500, 
   "verificationModel": "GroundedModel"
 }

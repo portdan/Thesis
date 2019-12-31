@@ -2,6 +2,9 @@ package OurPlanner;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -12,10 +15,13 @@ import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
+import com.sun.management.OperatingSystemMXBean;
+
 import Configuration.ConfigurationManager;
 import Configuration.OurPlannerConfiguration;
 import PlannerAndLearner.PlannerAndModelLearner;
 import Utils.FileDeleter;
+import Utils.TestDataAccumulator;
 import Utils.VerificationResult;
 import cz.agents.alite.creator.Creator;
 import enums.IterationMethod;
@@ -46,6 +52,7 @@ public class OurPlanner implements Creator  {
 	private TraceLearner learner = null;
 
 	private int timeoutInMS = 0;
+	private int cValue = 2;
 
 	private File tracesFile = null;
 	private File outputTestFile = null;
@@ -56,6 +63,7 @@ public class OurPlanner implements Creator  {
 
 	private List<String> agentList = null;
 	private	String currentLeaderAgent = "";
+	private String experimentDetails = "";
 	private List<String> availableLeaders= null;
 
 	// uses seed so agent order is same
@@ -69,6 +77,8 @@ public class OurPlanner implements Creator  {
 	private int num_agents_timeout = 0;
 
 	long startTimeMs = 0;
+
+	OperatingSystemMXBean OSstatistics = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
 
 	@Override
 	public void create() {
@@ -128,15 +138,22 @@ public class OurPlanner implements Creator  {
 			LOGGER.info("Coping original files failure");
 			System.exit(1);
 		}
+
+		TestDataAccumulator.getAccumulator().experimentDetails = experimentDetails;
+		TestDataAccumulator.getAccumulator().method = iterationMethod.name();
+		TestDataAccumulator.getAccumulator().initialTrainingSize = numOftraces;			
+
 		/*
-		if(!runPlanningAlgorithm())
-		{
-			LOGGER.fatal("Planning algorithem failure");
-			System.exit(1);
+		try {
+			FileUtils.copyDirectory(tracesFile, outputCopyDir);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		 */
 
 		if(plannerMode == PlannerMode.Planning) {
+
 			runPlanningAlgorithm();
 
 			TestDataAccumulator.getAccumulator().numOfAgentsSolved = num_agents_solved;
@@ -172,6 +189,20 @@ public class OurPlanner implements Creator  {
 
 		File f = null;
 		String extension = "";
+
+		verificationModel = configuration.verificationModel;
+
+		planningModel = configuration.planningModel;
+
+		plannerMode = configuration.plannerMode;
+
+		iterationMethod = configuration.iterationMethod;
+
+		timeoutInMS = configuration.timeoutInMS;
+
+		cValue = configuration.cValue;
+
+		experimentDetails = configuration.experimentDetails;
 
 		/*INPUT DIR PATH*/
 		Globals.INPUT_PATH = configuration.inputDirPath;
@@ -213,7 +244,7 @@ public class OurPlanner implements Creator  {
 		}
 
 		numOftraces = configuration.numOfTracesToUse;
-
+		
 		tracesLearinigInterval = configuration.tracesLearinigInterval;
 
 		domainFileName = configuration.domainFileName;
@@ -232,7 +263,12 @@ public class OurPlanner implements Creator  {
 			return false;
 		}
 
-		Globals.OUTPUT_COPY_PATH = configuration.outputCopyDirPath + "/" + numOftraces + "_traces";
+		Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+		String timestampFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(timestamp);
+
+		Globals.OUTPUT_COPY_PATH = configuration.outputCopyDirPath + "/" + experimentDetails + "/" + 
+				iterationMethod.name() + "/" + numOftraces + "_traces" + "/" + timestampFormat;
+
 		outputCopyDir = new File(Globals.OUTPUT_COPY_PATH);
 
 		if( !outputCopyDir.exists()) {
@@ -272,16 +308,6 @@ public class OurPlanner implements Creator  {
 
 		Globals.PYTHON_SCRIPTS_FOLDER = configuration.pythonScriptsPath;
 
-		verificationModel = configuration.verificationModel;
-
-		planningModel = configuration.planningModel;
-
-		plannerMode = configuration.plannerMode;
-
-		iterationMethod = configuration.iterationMethod;
-
-		timeoutInMS = configuration.timeoutInMS;
-
 		return true;
 	}
 
@@ -291,28 +317,40 @@ public class OurPlanner implements Creator  {
 
 		availableLeaders = new ArrayList<>(agentList);
 
-		List<String> leaderAgentPlan = null;
+		long agentTimeoutInMS = timeoutInMS/agentList.size();
 
-		int rounds = 1;
+		List<String> leaderAgentPlan = null;
 
 		boolean isLearning = false;
 		boolean isTimeout = false;
+
 		if(numOftraces>=0)
 			isLearning = learnSafeAndUnSafeModelsFromTraces();
 
-		TestDataAccumulator.getAccumulator().numOfIterations = 1;
+		LogLearningTimes();
+
+		LOGGER.info("Garbage collection!");
+		System.gc();
 
 		while(leaderAgentPlan == null) {
 
-			if(System.currentTimeMillis() - startTimeMs > timeoutInMS)
-			{
+			if(System.currentTimeMillis() - startTimeMs > timeoutInMS){
+
 				isTimeout= true;
 				LOGGER.fatal("TIMEOUT!");
 				break;
 			}
 
-			LOGGER.info("Round " + rounds + " - Start!");
-			rounds++;
+			long getCommittedVirtualMemorySize = OSstatistics.getCommittedVirtualMemorySize();
+			long getFreePhysicalMemorySize = OSstatistics.getFreePhysicalMemorySize();
+			long getTotalPhysicalMemorySize = OSstatistics.getTotalPhysicalMemorySize();
+
+			if(getFreePhysicalMemorySize > 0.8*getTotalPhysicalMemorySize) {
+
+				isTimeout= true;
+				LOGGER.fatal("MEMORY OVER USAGE!");
+				break;
+			}
 
 			if(availableLeaders.isEmpty()){
 
@@ -322,25 +360,20 @@ public class OurPlanner implements Creator  {
 
 			currentLeaderAgent = pickLeader();
 
-			//			TestDataAccumulator.getAccumulator().trainingSize = 0;
-			//
-			//			long learningStartTime = System.currentTimeMillis();
-			//
-			//			boolean isLearning = learnFromTraces(currentLeaderAgent);
-			//
-			//			long learningFinishTime = System.currentTimeMillis();
-			//
-			//			TestDataAccumulator.getAccumulator().totalLearningTimeMs += learningFinishTime - learningStartTime;
-			//			TestDataAccumulator.getAccumulator().agentLearningTimeMs.put(currentLeaderAgent, learningFinishTime - learningStartTime);
-
+			TestDataAccumulator.getAccumulator().agentNumOfIterations.put(currentLeaderAgent, 1);
 
 			LOGGER.info("Current Leader Agent " + currentLeaderAgent);
 
+			long planningTimeoutMS = agentTimeoutInMS - TestDataAccumulator.getAccumulator().agentLearningTimeMs.get(currentLeaderAgent);
+
 			long planningStartTime = System.currentTimeMillis();
 
-			leaderAgentPlan = planForAgent(currentLeaderAgent, isLearning, planningModel);
+			leaderAgentPlan = planForAgent(currentLeaderAgent, isLearning, planningModel, planningTimeoutMS);
 
 			long planningFinishTime = System.currentTimeMillis();
+			
+			LOGGER.info("Garbage collection!");
+			System.gc();
 
 			TestDataAccumulator.getAccumulator().totalPlaningTimeMs += planningFinishTime - planningStartTime;
 			TestDataAccumulator.getAccumulator().agentPlanningTimeMs.put(currentLeaderAgent, planningFinishTime - planningStartTime);
@@ -348,9 +381,21 @@ public class OurPlanner implements Creator  {
 			if(leaderAgentPlan == null)
 				continue;	
 
-			LogLearningTimes();
+			long verifingTimeoutMS = agentTimeoutInMS - (planningFinishTime - planningStartTime) - TestDataAccumulator.getAccumulator().agentLearningTimeMs.get(currentLeaderAgent);
 
-			if(verifyPlan(leaderAgentPlan, isLearning, verificationModel)) {
+			long verifingStartTime = System.currentTimeMillis();
+
+			boolean isVerified = verifyPlan(leaderAgentPlan, isLearning, verificationModel, verifingTimeoutMS);
+
+			long verifingFinishTime = System.currentTimeMillis();
+
+			TestDataAccumulator.getAccumulator().totalVerifingTimeMs += verifingFinishTime - verifingStartTime;
+			TestDataAccumulator.getAccumulator().agentVerifingTimeMs.put(currentLeaderAgent, verifingFinishTime - verifingStartTime);
+
+			LOGGER.info("Garbage collection!");
+			System.gc();
+
+			if(isVerified) {
 
 				TestDataAccumulator.getAccumulator().finishStatus = "SOLVED";
 				TestDataAccumulator.getAccumulator().solvingAgent = currentLeaderAgent;
@@ -358,9 +403,11 @@ public class OurPlanner implements Creator  {
 
 				return true;
 			}
+			else
+				leaderAgentPlan=null;
 		}
 
-		if(isTimeout)
+		if(isTimeout || num_agents_timeout==agentList.size())
 			TestDataAccumulator.getAccumulator().finishStatus = "TIMEOUT";
 		else
 			TestDataAccumulator.getAccumulator().finishStatus = "NOT SOLVED";
@@ -378,8 +425,15 @@ public class OurPlanner implements Creator  {
 
 		boolean isTimeout = false;
 
+		double timeLimitForAgent = ((double)timeoutInMS)/agentList.size();
+
 		if(numOftraces>=0)
 			learnSafeAndUnSafeModelsFromTraces();
+		
+		LOGGER.info("Garbage collection!");
+		System.gc();
+		
+		LogLearningTimes();
 
 		while(!availableLeaders.isEmpty()) {
 
@@ -395,17 +449,34 @@ public class OurPlanner implements Creator  {
 			LOGGER.info("Current Leader Agent " + currentLeaderAgent);
 
 			PlannerAndModelLearner plannerAndLearner = new PlannerAndModelLearner(currentLeaderAgent, agentList,
-					domainFileName, problemFileName, learner, learner.getGoalFacts(), iterationMethod, 
-					startTimeMs, timeoutInMS);
+					domainFileName, problemFileName, learner, learner.getGoalFacts(), System.currentTimeMillis(), timeLimitForAgent);
 
-			TestDataAccumulator.getAccumulator().addedTrainingSize = 0;
-			TestDataAccumulator.getAccumulator().numOfIterations = 0;
 
-			leaderAgentPlan = plannerAndLearner.planAndLearn();
+			if(iterationMethod==IterationMethod.Monte_Carlo_Reliability_Heuristic) {
 
-			TestDataAccumulator.getAccumulator().numOfAgentsSolved = plannerAndLearner.num_agents_solved;
-			TestDataAccumulator.getAccumulator().numOfAgentsTimeout = plannerAndLearner.num_agents_timeout;
-			TestDataAccumulator.getAccumulator().numOfAgentsNotSolved = plannerAndLearner.num_agents_not_solved;		
+				TestDataAccumulator.getAccumulator().method = "Monte_Carlo_Reliability_Heuristic C value = " + cValue;
+				leaderAgentPlan = plannerAndLearner.planAndLearnMonteCarlo(IterationMethod.Reliability_Heuristic, cValue);
+			}
+			else if(iterationMethod==IterationMethod.Monte_Carlo_Goal_Proximity_Heuristic) {
+
+				TestDataAccumulator.getAccumulator().method = "Monte_Carlo_Goal_Proximity_Heuristic C value = " + cValue;
+				leaderAgentPlan = plannerAndLearner.planAndLearnMonteCarlo(IterationMethod.Goal_Proximity_Heuristic, cValue);
+			}
+			else if(iterationMethod==IterationMethod.Monte_Carlo_Plan_Length_Heuristic) {
+
+				TestDataAccumulator.getAccumulator().method = "Monte_Carlo_Plan_Length_Heuristic C value = " + cValue;
+				leaderAgentPlan = plannerAndLearner.planAndLearnMonteCarlo(IterationMethod.Plan_Length_Heuristic, cValue);
+			}
+			else {
+				leaderAgentPlan = plannerAndLearner.planAndLearn(iterationMethod);
+			}
+
+			TestDataAccumulator.getAccumulator().numOfAgentsSolved += plannerAndLearner.num_agents_solved;
+			TestDataAccumulator.getAccumulator().numOfAgentsTimeout += plannerAndLearner.num_agents_timeout;
+			TestDataAccumulator.getAccumulator().numOfAgentsNotSolved += plannerAndLearner.num_agents_not_solved;
+
+			TestDataAccumulator.getAccumulator().agentNumOfIterations.put(currentLeaderAgent, plannerAndLearner.numOfIterations);
+			TestDataAccumulator.getAccumulator().agentAddedTrainingSize.put(currentLeaderAgent, plannerAndLearner.addedTrainingSize);
 
 			LogLearningTimes();
 
@@ -413,17 +484,17 @@ public class OurPlanner implements Creator  {
 
 				TestDataAccumulator.getAccumulator().finishStatus = "SOLVED";
 				TestDataAccumulator.getAccumulator().solvingAgent = currentLeaderAgent;
-				TestDataAccumulator.getAccumulator().planLength= leaderAgentPlan.size();
+				TestDataAccumulator.getAccumulator().planLength = leaderAgentPlan.size();
 
 				return true;
 			}
 
-			if(plannerAndLearner.isTimeout)
-			{
-				isTimeout=true;
-				LOGGER.fatal("TIMEOUT!");
-				break;
-			}
+			//			if(plannerAndLearner.isTimeout)
+			//			{
+			//				isTimeout=true;
+			//				LOGGER.fatal("TIMEOUT!");
+			//				break;
+			//			}
 		}
 
 		if(isTimeout)
@@ -452,7 +523,7 @@ public class OurPlanner implements Creator  {
 		LOGGER.info("Running learning algorithm");
 
 		learner = new TraceLearner(agentList,tracesFile, groundedFile, localViewFile, 
-				domainFileName, problemFileName, numOftraces, tracesLearinigInterval);	
+				domainFileName, problemFileName, numOftraces, tracesLearinigInterval, startTimeMs, timeoutInMS);	
 
 		boolean isLearned = learner.learnSafeAndUnSafeModels();
 
@@ -507,7 +578,7 @@ public class OurPlanner implements Creator  {
 	}
 
 
-	private boolean verifyPlan(List<String> plan, boolean isLearning, VerificationModel model) {
+	private boolean verifyPlan(List<String> plan, boolean isLearning, VerificationModel model, long timeoutMS) {
 
 		LOGGER.info("Verifing plan");
 
@@ -535,22 +606,33 @@ public class OurPlanner implements Creator  {
 		}
 
 		PlanVerifier planVerifier = new PlanVerifier(agentList,domainFileName,problemFileName,
-				problemFilesPath, useGrounded);		
+				timeoutMS, problemFilesPath, useGrounded);
 
 		VerificationResult res = planVerifier.verifyPlan(plan,0);
-
-		if(res.isVerified)
-			num_agents_solved++;
 
 		if(!FileDeleter.deleteTempFiles()) {
 			LOGGER.info("Deleting Temporary files failure");
 			return false;	
 		}
 
-		return res.isVerified;
+		if(res!=null)
+		{
+			if(res.isVerified) {
+				num_agents_solved++;
+				return true;
+			}
+			else if(res.isTimeout) {
+				num_agents_timeout++;
+				return false;
+			}
+			else 
+				return false;
+		}
+		else
+			return false;
 	}
 
-	private List<String> planForAgent(String agentName, boolean isLearning, PlanningModel model ) {
+	private List<String> planForAgent(String agentName, boolean isLearning, PlanningModel model, long timeoutMS) {
 
 		LOGGER.info("Planning for leader agent");
 
@@ -578,14 +660,21 @@ public class OurPlanner implements Creator  {
 		String agentADDLPath = Globals.OUTPUT_TEMP_PATH + "/" + problemFileName.split("\\.")[0] + ".addl";
 		String heuristic = "saFF-glcl";
 		int recursionLevel = -1;
-		double timeLimitMin = 0.2;
-
-		//agentDomainPath = groundedFolder + "/" + domainFileName;
+		double timeLimitMin = ((double)timeoutMS/60000);
 
 		MADLAPlanner planner = new MADLAPlanner(agentDomainPath, agentProblemPath, agentADDLPath,
 				heuristic, recursionLevel, timeLimitMin, agentList, agentName);
 
-		List<String> result = planner.plan();
+		List<String> result = null;
+
+		/*try {
+			result = planner.plan();
+		} catch (OutOfMemoryError E) {
+			num_agents_not_solved++;
+			return null;
+		}*/
+
+		result = planner.plan();
 
 		if(planner.isTimeout)
 			num_agents_timeout++;

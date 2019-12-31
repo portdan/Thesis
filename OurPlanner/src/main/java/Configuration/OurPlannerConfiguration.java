@@ -31,5 +31,7 @@ public class OurPlannerConfiguration {
 	public VerificationModel verificationModel;
 	public PlannerMode plannerMode;
 	public IterationMethod iterationMethod;
+	public String experimentDetails;
+	public int cValue;
 
 }

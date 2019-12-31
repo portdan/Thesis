@@ -10,22 +10,37 @@ import OurPlanner.StateActionState;
 public class ModelSearchNode {
 
 	private ModelSearchNode parent;
+	private List<ModelSearchNode> children;
+
 	private TempModel tempModel;
 	private List<StateActionState> planSASList;
 	private int goalProximity;
 
-	public void calcGoalProximity(Set<String> goalFacts) {
-		if(planSASList == null)
-			goalProximity = 0;
-		else if(planSASList.size() == 0)
-			goalProximity = 0;
-		else {
-			Set<String> lastValidStateEff = new HashSet<String> (planSASList.get(planSASList.size()-1).post);
+	private int numOfVisits;
+	private double value;
 
-			lastValidStateEff.retainAll(goalFacts);
+	public int getNumOfVisits() {
+		return numOfVisits;
+	}
 
-			goalProximity = lastValidStateEff.size();
-		}
+	public void setNumOfVisits(int numOfVisits) {
+		this.numOfVisits = numOfVisits;
+	}
+
+	public double getValue() {
+		return value;
+	}
+
+	public void setValue(double value) {
+		this.value = value;
+	}
+
+	public List<ModelSearchNode> getChildren() {
+		return children;
+	}
+
+	public void setChildren(List<ModelSearchNode> children) {
+		this.children = children;
 	}
 
 	public ModelSearchNode getParent() {
@@ -54,8 +69,11 @@ public class ModelSearchNode {
 
 	public ModelSearchNode(ModelSearchNode parent, TempModel tempModel) {
 		this.parent = parent;
+		this.children = null;
 		this.tempModel = tempModel;
 		this.goalProximity = 0;
+		this.numOfVisits = 0;
+		this.value = 0;
 	}
 
 	public int getReliabilityHeuristic(Map<String, Map<String, Integer>> actionsPreconditionsScore) {
@@ -85,6 +103,20 @@ public class ModelSearchNode {
 
 	public int getGoalProximityHeuristic() {
 		return goalProximity;
+	}
+
+	public void calcGoalProximity(Set<String> goalFacts) {
+		if(planSASList == null)
+			goalProximity = 0;
+		else if(planSASList.size() == 0)
+			goalProximity = 0;
+		else {
+			Set<String> lastValidStateEff = new HashSet<String> (planSASList.get(planSASList.size()-1).post);
+
+			lastValidStateEff.retainAll(goalFacts);
+
+			goalProximity = lastValidStateEff.size();
+		}
 	}
 
 	@Override
@@ -126,6 +158,6 @@ public class ModelSearchNode {
 
 	@Override
 	public String toString() {
-		return tempModel.toString();
+		return "{ " + tempModel.toString() + " Value: " + value + " Visited: " + numOfVisits + " }";
 	}
 }

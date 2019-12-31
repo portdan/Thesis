@@ -2,6 +2,7 @@ package Model;
 
 import java.util.*;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 import cz.agents.alite.configurator.ConfigurationInterface;
@@ -91,7 +92,7 @@ public class SASPreprocessor {
 		treatGoalAsPublic = config.getBoolean("treatGoalAsPublic", true);
 		unitCost = config.getBoolean("unitCost", true);
 
-		//		LOGGER.setLevel(Level.INFO);
+		LOGGER.setLevel(Level.INFO);
 
 		LinkedList<String> agents = new LinkedList<String>(addl.getAgentList());
 
@@ -405,85 +406,93 @@ public class SASPreprocessor {
 	 * @return
 	 */
 	public Problem getProblemForAgent(String agent){
-		Domain d = agentDomains.get(agent);
 
-		//translate initial state
-		int[] init = new int[d.sizeGlobal()];
-		for(String var : sas.init.keySet()){
-			if(LOGGER.isDebugEnabled())LOGGER.info(var + ":" + varCodes.get(var) + ", " + sas.init.get(var) + ":" + valCodes.get(sas.init.get(var)));
-			init[varCodes.get(var)] = valCodes.get(sas.init.get(var));
-		}
-		State initState = new State(d,init);
+		try {
 
-		//translate goal super-state
-		SuperState goalSuperState = new SuperState(d);
-		for(String var : sas.goal.keySet()){
-			if (treatGoalAsPublic || d.inDomainVar(varCodes.get(var))) {
-				goalSuperState.forceSetValue(varCodes.get(var), valCodes.get(sas.goal.get(var)));
+			Domain d = agentDomains.get(agent);
+
+			//translate initial state
+			int[] init = new int[d.sizeGlobal()];
+			for(String var : sas.init.keySet()){
+				if(LOGGER.isDebugEnabled())LOGGER.info(var + ":" + varCodes.get(var) + ", " + sas.init.get(var) + ":" + valCodes.get(sas.init.get(var)));
+				init[varCodes.get(var)] = valCodes.get(sas.init.get(var));
 			}
-		}
+			State initState = new State(d,init);
 
-		//translate actions
-		Set<Action> actions = new LinkedHashSet<Action>();
-		Set<Action> publicActions = new LinkedHashSet<Action>();
-		for(SASOperator op : agentOperators.get(agent)){
-			//            LOGGER.info(op.toString());
-			SuperState pre = new SuperState(d);
-			for(String var : op.pre.keySet()){
-				pre.setValue(varCodes.get(var), valCodes.get(op.pre.get(var)));
+			//translate goal super-state
+			SuperState goalSuperState = new SuperState(d);
+			for(String var : sas.goal.keySet()){
+				if (treatGoalAsPublic || d.inDomainVar(varCodes.get(var))) {
+					goalSuperState.forceSetValue(varCodes.get(var), valCodes.get(sas.goal.get(var)));
+				}
 			}
 
-			SuperState eff = new SuperState(d);
-			for(String var : op.eff.keySet()){
-				LOGGER.info(var + ":" + varCodes.get(var) + ", " + op.eff.get(var) + ":" + valCodes.get(op.eff.get(var)));
-				eff.forceSetValue(varCodes.get(var), valCodes.get(op.eff.get(var)));
+			//translate actions
+			Set<Action> actions = new LinkedHashSet<Action>();
+			Set<Action> publicActions = new LinkedHashSet<Action>();
+			for(SASOperator op : agentOperators.get(agent)){
+				//            LOGGER.info(op.toString());
+				SuperState pre = new SuperState(d);
+				for(String var : op.pre.keySet()){
+					pre.setValue(varCodes.get(var), valCodes.get(op.pre.get(var)));
+				}
+
+				SuperState eff = new SuperState(d);
+				for(String var : op.eff.keySet()){
+					LOGGER.info(var + ":" + varCodes.get(var) + ", " + op.eff.get(var) + ":" + valCodes.get(op.eff.get(var)));
+					eff.forceSetValue(varCodes.get(var), valCodes.get(op.eff.get(var)));
+				}
+
+				Action a = new Action(op.name,op.label, agent, pre, eff, op.isPublic);
+				LOGGER.info(a);
+				if(!unitCost){
+					a.setCost(op.cost);
+				}
+				actions.add(a);
+				if(a.isPublic()){
+					publicActions.add(a);
+				}
+
 			}
 
-			Action a = new Action(op.name,op.label, agent, pre, eff, op.isPublic);
-			LOGGER.info(a);
-			if(!unitCost){
-				a.setCost(op.cost);
-			}
-			actions.add(a);
-			if(a.isPublic()){
-				publicActions.add(a);
-			}
+			//translate other agents' public actions
+			Set<Action> allActions = new LinkedHashSet<Action>(actions);
+			for (String otherAgent : agentOperators.keySet()) {
+				if (!otherAgent.equals(agent)) {
+					for (SASOperator op : agentOperators.get(otherAgent)) {
+						if (op.isPublic) {
+							boolean isNotPure = false;
 
-		}
+							SuperState pre = new SuperState(d);
+							for (String var : op.pre.keySet()) {
+								isNotPure = isNotPure || pre.forceSetValue(varCodes.get(var), valCodes.get(op.pre.get(var)));
+							}
 
-		//translate other agents' public actions
-		Set<Action> allActions = new LinkedHashSet<Action>(actions);
-		for (String otherAgent : agentOperators.keySet()) {
-			if (!otherAgent.equals(agent)) {
-				for (SASOperator op : agentOperators.get(otherAgent)) {
-					if (op.isPublic) {
-						boolean isNotPure = false;
+							SuperState eff = new SuperState(d);
+							for (String var : op.eff.keySet()) {
+								eff.forceSetValue(varCodes.get(var), valCodes.get(op.eff.get(var)));
+							}
 
-						SuperState pre = new SuperState(d);
-						for (String var : op.pre.keySet()) {
-							isNotPure = isNotPure || pre.forceSetValue(varCodes.get(var), valCodes.get(op.pre.get(var)));
-						}
-
-						SuperState eff = new SuperState(d);
-						for (String var : op.eff.keySet()) {
-							eff.forceSetValue(varCodes.get(var), valCodes.get(op.eff.get(var)));
-						}
-
-						Action a = new Action(op.name,op.label, otherAgent, pre, eff, true, true, !isNotPure);
-						if(!unitCost){
-							a.setCost(op.cost);
-						}
-						allActions.add(a);
-						if(a.isPublic()){
-							publicActions.add(a);
+							Action a = new Action(op.name,op.label, otherAgent, pre, eff, true, true, !isNotPure);
+							if(!unitCost){
+								a.setCost(op.cost);
+							}
+							allActions.add(a);
+							if(a.isPublic()){
+								publicActions.add(a);
+							}
 						}
 					}
 				}
 			}
+
+
+			return new Problem(agent, initState, goalSuperState, actions,allActions,publicActions);
+
+		} 
+		catch (Exception e) {
+			return null;		
 		}
-
-
-		return new Problem(agent, initState, goalSuperState, actions,allActions,publicActions);
 	}
 
 	public Map<String, Set<String>> getAgentVarVals(String agentName) {

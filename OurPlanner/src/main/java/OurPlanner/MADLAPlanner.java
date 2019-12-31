@@ -19,6 +19,8 @@ import org.apache.log4j.Logger;
 
 import Model.IPCOutputExecutor;
 import Model.Planner;
+import Model.SASParser;
+import Model.SASPreprocessor;
 import cz.agents.alite.communication.PerformerCommunicator;
 import cz.agents.alite.communication.QueuedCommunicator;
 import cz.agents.alite.communication.channel.CommunicationChannelException;
@@ -31,8 +33,7 @@ import cz.agents.dimaptools.communication.protocol.DefaultEncoder;
 import cz.agents.dimaptools.experiment.DataAccumulator;
 import cz.agents.dimaptools.input.addl.ADDLObject;
 import cz.agents.dimaptools.input.addl.ADDLParser;
-import cz.agents.dimaptools.input.sas.SASParser;
-import cz.agents.dimaptools.input.sas.SASPreprocessor;
+import cz.agents.dimaptools.model.Problem;
 
 public class MADLAPlanner {
 
@@ -206,18 +207,25 @@ public class MADLAPlanner {
 
 		DataAccumulator.getAccumulator().startAfterPreprocessTimeMs = System.currentTimeMillis();
 
-		createEntities(addl);
+		boolean isCreatedOK = createEntities(addl);
 
+		if(!isCreatedOK) {
+			isNotSolved = true;
+			return null;
+		}
+		
 		runEntities();
 
-		executorService.shutdown();
+		executorService.shutdownNow();
 
+		/*
 		try {
 			executorService.awaitTermination(1, TimeUnit.MINUTES);
 		} catch (InterruptedException e) {
 			LOGGER.warn("Shutdown interrupted!");
 		}
-
+		 */
+		
 		for (final Planner planner : planners) {    
 			if (planner.foundPlan != null)
 				return planner.foundPlan;
@@ -355,7 +363,7 @@ public class MADLAPlanner {
 
 	}
 
-	private void createEntities(ADDLObject addl) {
+	private boolean createEntities(ADDLObject addl) {
 		LOGGER.info(">>> ENTITIES CREATION");
 
 		IPCOutputExecutor executor = new IPCOutputExecutor(OUTPUT_PLAN_PATH);
@@ -364,6 +372,9 @@ public class MADLAPlanner {
 
 			DIMAPWorldInterface world = initWorld(agentName,addl.getAgentCount());
 
+			if(world == null)
+				return false;
+
 			planners.add(new Planner(heuristic,recursionLevel,world,executor,timeLimitMin*60L*1000L));
 
 			executor.addProblem(world.getProblem());
@@ -371,6 +382,7 @@ public class MADLAPlanner {
 
 		executor.setInitAndGoal(preprocessor.getGlobalInit(), preprocessor.getGlobalGoal());
 
+		return true;
 	}
 
 	public PerformerCommunicator initQueuedCommunicator(String address){
@@ -390,11 +402,17 @@ public class MADLAPlanner {
 
 	public DIMAPWorldInterface initWorld(String agentName, int totalAgents){
 
+
+		Problem problem = preprocessor.getProblemForAgent(agentName);
+
+		if(problem == null)
+			return null;
+
 		return new DefaultDIMAPWorld(
 				agentName,
 				initQueuedCommunicator(agentName),
 				new DefaultEncoder(),
-				preprocessor.getProblemForAgent(agentName),
+				problem,
 				totalAgents
 				);
 	}

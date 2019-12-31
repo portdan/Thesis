@@ -5,17 +5,17 @@ import java.util.Set;
 
 public class Action {
 
-	Set<String> preconditions;
-	Set<String> effects;
+	public 	Set<String> preconditions;
+	public 	Set<String> effects;
 
-	String agent;
+	public 	String agent;
 
-	String agentLine;
-	String parametersLine;
+	public String agentLine;
+	public 	String parametersLine;
 
-	String name;
+	public 	String name;
 	
-	boolean isParam;
+	public boolean isParam;
 
 	public Action() {
 		preconditions = new LinkedHashSet<String>();

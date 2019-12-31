@@ -46,6 +46,9 @@ public class PlanVerifier {
 
 	private boolean sasSolvable = false;
 
+	private double timeoutInMS = 0;
+	private long startTimeMs = 0;
+
 	State agentInitState = null;
 	SuperState agentGoalState = null;
 
@@ -55,7 +58,7 @@ public class PlanVerifier {
 	String groundedProblemPDDL = "";
 
 	public PlanVerifier(List<String> agentList, String domainFileName,
-			String problemFileName,	String problemFilesPath, boolean useGrounded) {
+			String problemFileName, double timeoutInMS, String problemFilesPath, boolean useGrounded) {
 
 		LOGGER.setLevel(Level.INFO);
 
@@ -66,6 +69,9 @@ public class PlanVerifier {
 		this.problemFileName = problemFileName;
 		this.problemFilesPath = problemFilesPath;
 		this.useGrounded = useGrounded;
+		this.timeoutInMS = timeoutInMS;		 
+
+		startTimeMs = System.currentTimeMillis();
 
 		logInput();
 
@@ -94,6 +100,8 @@ public class PlanVerifier {
 		}
 	}
 
+
+
 	private void logInput() {
 
 		LOGGER.info("Logging input");
@@ -103,7 +111,8 @@ public class PlanVerifier {
 		LOGGER.info("problemFileName: " + problemFileName);
 		LOGGER.info("problemFilesPath: " + problemFilesPath);
 		LOGGER.info("useGrounded: " + useGrounded);
-
+		LOGGER.info("timeoutInMS: " + timeoutInMS);
+		LOGGER.info("startTimeMs: " + startTimeMs);
 	}
 
 	private boolean preparePDDLLocalView() {
@@ -275,7 +284,13 @@ public class PlanVerifier {
 
 		SASParser parser = new SASParser(sasFile);
 		SASDomain sasDom = parser.getDomain();
-		PlanVerifierSASPreprocessor preprocessor = new PlanVerifierSASPreprocessor(sasDom, addl);
+		PlanVerifierSASPreprocessor preprocessor = new PlanVerifierSASPreprocessor(sasDom, addl, startTimeMs, timeoutInMS);
+
+		if(System.currentTimeMillis() - startTimeMs > timeoutInMS)
+		{
+			LOGGER.fatal("TIMEOUT!");
+			return null;
+		}
 
 		agentInitState = preprocessor.getGlobalInit();
 		agentGoalState = preprocessor.getGlobalGoal();
@@ -400,7 +415,13 @@ public class PlanVerifier {
 	public VerificationResult verifyPlan(List<String> plan, int actionIndex) {
 
 		LOGGER.info("Verifying plan");
-		
+
+		if(System.currentTimeMillis() - startTimeMs > timeoutInMS)
+		{
+			LOGGER.fatal("TIMEOUT!");
+			return new VerificationResult(-1, false, true);
+		}
+
 		String actionStr = plan.get(actionIndex);
 
 		String actionOwner = getActionOwnerFromAction(actionStr);
@@ -423,6 +444,17 @@ public class PlanVerifier {
 		}		
 
 		Problem agentProblem = generateProblem(agentName, domainPath, problemPath, agentADDLPath);
+
+		if(agentProblem == null) {
+			LOGGER.info("Plan cannot be verified!");
+			return new VerificationResult(actionIndex, false);
+		}
+
+		if(System.currentTimeMillis() - startTimeMs > timeoutInMS)
+		{
+			LOGGER.fatal("TIMEOUT!");
+			return new VerificationResult(-1, false, true);
+		}
 
 		Action action = getActionFromPlan(agentProblem, actionStr);
 
