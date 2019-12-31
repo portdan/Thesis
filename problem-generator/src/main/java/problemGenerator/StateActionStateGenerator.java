@@ -328,7 +328,7 @@ public class StateActionStateGenerator implements Creator {
 			e.printStackTrace();
 		}
 
-		int problemCounter = 1;
+		int problemCounter = 0;
 
 		// generate problems
 		for (int i = 1; i <= numOfTracesToGenerate; i++) {
@@ -355,7 +355,7 @@ public class StateActionStateGenerator implements Creator {
 					e.printStackTrace();
 				}
 
-				problemCounter++;
+				problemCounter += sasList.size();
 			}
 		}
 
@@ -363,10 +363,11 @@ public class StateActionStateGenerator implements Creator {
 
 		try {
 			sasGenerator.mixOutputFile();
+			sasGenerator.renameFile(problemFileName + "_Traces_" + problemCounter);
 		} catch (IOException | InterruptedException e) {
 			e.printStackTrace();
 		}
-
+		
 		delelteTemporaryFiles();
 
 		deleteSasFile();
@@ -406,6 +407,7 @@ public class StateActionStateGenerator implements Creator {
 
 			String cmd = scriptPath + " " + path + " " + domainFileName + " " + problemFileName + " " + tempDirPath;
 
+			/*
 			LOGGER.info("RUN: " + cmd);
 
 			ProcessBuilder pb = new ProcessBuilder(scriptPath, path, domainFileName, problemFileName, tempDirPath);
@@ -414,6 +416,10 @@ public class StateActionStateGenerator implements Creator {
 			Process pr = pb.start();
 
 			pr.waitFor();			
+			 */
+
+			new ExecCommand(cmd);
+
 		} catch (Exception e) {
 			LOGGER.fatal(e, e);
 			System.exit(1);
@@ -446,12 +452,16 @@ public class StateActionStateGenerator implements Creator {
 
 			LOGGER.info("RUN: " + cmd);
 
+			/*
 			ProcessBuilder pb = new ProcessBuilder(scriptPath, domainFilePath, problemFilePath, sasFilePath);
 			pb.redirectOutput(Redirect.INHERIT);
 
 			Process pr = pb.start();
 
 			pr.waitFor();			
+			 */
+
+			new ExecCommand(cmd);
 
 		} catch (Exception e) {
 			LOGGER.fatal(e, e);
@@ -524,6 +534,4 @@ public class StateActionStateGenerator implements Creator {
 
 		return true;
 	}
-
-
 }

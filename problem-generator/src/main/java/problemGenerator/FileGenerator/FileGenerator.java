@@ -30,6 +30,20 @@ public class FileGenerator {
 			clearFile();
 	}
 
+	public void renameFile(String newfileName, String fileType) throws IOException {
+
+		//need to be in the same path
+	    File fileWithNewName = new File(outFile.getParent(), newfileName + "." + fileType);
+	    if (fileWithNewName.exists()) {
+	        throw new IOException("file exists");
+	    }
+	    // Rename file (or directory)
+	    boolean success = outFile.renameTo(fileWithNewName);
+	    if (!success) {
+	        // File was not successfully renamed
+	    }
+	}
+
 	/*
 	private void appendToFile(List<String> strings) throws IOException{
 

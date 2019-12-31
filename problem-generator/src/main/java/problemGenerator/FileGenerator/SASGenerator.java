@@ -16,6 +16,11 @@ public class SASGenerator extends FileGenerator{
 
 		generateFile(folderPath, fileName, FILE_TYPE);
 	}
+	
+	public void renameFile(String newFileName) throws IOException{
+
+		renameFile(newFileName, FILE_TYPE);
+	}
 
 	public void mixOutputFile() throws IOException, InterruptedException{
 

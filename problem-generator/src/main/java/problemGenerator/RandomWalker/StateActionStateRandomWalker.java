@@ -108,42 +108,6 @@ public class StateActionStateRandomWalker {
 		return current;
 	}
 
-	private static Set<String> getStateFacts(State state, Map<Integer, Set<Integer>> varDomains) {
-
-		LOGGER.info("Extracting facts from state " + state);
-
-		Set<String> out = new HashSet<String>();
-
-		int[] values = state.getValues();
-
-		for(int var = 0; var < values.length; ++var){
-
-			if(var >= 0)
-				addFactToOut(varDomains, out, values, var);
-		}
-
-		return out;
-	}
-
-	private static void addFactToOut(Map<Integer, Set<Integer>> varDomains, Set<String> out, int[] values, int var) {
-
-		String newVal = Domain.valNames.get(values[var]).toString();
-
-		if(newVal.startsWith("NONE")) {
-
-			for (int val : varDomains.get(var)) {
-				newVal = Domain.valNames.get(val).toString();
-
-				if(val!=values[var])
-					out.add("not ("+ newVal + ")");
-			}
-
-		}
-		else {
-			out.add(newVal);
-		}
-	}
-
 	public static State RandomWalk(List<StateActionState> sasList, State startState, SuperState goalState, 
 			int numOfExpands, List<Problem> problems, int trace_number) {
 
@@ -208,8 +172,10 @@ public class StateActionStateRandomWalker {
 
 				String actionName = randomAction.getSimpleLabel();
 
-				Set<String> preFacts = getStateFacts(pre);
-				Set<String> postFacts = getStateFacts(current);
+				Map<Integer, Set<Integer>> varDomains = problem.getDomain().getVariableDomains();
+
+				Set<String> preFacts = getStateFacts(pre, varDomains);
+				Set<String> postFacts = getStateFacts(current, varDomains);
 
 				//preFacts = formatFacts(preFacts);
 				//postFacts = formatFacts(postFacts);
@@ -229,7 +195,7 @@ public class StateActionStateRandomWalker {
 		return current;
 	}
 
-	private static Set<String> getStateFacts(State state) {
+	private static Set<String> getStateFacts(State state, Map<Integer, Set<Integer>> varDomains) {
 
 		LOGGER.info("Extracting facts from state " + state);
 
@@ -242,12 +208,58 @@ public class StateActionStateRandomWalker {
 
 				String newVal = Domain.valNames.get(values[var]).toString();
 
-				out.add(newVal);
+				if(newVal.startsWith("NONE")) {
+					for (int val : varDomains.get(var)) {
+						newVal = Domain.valNames.get(val).toString();
+
+						if(val!=values[var])
+							out.add("Negated" + newVal);
+					}
+				}
+				else
+					out.add(newVal);
 			}
 		}
 
 		return out;
 	}
+
+	/*
+	private static Set<String> getStateFacts(State state, Map<Integer, Set<Integer>> varDomains) {
+		LOGGER.info("Extracting facts from state " + state);
+
+		Set<String> out = new HashSet<String>();
+
+		int[] values = state.getValues();
+
+		for(int var = 0; var < values.length; ++var){
+
+			if(var >= 0)
+				addFactToOut(varDomains, out, values, var);
+		}
+
+		return out;
+	}
+
+		private static void addFactToOut(Map<Integer, Set<Integer>> varDomains, Set<String> out, int[] values, int var) {
+
+		String newVal = Domain.valNames.get(values[var]).toString();
+
+		if(newVal.startsWith("NONE")) {
+
+			for (int val : varDomains.get(var)) {
+				newVal = Domain.valNames.get(val).toString();
+
+				if(val!=values[var])
+					out.add("not ("+ newVal + ")");
+			}
+
+		}
+		else {
+			out.add(newVal);
+		}
+	}
+	 */
 
 	private static Set<String> formatFacts(Set<String> facts) {
 
@@ -280,7 +292,7 @@ public class StateActionStateRandomWalker {
 			formattedFact = formattedFact.replace(")", "");
 
 			formattedFact = formattedFact.trim();
-			
+
 			formattedFact = '(' + formattedFact + ')';
 
 			if(formattedFact.startsWith("NONE")) {
