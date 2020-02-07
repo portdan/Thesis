@@ -55,7 +55,7 @@ public class PlannerAndModelLearner {
 
 	private long startTimeMs = 0;
 	private double timeoutInMS = 0;
-
+	private int planningTimeoutInMS;
 	public int numOfIterations = 0;
 	public int addedTrainingSize = 0;
 
@@ -72,7 +72,7 @@ public class PlannerAndModelLearner {
 
 	public PlannerAndModelLearner(String agentName, List<String> agentList, String domainFileName,
 			String problemFileName, TraceLearner learner, Set<String> goalFacts,
-			long startTimeMs, double timeoutInMS) {
+			long startTimeMs, double timeoutInMS, int planningTimeoutInMS) {
 
 		LOGGER.setLevel(Level.INFO);
 
@@ -85,6 +85,7 @@ public class PlannerAndModelLearner {
 		this.learner = learner;
 		this.startTimeMs = startTimeMs;
 		this.timeoutInMS = timeoutInMS;
+		this.planningTimeoutInMS = planningTimeoutInMS;
 		this.goalFacts = goalFacts;
 
 		logInput();
@@ -98,6 +99,9 @@ public class PlannerAndModelLearner {
 		LOGGER.info("agentList: " + agentList);
 		LOGGER.info("domainFileName: " + domainFileName);
 		LOGGER.info("problemFileName: " + problemFileName);
+		LOGGER.info("startTimeMs: " + startTimeMs);
+		LOGGER.info("timeoutInMS: " + timeoutInMS);
+		LOGGER.info("planningTimeoutInMS: " + planningTimeoutInMS);
 	}
 
 	private boolean copyProblemFiles() {
@@ -218,7 +222,7 @@ public class PlannerAndModelLearner {
 
 			writeDomainFile(currModel.reconstructModelString());
 
-		plan = planForAgent();
+			plan = planForAgent();
 
 			LOGGER.info("Garbage collection!");
 			System.gc();
@@ -256,6 +260,10 @@ public class PlannerAndModelLearner {
 					else {
 
 						PlanToStateActionStateResult result = planToSASList(plan, res.lastActionIndex);
+						
+						if(result.isTimeout())
+							continue;
+						
 						List<StateActionState> planSASList = result.getPlanSASList();
 						StateActionState failedActionSAS = result.getFailedActionSAS();
 
@@ -379,6 +387,10 @@ public class PlannerAndModelLearner {
 					else {
 
 						PlanToStateActionStateResult result = planToSASList(plan, res.lastActionIndex);
+
+						if(result.isTimeout())
+							continue;
+
 						List<StateActionState> planSASList = result.getPlanSASList();
 						StateActionState failedActionSAS = result.getFailedActionSAS();
 
@@ -476,7 +488,7 @@ public class PlannerAndModelLearner {
 		String safeModelPath = Globals.OUTPUT_SAFE_MODEL_PATH + "/" + agentName + "/" + domainFileName;
 		String unsafeModelPath = Globals.OUTPUT_UNSAFE_MODEL_PATH + "/" + agentName + "/" + domainFileName;
 
-		if(planSASList.size() > 0) {
+		if(planSASList != null && planSASList.size() > 0) {
 			learner.expandSafeAndUnSafeModelsWithPlan(planSASList, Globals.OUTPUT_SAFE_MODEL_PATH, Globals.OUTPUT_UNSAFE_MODEL_PATH, 
 					sequancingTimeTotal, sequancingAmountTotal);
 
@@ -633,6 +645,9 @@ public class PlannerAndModelLearner {
 		Set<ModelSearchNode> res = new LinkedHashSet<ModelSearchNode>();
 		Set<String> preconditions = null;
 
+		if(failedActionSAS == null)
+			return res;
+
 		String failedActionName = failedActionSAS.action;
 
 		LOGGER.info(agentName + " " + failedActionName);
@@ -781,7 +796,7 @@ public class PlannerAndModelLearner {
 
 		String heuristic = "saFF-glcl";
 		int recursionLevel = -1;
-		double timeLimitMin = 0.125;
+		double timeLimitMin = ((double)planningTimeoutInMS)/60000;
 
 		long planningStartTime = System.currentTimeMillis();
 
@@ -826,27 +841,27 @@ public class PlannerAndModelLearner {
 		boolean useGrounded = true;
 
 		long verifingStartTime = System.currentTimeMillis();
-		
+
 		long verifingTimeoutMS = (long)timeoutInMS - TestDataAccumulator.getAccumulator().agentPlanningTimeMs.get(agentName) - TestDataAccumulator.getAccumulator().agentLearningTimeMs.get(agentName);
-		
+
 		//verifingTimeoutMS = 5000;
-		
+
 		PlanVerifier planVerifier = new PlanVerifier(agentList,domainFileName,problemFileName,
 				verifingTimeoutMS,problemFilesPath, useGrounded);	
-		
+
 		VerificationResult res = planVerifier.verifyPlan(plan,0);
 
 		long verifingFinishTime = System.currentTimeMillis();
 
 		TestDataAccumulator.getAccumulator().totalVerifingTimeMs += verifingFinishTime - verifingStartTime;
-		
+
 		Long agentVerifingTime = TestDataAccumulator.getAccumulator().agentVerifingTimeMs.get(agentName);
-		
+
 		if(agentVerifingTime == null) 
 			agentVerifingTime = verifingFinishTime - verifingStartTime;
 		else
 			agentVerifingTime += verifingFinishTime - verifingStartTime;
-		
+
 		TestDataAccumulator.getAccumulator().agentVerifingTimeMs.put(agentName, agentVerifingTime);
 
 		if(!FileDeleter.deleteTempFiles()) {
@@ -863,27 +878,39 @@ public class PlannerAndModelLearner {
 
 		long sequancingStartTime = System.currentTimeMillis();
 
+		long planToSASListTimeoutMS = (long)timeoutInMS 
+				- TestDataAccumulator.getAccumulator().agentPlanningTimeMs.get(agentName) 
+				- TestDataAccumulator.getAccumulator().agentLearningTimeMs.get(agentName) 
+				- TestDataAccumulator.getAccumulator().agentVerifingTimeMs.get(agentName);
+
+
 		String problemFilesPath = Globals.INPUT_GROUNDED_PATH;
 
-		PlanToStateActionState plan2SAS = new PlanToStateActionState(domainFileName, problemFileName, problemFilesPath);
+		PlanToStateActionState plan2SAS = new PlanToStateActionState(domainFileName, problemFileName,
+				problemFilesPath,sequancingStartTime, planToSASListTimeoutMS);
 
 		List<StateActionState> planSASList = plan2SAS.generateSASList(plan, lastActionIndex);
+		StateActionState failedActionSAS = null;
 
-		StateActionState failedActionSAS = planSASList.get(lastActionIndex);
+		if(planSASList == null)
+			return new PlanToStateActionStateResult(null, null, true);		
 
+		failedActionSAS = planSASList.get(lastActionIndex);
 		planSASList.remove(lastActionIndex);
+
+		sequancingAmountTotal = planSASList.size() + 1;
 
 		long sequancingEndTime = System.currentTimeMillis();
 
 		sequancingTimeTotal = sequancingEndTime - sequancingStartTime;
-		sequancingAmountTotal = planSASList.size() + 1;
+		//sequancingAmountTotal = planSASList.size() + 1;
 
 		if(!FileDeleter.deleteTempFiles()) {
 			LOGGER.info("Deleting Temporary files failure");
 			return null;	
 		}
 
-		return new PlanToStateActionStateResult(planSASList, failedActionSAS);
+		return new PlanToStateActionStateResult(planSASList, failedActionSAS, false);
 	}
 
 	private boolean writeDomainFile(String newDomainString) {

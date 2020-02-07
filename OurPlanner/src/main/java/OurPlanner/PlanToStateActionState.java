@@ -40,11 +40,15 @@ public class PlanToStateActionState {
 	private String problemFileName = "";
 	private String problemFilesPath = "";
 
+	private double timeoutInMS = 0;
+	private long startTimeMs = 0;
+
 	private Map<String, Problem> agentsToProblems = null;
 
 	private SASPreprocessor preprocessor;
 
-	public PlanToStateActionState(String domainFileName,String problemFileName, String problemFilesPath) {
+	public PlanToStateActionState(String domainFileName,String problemFileName, String problemFilesPath, 
+			long startTimeMs, long timeoutInMS) {
 
 		LOGGER.setLevel(Level.INFO);
 
@@ -53,6 +57,8 @@ public class PlanToStateActionState {
 		this.domainFileName = domainFileName;
 		this.problemFileName = problemFileName;
 		this.problemFilesPath = problemFilesPath;
+		this.startTimeMs = startTimeMs;
+		this.timeoutInMS = timeoutInMS;
 
 		logInput();
 
@@ -65,6 +71,8 @@ public class PlanToStateActionState {
 		LOGGER.info("domainFileName: " + domainFileName);
 		LOGGER.info("problemFileName: " + problemFileName);
 		LOGGER.info("problemFilesPath: " + problemFilesPath);
+		LOGGER.info("startTimeMs: " + startTimeMs);
+		LOGGER.info("timeoutInMS: " + timeoutInMS);
 	}
 
 	public List<StateActionState> generateSASList(List<String> plan, int lastActionIndex) {
@@ -260,10 +268,16 @@ public class PlanToStateActionState {
 		SASParser parser = new SASParser(sasFile);
 		SASDomain sasDom = parser.getDomain();
 
-		preprocessor = new SASPreprocessor(sasDom, addl);
+		preprocessor = new SASPreprocessor(sasDom, addl, startTimeMs, timeoutInMS);
 
 		for (String agentName : addl.getAgentList()) {
-			agentsToProblems.put(agentName, preprocessor.getProblemForAgent(agentName));
+			
+			Problem problem = preprocessor.getProblemForAgent(agentName, startTimeMs, timeoutInMS);
+			
+			if(problem == null)
+				return false;
+			
+			agentsToProblems.put(agentName, problem);
 		}
 
 		return true;

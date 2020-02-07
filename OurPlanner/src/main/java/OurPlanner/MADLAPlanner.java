@@ -203,7 +203,7 @@ public class MADLAPlanner {
 		}
 
 		SASParser parser = new SASParser(sasFile);
-		preprocessor = new SASPreprocessor(parser.getDomain(), addl);
+		preprocessor = new SASPreprocessor(parser.getDomain(), addl, System.currentTimeMillis(), timeLimitMin*60L*1000L);
 
 		DataAccumulator.getAccumulator().startAfterPreprocessTimeMs = System.currentTimeMillis();
 
@@ -403,7 +403,7 @@ public class MADLAPlanner {
 	public DIMAPWorldInterface initWorld(String agentName, int totalAgents){
 
 
-		Problem problem = preprocessor.getProblemForAgent(agentName);
+		Problem problem = preprocessor.getProblemForAgent(agentName, System.currentTimeMillis(), timeLimitMin*60L*1000L);
 
 		if(problem == null)
 			return null;

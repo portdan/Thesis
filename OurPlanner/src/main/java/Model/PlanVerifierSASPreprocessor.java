@@ -36,8 +36,6 @@ public class PlanVerifierSASPreprocessor {
 
 	//global textual SAS domain
 	private final SASDomain sas;
-	private long  startTimeMs;
-	private double timeoutInMS;
 
 	//working structures
 	private Map<String,Map<String,Set<String>>> agentVarVals = new HashMap<String,Map<String,Set<String>>>();
@@ -95,8 +93,6 @@ public class PlanVerifierSASPreprocessor {
 	 */
 	public PlanVerifierSASPreprocessor(SASDomain sas, ADDLObject addl, ConfigurationInterface config, long startTimeMs, double timeoutInMS){
 		this.sas = sas;
-		this.startTimeMs = startTimeMs;
-		this.timeoutInMS = timeoutInMS;
 		treatGoalAsPublic = config.getBoolean("treatGoalAsPublic", true);
 		unitCost = config.getBoolean("unitCost", true);
 
@@ -293,13 +289,18 @@ public class PlanVerifierSASPreprocessor {
 
 		//extract the  domains
 
-		extractPublicDomain();
+		extractPublicDomain(startTimeMs, timeoutInMS);
+
+		if(System.currentTimeMillis() - startTimeMs > timeoutInMS){
+			LOGGER.fatal("TIMEOUT!");
+			return;
+		}
 
 		varMax = publicVarMax;
 		valMax = publicValMax;
 
 		for(String agent : agents){
-			agentDomains.put(agent, extractDomain(agent, varMax, valMax));
+			agentDomains.put(agent, extractDomain(agent, varMax, valMax, startTimeMs, timeoutInMS));
 		}
 
 		//set global size
@@ -332,8 +333,10 @@ public class PlanVerifierSASPreprocessor {
 
 	/**
 	 * Extract the integer representations of the public variables/values
+	 * @param timeoutInMS 
+	 * @param startTimeMs 
 	 */
-	private void extractPublicDomain(){
+	private void extractPublicDomain(long startTimeMs, double timeoutInMS){
 		Map<String,Set<String>> varValMap = agentVarVals.get(PUBLIC);
 
 		for(String agent : agentVarVals.keySet()){
@@ -341,6 +344,11 @@ public class PlanVerifierSASPreprocessor {
 		}
 
 		for(String var : varValMap.keySet()){
+
+			if(System.currentTimeMillis() - startTimeMs > timeoutInMS){
+				LOGGER.fatal("TIMEOUT!");
+				return;
+			}
 			//var
 			Domain.varNames.put(varCount, var);
 			varCodes.put(var, varCount);
@@ -359,20 +367,10 @@ public class PlanVerifierSASPreprocessor {
 
 				valCount++;
 				publicValMax++;
-
-
 			}
-
 			varCount++;
 			publicVarMax++;
-
-
-
-
 		}
-
-
-
 	}
 
 	/**
@@ -380,9 +378,11 @@ public class PlanVerifierSASPreprocessor {
 	 * @param agent
 	 * @param agentVarMin
 	 * @param agentValMin
+	 * @param timeoutInMS 
+	 * @param startTimeMs 
 	 * @return
 	 */
-	private Domain extractDomain(String agent, int agentVarMin, int agentValMin){
+	private Domain extractDomain(String agent, int agentVarMin, int agentValMin, long startTimeMs, double timeoutInMS){
 		int agentVarMax = agentVarMin;
 		int agentValMax = agentValMin;
 
@@ -390,7 +390,10 @@ public class PlanVerifierSASPreprocessor {
 
 		for (String var : varValMap.keySet()) {
 
-
+			if(System.currentTimeMillis() - startTimeMs > timeoutInMS){
+				LOGGER.fatal("TIMEOUT!");
+				return null;
+			}
 
 			if (!varCodes.containsKey(var)) {
 				// var
@@ -407,6 +410,12 @@ public class PlanVerifierSASPreprocessor {
 
 			// vals
 			for (String val : varValMap.get(var)) {
+
+				if(System.currentTimeMillis() - startTimeMs > timeoutInMS){
+					LOGGER.fatal("TIMEOUT!");
+					return null;
+				}
+
 				if (!valCodes.containsKey(val)) {
 					Domain.valNames.put(valCount, val);
 					valCodes.put(val, valCount);
@@ -418,17 +427,10 @@ public class PlanVerifierSASPreprocessor {
 				}
 
 			}
-
-
-
-
-
 		}
 
 		varMax = agentVarMax;
 		valMax = agentValMax;
-
-
 
 		Domain d = new Domain(agent,publicVarMax,publicValMax,agentVarMin,agentVarMax,agentValMin,agentValMax);
 		d.setVariableDomains(agentVariableDomains.get(agent));
@@ -451,7 +453,7 @@ public class PlanVerifierSASPreprocessor {
 	 * @param agent
 	 * @return
 	 */
-	public Problem getProblemForAgent(String agent){
+	public Problem getProblemForAgent(String agent, long startTimeMs, double timeoutInMS){
 
 		try {
 
@@ -477,6 +479,12 @@ public class PlanVerifierSASPreprocessor {
 			Set<Action> actions = new LinkedHashSet<Action>();
 			Set<Action> publicActions = new LinkedHashSet<Action>();
 			for(SASOperator op : agentOperators.get(agent)){
+
+				if(System.currentTimeMillis() - startTimeMs > timeoutInMS){
+					LOGGER.fatal("TIMEOUT!");
+					return null;
+				}
+
 				//            LOGGER.info(op.toString());
 				SuperState pre = new SuperState(d);
 				for(String var : op.pre.keySet()){
@@ -506,6 +514,12 @@ public class PlanVerifierSASPreprocessor {
 			for (String otherAgent : agentOperators.keySet()) {
 				if (!otherAgent.equals(agent)) {
 					for (SASOperator op : agentOperators.get(otherAgent)) {
+
+						if(System.currentTimeMillis() - startTimeMs > timeoutInMS){
+							LOGGER.fatal("TIMEOUT!");
+							return null;
+						}
+
 						if (op.isPublic) {
 							boolean isNotPure = false;
 

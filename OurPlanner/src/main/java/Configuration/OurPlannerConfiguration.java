@@ -33,5 +33,6 @@ public class OurPlannerConfiguration {
 	public IterationMethod iterationMethod;
 	public String experimentDetails;
 	public int cValue;
+	public int planningTimeoutInMS;
 
 }

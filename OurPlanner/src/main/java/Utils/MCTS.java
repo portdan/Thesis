@@ -24,6 +24,9 @@ public class MCTS {
 
 		if(node.getNumOfVisits() == 0)
 			return node;
+		
+		if(node.getChildren() == null || node.getChildren().isEmpty())
+			return node;
 
 		ModelSearchNode maxScoreChild = node.getChildren().get(0);
 		double maxScore = 0;

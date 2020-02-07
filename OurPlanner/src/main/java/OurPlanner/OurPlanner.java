@@ -76,7 +76,9 @@ public class OurPlanner implements Creator  {
 	private int num_agents_not_solved = 0;
 	private int num_agents_timeout = 0;
 
-	long startTimeMs = 0;
+	private long startTimeMs = 0;
+	
+	private int planningTimeoutInMS = 10000;
 
 	OperatingSystemMXBean OSstatistics = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
 
@@ -165,7 +167,7 @@ public class OurPlanner implements Creator  {
 
 		if(!copyOutputFolder()) {
 			LOGGER.info("Coping output folder failure");
-			System.exit(1);
+			//System.exit(1);
 		}
 
 		/*
@@ -203,6 +205,8 @@ public class OurPlanner implements Creator  {
 		cValue = configuration.cValue;
 
 		experimentDetails = configuration.experimentDetails;
+		
+		planningTimeoutInMS = configuration.planningTimeoutInMS;
 
 		/*INPUT DIR PATH*/
 		Globals.INPUT_PATH = configuration.inputDirPath;
@@ -244,7 +248,7 @@ public class OurPlanner implements Creator  {
 		}
 
 		numOftraces = configuration.numOfTracesToUse;
-		
+
 		tracesLearinigInterval = configuration.tracesLearinigInterval;
 
 		domainFileName = configuration.domainFileName;
@@ -371,7 +375,7 @@ public class OurPlanner implements Creator  {
 			leaderAgentPlan = planForAgent(currentLeaderAgent, isLearning, planningModel, planningTimeoutMS);
 
 			long planningFinishTime = System.currentTimeMillis();
-			
+
 			LOGGER.info("Garbage collection!");
 			System.gc();
 
@@ -429,10 +433,10 @@ public class OurPlanner implements Creator  {
 
 		if(numOftraces>=0)
 			learnSafeAndUnSafeModelsFromTraces();
-		
+
 		LOGGER.info("Garbage collection!");
 		System.gc();
-		
+
 		LogLearningTimes();
 
 		while(!availableLeaders.isEmpty()) {
@@ -448,8 +452,11 @@ public class OurPlanner implements Creator  {
 
 			LOGGER.info("Current Leader Agent " + currentLeaderAgent);
 
+			double timeoutMS = timeLimitForAgent - TestDataAccumulator.getAccumulator().agentLearningTimeMs.get(currentLeaderAgent);
+			
 			PlannerAndModelLearner plannerAndLearner = new PlannerAndModelLearner(currentLeaderAgent, agentList,
-					domainFileName, problemFileName, learner, learner.getGoalFacts(), System.currentTimeMillis(), timeLimitForAgent);
+					domainFileName, problemFileName, learner, learner.getGoalFacts(),
+					System.currentTimeMillis(), timeoutMS, planningTimeoutInMS);
 
 
 			if(iterationMethod==IterationMethod.Monte_Carlo_Reliability_Heuristic) {
@@ -514,7 +521,8 @@ public class OurPlanner implements Creator  {
 				if(!otherAgentName.equals(agentName))
 					agentLearningTime += learner.agentLearningTimes.get(otherAgentName);
 
-			TestDataAccumulator.getAccumulator().agentLearningTimeMs.put(agentName, agentLearningTime);
+			//TestDataAccumulator.getAccumulator().agentLearningTimeMs.put(agentName, agentLearningTime);
+			TestDataAccumulator.getAccumulator().agentLearningTimeMs.put(agentName, learner.agentLearningTimes.get(agentName));
 		}
 	}
 

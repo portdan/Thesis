@@ -297,7 +297,7 @@ public class PlanVerifier {
 
 		agentValCodes = preprocessor.valCodes;
 
-		return preprocessor.getProblemForAgent(agentName);
+		return preprocessor.getProblemForAgent(agentName, System.currentTimeMillis(), timeoutInMS);
 	}
 
 	private boolean runConvert(String groundedDomainPath, String groundedProblemPath, String outputFolder){
