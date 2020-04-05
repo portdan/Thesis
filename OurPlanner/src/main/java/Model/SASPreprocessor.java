@@ -91,6 +91,7 @@ public class SASPreprocessor {
 		this.sas = sas;
 		treatGoalAsPublic = config.getBoolean("treatGoalAsPublic", true);
 		unitCost = config.getBoolean("unitCost", true);
+		long passedTimeMS = 0;
 
 		LOGGER.setLevel(Level.INFO);
 
@@ -103,12 +104,14 @@ public class SASPreprocessor {
 		}
 
 		for (SASOperator action : sas.operators) {
-			
+
+			passedTimeMS = System.currentTimeMillis() - startTimeMs;
+
 			if(System.currentTimeMillis() - startTimeMs > timeoutInMS){
 				LOGGER.fatal("TIMEOUT!");
 				return;
 			}
-			
+
 			int minIndex = Integer.MAX_VALUE;
 			String minAgent = null;
 
@@ -134,12 +137,14 @@ public class SASPreprocessor {
 			//compare each two agents once
 			for(int i = 0; i < agents.size(); ++i){
 				for(int j = i+1; j < agents.size(); ++j){
-					
+
+					passedTimeMS = System.currentTimeMillis() - startTimeMs;
+
 					if(System.currentTimeMillis() - startTimeMs > timeoutInMS){
 						LOGGER.fatal("TIMEOUT!");
 						return;
 					}
-					
+
 					String a1 = agents.get(i);
 					String a2 = agents.get(j);
 
@@ -151,7 +156,9 @@ public class SASPreprocessor {
 					//TODO: should not add again var-vals from already compared operators!
 					for(SASOperator op1 : agentOperators.get(a1)){
 						for(SASOperator op2 : agentOperators.get(a2)){
-							
+
+							passedTimeMS = System.currentTimeMillis() - startTimeMs;
+
 							if(System.currentTimeMillis() - startTimeMs > timeoutInMS){
 								LOGGER.fatal("TIMEOUT!");
 								return;
@@ -222,12 +229,14 @@ public class SASPreprocessor {
 		}else{
 			String a = agents.get(0);
 			for(SASOperator op1 : agentOperators.get(a)){
-				
+
+				passedTimeMS = System.currentTimeMillis() - startTimeMs;
+
 				if(System.currentTimeMillis() - startTimeMs > timeoutInMS){
 					LOGGER.fatal("TIMEOUT!");
 					return;
 				}
-				
+
 				for(SASFact f : op1.getFacts()){
 					addVarValToAgent(a, f.var, f.val);
 				}
@@ -271,7 +280,9 @@ public class SASPreprocessor {
 		//extract the  domains
 
 		extractPublicDomain(startTimeMs, timeoutInMS);
-		
+
+		passedTimeMS = System.currentTimeMillis() - startTimeMs;
+
 		if(System.currentTimeMillis() - startTimeMs > timeoutInMS){
 			LOGGER.fatal("TIMEOUT!");
 			return;
@@ -325,12 +336,14 @@ public class SASPreprocessor {
 		}
 
 		for(String var : varValMap.keySet()){
-			
+
+			long passedTimeMS = System.currentTimeMillis() - startTimeMs;
+
 			if(System.currentTimeMillis() - startTimeMs > timeoutInMS){
 				LOGGER.fatal("TIMEOUT!");
 				return;
 			}
-			
+
 			//var
 			Domain.varNames.put(varCount, var);
 			varCodes.put(var, varCount);
@@ -377,10 +390,13 @@ public class SASPreprocessor {
 	private Domain extractDomain(String agent, int agentVarMin, int agentValMin, long startTimeMs, double timeoutInMS){
 		int agentVarMax = agentVarMin;
 		int agentValMax = agentValMin;
+		long passedTimeMS = 0;
 
 		Map<String,Set<String>> varValMap = agentVarVals.get(agent);
 
 		for (String var : varValMap.keySet()) {
+
+			passedTimeMS = System.currentTimeMillis() - startTimeMs;
 
 			if(System.currentTimeMillis() - startTimeMs > timeoutInMS){
 				LOGGER.fatal("TIMEOUT!");
@@ -402,12 +418,14 @@ public class SASPreprocessor {
 
 			// vals
 			for (String val : varValMap.get(var)) {
-				
+
+				passedTimeMS = System.currentTimeMillis() - startTimeMs;
+
 				if(System.currentTimeMillis() - startTimeMs > timeoutInMS){
 					LOGGER.fatal("TIMEOUT!");
 					return null;
 				}
-				
+
 				if (!valCodes.containsKey(val)) {
 					Domain.valNames.put(valCount, val);
 					valCodes.put(val, valCount);
@@ -478,12 +496,14 @@ public class SASPreprocessor {
 			Set<Action> actions = new LinkedHashSet<Action>();
 			Set<Action> publicActions = new LinkedHashSet<Action>();
 			for(SASOperator op : agentOperators.get(agent)){
-				
+
+				long passedTimeMS = System.currentTimeMillis() - startTimeMs;
+
 				if(System.currentTimeMillis() - startTimeMs > timeoutInMS){
 					LOGGER.fatal("TIMEOUT!");
 					return null;
 				}
-				
+
 				//            LOGGER.info(op.toString());
 				SuperState pre = new SuperState(d);
 				for(String var : op.pre.keySet()){
@@ -512,13 +532,15 @@ public class SASPreprocessor {
 			Set<Action> allActions = new LinkedHashSet<Action>(actions);
 			for (String otherAgent : agentOperators.keySet()) {
 				if (!otherAgent.equals(agent)) {
-					for (SASOperator op : agentOperators.get(otherAgent)) {
-						
+					for (SASOperator op : agentOperators.get(otherAgent)) {						
+
+						long passedTimeMS = System.currentTimeMillis() - startTimeMs;
+
 						if(System.currentTimeMillis() - startTimeMs > timeoutInMS){
 							LOGGER.fatal("TIMEOUT!");
 							return null;
 						}
-						
+
 						if (op.isPublic) {
 							boolean isNotPure = false;
 

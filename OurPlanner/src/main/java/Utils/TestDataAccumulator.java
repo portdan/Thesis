@@ -13,6 +13,7 @@ import java.util.List;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
+import OurPlanner.Globals;
 import enums.IterationMethod;
 
 public class TestDataAccumulator {
@@ -28,6 +29,7 @@ public class TestDataAccumulator {
 	public List<String> agentNames;
 
 	public Map<String, Long> agentLearningTimeMs = new HashMap<String, Long>();
+	public Map<String, Long> agentOfflineLearningTimeMs = new HashMap<String, Long>();
 	public Map<String, Long> agentPlanningTimeMs = new HashMap<String, Long>();
 	public Map<String, Long> agentVerifingTimeMs = new HashMap<String, Long>();
 	public Map<String, Integer> agentAddedTrainingSize = new HashMap<String, Integer>();
@@ -38,6 +40,7 @@ public class TestDataAccumulator {
 	public long totalPlaningTimeMs = 0;
 	public long totalVerifingTimeMs = 0;
 	public int initialTrainingSize = 0;
+	public int trainingSizeBucket = 0;
 	public int numOfAgentsSolved = 0;
 	public int numOfAgentsTimeout = 0;
 	public int numOfAgentsNotSolved = 0;
@@ -56,6 +59,22 @@ public class TestDataAccumulator {
 		this.domain = domain;
 		this.problem = problem;
 		this.agentNames = new ArrayList<String>(agentNames);
+
+		agentLearningTimeMs = new HashMap<String, Long>();
+		agentOfflineLearningTimeMs = new HashMap<String, Long>();
+		agentPlanningTimeMs = new HashMap<String, Long>();
+		agentVerifingTimeMs = new HashMap<String, Long>();
+		agentAddedTrainingSize = new HashMap<String, Integer>();
+		agentNumOfIterations = new HashMap<String, Integer>();
+
+		for (String agent : agentNames) {
+			agentLearningTimeMs.put(agent, 0l);
+			agentOfflineLearningTimeMs.put(agent, 0l);
+			agentPlanningTimeMs.put(agent, 0l);
+			agentVerifingTimeMs.put(agent, 0l);
+			agentAddedTrainingSize.put(agent, 0);
+			agentNumOfIterations.put(agent, 0);
+		}
 	}
 
 	public static void startNewAccumulator(String domain, String problem, List<String> agentNames) {
@@ -64,6 +83,40 @@ public class TestDataAccumulator {
 
 	public static TestDataAccumulator getAccumulator() {
 		return currentAccumulator;
+	}
+
+	/*
+	public long getTotalTimeMSforAgent(String agentName) {
+		return agentLearningTimeMs.get(agentName) + agentPlanningTimeMs.get(agentName) + agentVerifingTimeMs.get(agentName);
+	}
+
+	public long getTotalTimeMSforAgentWithoutOfflineLearning(String agentName) {
+		return agentLearningTimeMs.get(agentName) - agentOfflineLearningTimeMs.get(agentName) + agentPlanningTimeMs.get(agentName) + agentVerifingTimeMs.get(agentName);
+	}
+
+	public long getTotalTimeMS() {
+		long res = 0;
+		for (String agent : agentNames) 
+			res += getTotalTimeMSforAgent(agent);
+
+		return res;
+	}
+
+	public long getTotalTimeMSWithoutOfflienLearning() {
+		long res = 0;
+		for (String agent : agentNames) 
+			res += getTotalTimeMSforAgentWithoutOfflineLearning(agent);
+
+		return res;
+	}
+	 */
+
+	public long getOfflineLearningTime() {
+		long res = 0;
+		for (String agent : agentNames) 
+			res += agentOfflineLearningTimeMs.get(agent);
+
+		return res;
 	}
 
 	public void setOutputFile(String output) {
@@ -78,12 +131,17 @@ public class TestDataAccumulator {
 		sb.append("Agents").append(sep);
 		sb.append("Details").append(sep);
 		sb.append("Initial Training Size").append(sep);
+		sb.append("Training Size Bucket").append(sep);
 		sb.append("Iteration Method").append(sep);
 		sb.append("Status").append(sep);
 		sb.append("Solved").append(sep);
 		sb.append("Timeout").append(sep);
 		sb.append("Not Solved").append(sep);
 		sb.append("Total Time").append(sep);
+
+		if(Globals.IGNORE_OFFLINE_LEARNING_TIMEOUT)
+			sb.append("Total Time - Learning").append(sep);
+
 		sb.append("Total Learning Time").append(sep);
 		sb.append("Total Planning Time").append(sep);
 		sb.append("Total Verifing Time").append(sep);
@@ -110,12 +168,17 @@ public class TestDataAccumulator {
 		sb.append(agentNames.size()).append(sep);
 		sb.append(experimentDetails).append(sep);
 		sb.append(initialTrainingSize).append(sep);
+		sb.append(trainingSizeBucket).append(sep);
 		sb.append(method).append(sep);
 		sb.append(finishStatus).append(sep);
 		sb.append(numOfAgentsSolved).append(sep);
 		sb.append(numOfAgentsTimeout).append(sep);
 		sb.append(numOfAgentsNotSolved).append(sep);
 		sb.append(totalTimeMs).append(sep);
+
+		if(Globals.IGNORE_OFFLINE_LEARNING_TIMEOUT)
+			sb.append(totalTimeMs - getOfflineLearningTime()).append(sep);
+
 		sb.append(totalLearningTimeMs).append(sep);
 		sb.append(totalPlaningTimeMs).append(sep);
 		sb.append(totalVerifingTimeMs).append(sep);

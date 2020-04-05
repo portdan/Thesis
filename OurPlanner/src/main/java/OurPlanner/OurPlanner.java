@@ -21,6 +21,7 @@ import Configuration.ConfigurationManager;
 import Configuration.OurPlannerConfiguration;
 import PlannerAndLearner.PlannerAndModelLearner;
 import Utils.FileDeleter;
+import Utils.OSStatistics;
 import Utils.TestDataAccumulator;
 import Utils.VerificationResult;
 import cz.agents.alite.creator.Creator;
@@ -70,14 +71,15 @@ public class OurPlanner implements Creator  {
 	private	Random rnd = new Random(SEED);
 	//private	Random rnd = new Random();
 
-	private int numOftraces = 0;
+	private int numOftracesToUse = 0;
+	private int tracesBucket = 0;
 	private int tracesLearinigInterval = 0;
 	private int num_agents_solved = 0;
 	private int num_agents_not_solved = 0;
 	private int num_agents_timeout = 0;
 
 	private long startTimeMs = 0;
-	
+
 	private int planningTimeoutInMS = 10000;
 
 	OperatingSystemMXBean OSstatistics = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
@@ -143,7 +145,8 @@ public class OurPlanner implements Creator  {
 
 		TestDataAccumulator.getAccumulator().experimentDetails = experimentDetails;
 		TestDataAccumulator.getAccumulator().method = iterationMethod.name();
-		TestDataAccumulator.getAccumulator().initialTrainingSize = numOftraces;			
+		TestDataAccumulator.getAccumulator().initialTrainingSize = numOftracesToUse;			
+		TestDataAccumulator.getAccumulator().trainingSizeBucket = tracesBucket;			
 
 		/*
 		try {
@@ -205,7 +208,7 @@ public class OurPlanner implements Creator  {
 		cValue = configuration.cValue;
 
 		experimentDetails = configuration.experimentDetails;
-		
+
 		planningTimeoutInMS = configuration.planningTimeoutInMS;
 
 		/*INPUT DIR PATH*/
@@ -247,7 +250,8 @@ public class OurPlanner implements Creator  {
 			return false;
 		}
 
-		numOftraces = configuration.numOfTracesToUse;
+		numOftracesToUse = configuration.numOfTracesToUse;
+		tracesBucket = configuration.totalTracesBucket;
 
 		tracesLearinigInterval = configuration.tracesLearinigInterval;
 
@@ -271,7 +275,7 @@ public class OurPlanner implements Creator  {
 		String timestampFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(timestamp);
 
 		Globals.OUTPUT_COPY_PATH = configuration.outputCopyDirPath + "/" + experimentDetails + "/" + 
-				iterationMethod.name() + "/" + numOftraces + "_traces" + "/" + timestampFormat;
+				iterationMethod.name() + "/" + numOftracesToUse + "_traces" + "/" + timestampFormat;
 
 		outputCopyDir = new File(Globals.OUTPUT_COPY_PATH);
 
@@ -320,6 +324,7 @@ public class OurPlanner implements Creator  {
 		LOGGER.info("Running planning algorithm");
 
 		availableLeaders = new ArrayList<>(agentList);
+		long passedTimeMS = 0;
 
 		long agentTimeoutInMS = timeoutInMS/agentList.size();
 
@@ -328,28 +333,44 @@ public class OurPlanner implements Creator  {
 		boolean isLearning = false;
 		boolean isTimeout = false;
 
-		if(numOftraces>=0)
+		if(numOftracesToUse>=0)
 			isLearning = learnSafeAndUnSafeModelsFromTraces();
 
 		LogLearningTimes();
+
+		if(Globals.IGNORE_OFFLINE_LEARNING_TIMEOUT)
+			timeoutInMS += TestDataAccumulator.getAccumulator().totalLearningTimeMs;
 
 		LOGGER.info("Garbage collection!");
 		System.gc();
 
 		while(leaderAgentPlan == null) {
 
-			if(System.currentTimeMillis() - startTimeMs > timeoutInMS){
+			passedTimeMS = System.currentTimeMillis() - startTimeMs;
+			/*
+			if(!Globals.IGNORE_OFFLINE_LEARNING_TIMEOUT)
+				passedTimeMS = TestDataAccumulator.getAccumulator().getTotalTimeMSWithoutOfflienLearning();
+			else
+				passedTimeMS = TestDataAccumulator.getAccumulator().getTotalTimeMS();
+			 */
+
+			if(passedTimeMS > timeoutInMS){
 
 				isTimeout= true;
 				LOGGER.fatal("TIMEOUT!");
 				break;
 			}
 
-			long getCommittedVirtualMemorySize = OSstatistics.getCommittedVirtualMemorySize();
-			long getFreePhysicalMemorySize = OSstatistics.getFreePhysicalMemorySize();
-			long getTotalPhysicalMemorySize = OSstatistics.getTotalPhysicalMemorySize();
+			/*
+			double getCommittedVirtualMemorySize = (double)OSstatistics.getCommittedVirtualMemorySize()/1073741824;
+			double getFreePhysicalMemorySize = (double)OSstatistics.getFreePhysicalMemorySize()/1073741824;
+			double getTotalPhysicalMemorySize = (double)OSstatistics.getTotalPhysicalMemorySize()/1073741824;
 
-			if(getFreePhysicalMemorySize > 0.8*getTotalPhysicalMemorySize) {
+			double usedMemoryRatio = (double)(getTotalPhysicalMemorySize-getFreePhysicalMemorySize)/(double)getTotalPhysicalMemorySize;
+			 */
+			double usedMemoryRatio = OSStatistics.GetMemoryUsage();
+
+			if(usedMemoryRatio > Globals.MEMORY_OVER_USAGE_RATIO) {
 
 				isTimeout= true;
 				LOGGER.fatal("MEMORY OVER USAGE!");
@@ -368,33 +389,38 @@ public class OurPlanner implements Creator  {
 
 			LOGGER.info("Current Leader Agent " + currentLeaderAgent);
 
-			long planningTimeoutMS = agentTimeoutInMS - TestDataAccumulator.getAccumulator().agentLearningTimeMs.get(currentLeaderAgent);
+			long agentLearningTime = 0;
+
+			if(Globals.IGNORE_OFFLINE_LEARNING_TIMEOUT)
+				agentLearningTime = TestDataAccumulator.getAccumulator().agentOfflineLearningTimeMs.get(currentLeaderAgent);
+
+			long planningTimeoutMS = agentTimeoutInMS;// + agentLearningTime;
 
 			long planningStartTime = System.currentTimeMillis();
 
 			leaderAgentPlan = planForAgent(currentLeaderAgent, isLearning, planningModel, planningTimeoutMS);
 
-			long planningFinishTime = System.currentTimeMillis();
+			long planningTimeTotal = System.currentTimeMillis() - planningStartTime;
 
 			LOGGER.info("Garbage collection!");
 			System.gc();
 
-			TestDataAccumulator.getAccumulator().totalPlaningTimeMs += planningFinishTime - planningStartTime;
-			TestDataAccumulator.getAccumulator().agentPlanningTimeMs.put(currentLeaderAgent, planningFinishTime - planningStartTime);
+			TestDataAccumulator.getAccumulator().totalPlaningTimeMs += planningTimeTotal;
+			TestDataAccumulator.getAccumulator().agentPlanningTimeMs.put(currentLeaderAgent, planningTimeTotal);
 
 			if(leaderAgentPlan == null)
 				continue;	
 
-			long verifingTimeoutMS = agentTimeoutInMS - (planningFinishTime - planningStartTime) - TestDataAccumulator.getAccumulator().agentLearningTimeMs.get(currentLeaderAgent);
+			long verifingTimeoutMS = agentTimeoutInMS - planningTimeTotal + agentLearningTime;
 
 			long verifingStartTime = System.currentTimeMillis();
 
 			boolean isVerified = verifyPlan(leaderAgentPlan, isLearning, verificationModel, verifingTimeoutMS);
 
-			long verifingFinishTime = System.currentTimeMillis();
+			long verifingTotalTime = System.currentTimeMillis() - verifingStartTime;
 
-			TestDataAccumulator.getAccumulator().totalVerifingTimeMs += verifingFinishTime - verifingStartTime;
-			TestDataAccumulator.getAccumulator().agentVerifingTimeMs.put(currentLeaderAgent, verifingFinishTime - verifingStartTime);
+			TestDataAccumulator.getAccumulator().totalVerifingTimeMs += verifingTotalTime;
+			TestDataAccumulator.getAccumulator().agentVerifingTimeMs.put(currentLeaderAgent, verifingTotalTime);
 
 			LOGGER.info("Garbage collection!");
 			System.gc();
@@ -426,12 +452,13 @@ public class OurPlanner implements Creator  {
 		availableLeaders = new ArrayList<>(agentList);
 
 		List<String> leaderAgentPlan = null;
+		long passedTimeMS = 0;
 
 		boolean isTimeout = false;
 
 		double timeLimitForAgent = ((double)timeoutInMS)/agentList.size();
 
-		if(numOftraces>=0)
+		if(numOftracesToUse>=0)
 			learnSafeAndUnSafeModelsFromTraces();
 
 		LOGGER.info("Garbage collection!");
@@ -439,9 +466,19 @@ public class OurPlanner implements Creator  {
 
 		LogLearningTimes();
 
+		if(Globals.IGNORE_OFFLINE_LEARNING_TIMEOUT)
+			timeoutInMS += TestDataAccumulator.getAccumulator().totalLearningTimeMs;
+
 		while(!availableLeaders.isEmpty()) {
 
-			if(System.currentTimeMillis() - startTimeMs > timeoutInMS)
+			passedTimeMS = System.currentTimeMillis() - startTimeMs;
+			/*
+			if(!Globals.IGNORE_OFFLINE_LEARNING_TIMEOUT)
+				passedTimeMS = TestDataAccumulator.getAccumulator().getTotalTimeMSWithoutOfflienLearning();
+			else
+				passedTimeMS = TestDataAccumulator.getAccumulator().getTotalTimeMS();
+			 */
+			if(passedTimeMS > timeoutInMS)
 			{
 				isTimeout=true;
 				LOGGER.fatal("TIMEOUT!");
@@ -452,8 +489,13 @@ public class OurPlanner implements Creator  {
 
 			LOGGER.info("Current Leader Agent " + currentLeaderAgent);
 
-			double timeoutMS = timeLimitForAgent - TestDataAccumulator.getAccumulator().agentLearningTimeMs.get(currentLeaderAgent);
-			
+			long agentLearningTime = 0;
+
+			if(Globals.IGNORE_OFFLINE_LEARNING_TIMEOUT)
+				agentLearningTime = TestDataAccumulator.getAccumulator().agentOfflineLearningTimeMs.get(currentLeaderAgent);
+
+			double timeoutMS = timeLimitForAgent + agentLearningTime;
+
 			PlannerAndModelLearner plannerAndLearner = new PlannerAndModelLearner(currentLeaderAgent, agentList,
 					domainFileName, problemFileName, learner, learner.getGoalFacts(),
 					System.currentTimeMillis(), timeoutMS, planningTimeoutInMS);
@@ -486,6 +528,9 @@ public class OurPlanner implements Creator  {
 			TestDataAccumulator.getAccumulator().agentAddedTrainingSize.put(currentLeaderAgent, plannerAndLearner.addedTrainingSize);
 
 			LogLearningTimes();
+			
+			LOGGER.info("Garbage collection!");
+			System.gc();
 
 			if(leaderAgentPlan != null) {
 
@@ -523,6 +568,7 @@ public class OurPlanner implements Creator  {
 
 			//TestDataAccumulator.getAccumulator().agentLearningTimeMs.put(agentName, agentLearningTime);
 			TestDataAccumulator.getAccumulator().agentLearningTimeMs.put(agentName, learner.agentLearningTimes.get(agentName));
+			TestDataAccumulator.getAccumulator().agentOfflineLearningTimeMs.put(agentName, learner.agentLearningTimes.get(agentName));
 		}
 	}
 
@@ -531,7 +577,8 @@ public class OurPlanner implements Creator  {
 		LOGGER.info("Running learning algorithm");
 
 		learner = new TraceLearner(agentList,tracesFile, groundedFile, localViewFile, 
-				domainFileName, problemFileName, numOftraces, tracesLearinigInterval, startTimeMs, timeoutInMS);	
+				domainFileName, problemFileName, numOftracesToUse, tracesLearinigInterval, 
+				startTimeMs, timeoutInMS , Globals.IGNORE_OFFLINE_LEARNING_TIMEOUT);	
 
 		boolean isLearned = learner.learnSafeAndUnSafeModels();
 

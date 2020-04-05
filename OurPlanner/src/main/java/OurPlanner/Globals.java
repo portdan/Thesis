@@ -32,5 +32,8 @@ public class Globals {
 	public static final String AGENT_INDICATION = "-agent-";
 
 	public static String PYTHON_SCRIPTS_FOLDER;
+	
+	public final static boolean IGNORE_OFFLINE_LEARNING_TIMEOUT = true;
+	public final static double MEMORY_OVER_USAGE_RATIO = 0.9;
 
 }

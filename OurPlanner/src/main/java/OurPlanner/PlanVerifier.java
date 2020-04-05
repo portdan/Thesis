@@ -19,6 +19,7 @@ import org.apache.log4j.Logger;
 
 import Model.*;
 import Utils.FileDeleter;
+import Utils.TestDataAccumulator;
 import Utils.VerificationResult;
 import cz.agents.dimaptools.input.addl.ADDLObject;
 import cz.agents.dimaptools.input.addl.ADDLParser;
@@ -247,6 +248,7 @@ public class PlanVerifier {
 			String problemPath, String agentADDLPath) {
 
 		LOGGER.info("Generating problem for agent: " + agentName);
+		long passedTimeMS = 0;
 
 		File agentFile = new File(agentADDLPath);
 		if (!agentFile.exists()) {
@@ -286,7 +288,9 @@ public class PlanVerifier {
 		SASDomain sasDom = parser.getDomain();
 		PlanVerifierSASPreprocessor preprocessor = new PlanVerifierSASPreprocessor(sasDom, addl, startTimeMs, timeoutInMS);
 
-		if(System.currentTimeMillis() - startTimeMs > timeoutInMS)
+		passedTimeMS = System.currentTimeMillis() - startTimeMs;
+
+		if(passedTimeMS > timeoutInMS)
 		{
 			LOGGER.fatal("TIMEOUT!");
 			return null;
@@ -415,8 +419,11 @@ public class PlanVerifier {
 	public VerificationResult verifyPlan(List<String> plan, int actionIndex) {
 
 		LOGGER.info("Verifying plan");
+		long passedTimeMS = 0;
 
-		if(System.currentTimeMillis() - startTimeMs > timeoutInMS)
+		passedTimeMS = System.currentTimeMillis() - startTimeMs;
+
+		if(passedTimeMS > timeoutInMS)
 		{
 			LOGGER.fatal("TIMEOUT!");
 			return new VerificationResult(-1, false, true);
@@ -450,7 +457,9 @@ public class PlanVerifier {
 			return new VerificationResult(actionIndex, false);
 		}
 
-		if(System.currentTimeMillis() - startTimeMs > timeoutInMS)
+		passedTimeMS = System.currentTimeMillis() - startTimeMs;
+
+		if(passedTimeMS > timeoutInMS)
 		{
 			LOGGER.fatal("TIMEOUT!");
 			return new VerificationResult(-1, false, true);

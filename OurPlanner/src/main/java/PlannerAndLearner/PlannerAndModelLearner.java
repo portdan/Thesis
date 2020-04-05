@@ -27,6 +27,7 @@ import OurPlanner.TraceLearner;
 import Utils.ArrayUtils;
 import Utils.FileDeleter;
 import Utils.MCTS;
+import Utils.OSStatistics;
 import Utils.TestDataAccumulator;
 import Utils.VerificationResult;
 import enums.IterationMethod;
@@ -140,6 +141,7 @@ public class PlannerAndModelLearner {
 		LOGGER.info("test");
 
 		List<String> plan = null;
+		long passedTimeMS = 0;
 
 		if(!copyProblemFiles()) {
 			LOGGER.info("Coping domain file failure");
@@ -171,7 +173,16 @@ public class PlannerAndModelLearner {
 
 		while (!open.isEmpty()) {
 
-			if(System.currentTimeMillis() - startTimeMs > timeoutInMS){
+			passedTimeMS = System.currentTimeMillis() - startTimeMs;
+
+			/*
+			if(!Globals.IGNORE_OFFLINE_LEARNING_TIMEOUT)
+				passedTimeMS = TestDataAccumulator.getAccumulator().getTotalTimeMSforAgentWithoutOfflineLearning(agentName) ;
+			else
+				passedTimeMS = TestDataAccumulator.getAccumulator().getTotalTimeMSforAgent(agentName) ;
+			 */
+
+			if(passedTimeMS > timeoutInMS){
 				LOGGER.fatal("TIMEOUT!");
 				isTimeout = true;
 				num_agents_solved = 0;
@@ -260,10 +271,10 @@ public class PlannerAndModelLearner {
 					else {
 
 						PlanToStateActionStateResult result = planToSASList(plan, res.lastActionIndex);
-						
+
 						if(result.isTimeout())
 							continue;
-						
+
 						List<StateActionState> planSASList = result.getPlanSASList();
 						StateActionState failedActionSAS = result.getFailedActionSAS();
 
@@ -302,6 +313,7 @@ public class PlannerAndModelLearner {
 		LOGGER.info("test");
 
 		List<String> plan = null;
+		long passedTimeMS = 0;
 
 		if(!copyProblemFiles()) {
 			LOGGER.info("Coping domain file failure");
@@ -330,7 +342,16 @@ public class PlannerAndModelLearner {
 
 		while (!isTimeout) {
 
-			if(System.currentTimeMillis() - startTimeMs > timeoutInMS){
+			passedTimeMS = System.currentTimeMillis() - startTimeMs;
+
+			/*
+			if(!Globals.IGNORE_OFFLINE_LEARNING_TIMEOUT)
+				passedTimeMS = TestDataAccumulator.getAccumulator().getTotalTimeMSforAgentWithoutOfflineLearning(agentName) ;
+			else
+				passedTimeMS = TestDataAccumulator.getAccumulator().getTotalTimeMSforAgent(agentName) ;
+			 */
+
+			if(passedTimeMS > timeoutInMS){
 
 				LOGGER.fatal("TIMEOUT!");
 				isTimeout = true;
@@ -340,11 +361,17 @@ public class PlannerAndModelLearner {
 				return null;
 			}
 
-			long getCommittedVirtualMemorySize = OSstatistics.getCommittedVirtualMemorySize();
-			long getFreePhysicalMemorySize = OSstatistics.getFreePhysicalMemorySize();
-			long getTotalPhysicalMemorySize = OSstatistics.getTotalPhysicalMemorySize();
+			/*
+			double getCommittedVirtualMemorySize = (double)OSstatistics.getCommittedVirtualMemorySize()/1073741824;
+			double getFreePhysicalMemorySize = (double)OSstatistics.getFreePhysicalMemorySize()/1073741824;
+			double getTotalPhysicalMemorySize = (double)OSstatistics.getTotalPhysicalMemorySize()/1073741824;
 
-			if(getFreePhysicalMemorySize > 0.8*getTotalPhysicalMemorySize) {
+			double usedMemoryRatio = (double)(getTotalPhysicalMemorySize-getFreePhysicalMemorySize)/(double)getTotalPhysicalMemorySize;
+			 */
+
+			double usedMemoryRatio = OSStatistics.GetMemoryUsage();
+
+			if(usedMemoryRatio > Globals.MEMORY_OVER_USAGE_RATIO) {
 
 				LOGGER.fatal("MEMORY OVER USAGE!");
 				isTimeout = true;
@@ -811,16 +838,16 @@ public class PlannerAndModelLearner {
 		if(planner.isNotSolved)
 			num_agents_not_solved++;*/
 
-		long planningFinishTime = System.currentTimeMillis();
+		long planningTimeTotal = System.currentTimeMillis() - planningStartTime;
 
-		TestDataAccumulator.getAccumulator().totalPlaningTimeMs += planningFinishTime - planningStartTime;
+		TestDataAccumulator.getAccumulator().totalPlaningTimeMs += planningTimeTotal;
 
 		Long agentPlanningTimes = TestDataAccumulator.getAccumulator().agentPlanningTimeMs.get(agentName);
 
 		if(agentPlanningTimes == null) 
-			agentPlanningTimes = planningFinishTime - planningStartTime;
+			agentPlanningTimes = planningTimeTotal;
 		else
-			agentPlanningTimes += planningFinishTime - planningStartTime;
+			agentPlanningTimes += planningTimeTotal;
 
 		TestDataAccumulator.getAccumulator().agentPlanningTimeMs.put(agentName, agentPlanningTimes);		
 
@@ -851,16 +878,16 @@ public class PlannerAndModelLearner {
 
 		VerificationResult res = planVerifier.verifyPlan(plan,0);
 
-		long verifingFinishTime = System.currentTimeMillis();
+		long verifingTotalTime = System.currentTimeMillis() - verifingStartTime;
 
-		TestDataAccumulator.getAccumulator().totalVerifingTimeMs += verifingFinishTime - verifingStartTime;
+		TestDataAccumulator.getAccumulator().totalVerifingTimeMs += verifingTotalTime;
 
 		Long agentVerifingTime = TestDataAccumulator.getAccumulator().agentVerifingTimeMs.get(agentName);
 
 		if(agentVerifingTime == null) 
-			agentVerifingTime = verifingFinishTime - verifingStartTime;
+			agentVerifingTime = verifingTotalTime;
 		else
-			agentVerifingTime += verifingFinishTime - verifingStartTime;
+			agentVerifingTime += verifingTotalTime;
 
 		TestDataAccumulator.getAccumulator().agentVerifingTimeMs.put(agentName, agentVerifingTime);
 
@@ -883,6 +910,7 @@ public class PlannerAndModelLearner {
 				- TestDataAccumulator.getAccumulator().agentLearningTimeMs.get(agentName) 
 				- TestDataAccumulator.getAccumulator().agentVerifingTimeMs.get(agentName);
 
+		//planToSASListTimeoutMS = (long)timeoutInMS - TestDataAccumulator.getAccumulator().getTotalTimeMSforAgent(agentName);
 
 		String problemFilesPath = Globals.INPUT_GROUNDED_PATH;
 

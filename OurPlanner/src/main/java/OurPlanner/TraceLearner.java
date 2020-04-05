@@ -28,6 +28,8 @@ public class TraceLearner {
 
 	private List<String> agentList = null;
 
+	private boolean ignoreOfflineLearningTimeout = true;
+
 	private File trajectoryFiles = null;
 	private File problemFiles = null;
 	private File localViewFiles = null;
@@ -61,7 +63,7 @@ public class TraceLearner {
 
 	public TraceLearner(List<String> agentList , String agentName, File trajectoryFiles ,
 			File problemFiles , File localViewFiles ,String domainFileName ,String problemFileName, 
-			int numOfTracesToUse, int tracesLearinigInterval, long startTimeMs, int timeoutInMS) {
+			int numOfTracesToUse, int tracesLearinigInterval, long startTimeMs, int timeoutInMS, boolean ignoreOfflineLearningTimeout) {
 
 		LOGGER.setLevel(Level.INFO);
 
@@ -77,6 +79,7 @@ public class TraceLearner {
 		this.tracesLearinigInterval = tracesLearinigInterval;
 		this.timeoutInMS = timeoutInMS;
 		this.startTimeMs = startTimeMs;
+		this.ignoreOfflineLearningTimeout = ignoreOfflineLearningTimeout;
 
 		for (String agent : agentList) 
 			agentLearningTimes.put(agent,(long) 0);
@@ -86,10 +89,10 @@ public class TraceLearner {
 
 	public TraceLearner(List<String> agentList, File trajectoryFiles , File problemFiles , File localViewFiles, 
 			String domainFileName ,String problemFileName, int numOfTracesToUse, int tracesLearinigInterval,
-			long startTimeMs, int timeoutInMS) {
+			long startTimeMs, int timeoutInMS,  boolean ignoreOfflineLearningTimeout) {
 
 		this(agentList, "", trajectoryFiles, problemFiles, localViewFiles, domainFileName, problemFileName, 
-				numOfTracesToUse, tracesLearinigInterval, startTimeMs, timeoutInMS);
+				numOfTracesToUse, tracesLearinigInterval, startTimeMs, timeoutInMS, ignoreOfflineLearningTimeout);
 	}
 
 	private void logInput() {
@@ -106,7 +109,7 @@ public class TraceLearner {
 		LOGGER.info("tracesLearinigInterval: " + tracesLearinigInterval);
 		LOGGER.info("timeoutMS: " + timeoutInMS);
 		LOGGER.info("startTimeMs: " +startTimeMs);
-
+		LOGGER.info("ignoreOfflineLearningTimeout: " + ignoreOfflineLearningTimeout);
 	}
 
 	public boolean learnSafeAndUnSafeModels() {
@@ -115,6 +118,7 @@ public class TraceLearner {
 
 		IsSafeModelUpdated = false;
 		IsUnSafeModelUpdated = false;
+		long passedTimeMS = 0;
 
 		sasSequencer = new StateActionStateSequencer(agentList, 
 				problemFiles, domainFileName, problemFileName, trajectoryFiles);
@@ -130,8 +134,10 @@ public class TraceLearner {
 		initializeActionsPreconditionsScore(formatFacts(allFacts), actionLabels);
 
 		while(!sasSequencer.StopSequencing) {
-			
-			if(System.currentTimeMillis() - startTimeMs > timeoutInMS){
+
+			passedTimeMS = System.currentTimeMillis() - startTimeMs;
+
+			if(!ignoreOfflineLearningTimeout && passedTimeMS > timeoutInMS){
 				LOGGER.fatal("TIMEOUT!");
 				return false;
 			}
@@ -199,6 +205,7 @@ public class TraceLearner {
 			String pathUnSafeModel, long sequancingTimeTotal, long sequancingAmountTotal) {
 
 		LOGGER.info("Learning new actions from plan");
+		long passedTimeMS = 0;
 
 		IsSafeModelUpdated = false;
 		IsUnSafeModelUpdated = false;
@@ -209,8 +216,10 @@ public class TraceLearner {
 		List<StateActionState> sasList = new ArrayList<StateActionState>(planSASList); 
 
 		while(!sasList.isEmpty()) {
-			
-			if(System.currentTimeMillis() - startTimeMs > timeoutInMS){
+
+			passedTimeMS = System.currentTimeMillis() - startTimeMs;
+
+			if(passedTimeMS > timeoutInMS){
 				LOGGER.fatal("TIMEOUT!");
 				return false;
 			}

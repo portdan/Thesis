@@ -11,7 +11,7 @@ public class StateActionState {
 	public String actionOwner = null;
 	public Set<String> post = null;
 	public int traceNumber = 0;
-	
+
 	public StateActionState(StateActionState toCopy) {
 
 		this.pre = new HashSet<String>(toCopy.pre);
@@ -20,7 +20,7 @@ public class StateActionState {
 		this.post = new HashSet<String>(toCopy.post);
 		this.traceNumber = toCopy.traceNumber;
 	}
-	
+
 	public StateActionState(Set<String> pre, String action, String actionOwner, Set<String> post, int traceNumber) {
 
 		this.pre = new HashSet<String>(pre);
@@ -50,7 +50,7 @@ public class StateActionState {
 			reconstructActionOwner(sas);
 
 			reconstructPost(sas);
-			
+
 			reconstructTraceNumber(sas);
 		}
 	}
@@ -141,7 +141,7 @@ public class StateActionState {
 			else
 				res += " ] ";
 		}
-		
+
 		res += " ; traceNum[ " + traceNumber + " ] ";
 
 		res += "]";
@@ -149,4 +149,50 @@ public class StateActionState {
 		return res;
 
 	}
+
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((action == null) ? 0 : action.hashCode());
+		result = prime * result + ((actionOwner == null) ? 0 : actionOwner.hashCode());
+		result = prime * result + ((post == null) ? 0 : post.hashCode());
+		result = prime * result + ((pre == null) ? 0 : pre.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		StateActionState other = (StateActionState) obj;
+		if (action == null) {
+			if (other.action != null)
+				return false;
+		} else if (!action.equals(other.action))
+			return false;
+		if (actionOwner == null) {
+			if (other.actionOwner != null)
+				return false;
+		} else if (!actionOwner.equals(other.actionOwner))
+			return false;
+		if (post == null) {
+			if (other.post != null)
+				return false;
+		} else if (!post.equals(other.post))
+			return false;
+		if (pre == null) {
+			if (other.pre != null)
+				return false;
+		} else if (!pre.equals(other.pre))
+			return false;
+		return true;
+	}
+
+
 }
