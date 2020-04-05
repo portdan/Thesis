@@ -31,7 +31,7 @@ Plan_Length_Heuristic = "Plan_Length_Heuristic"
 Random = "Random"
 BFS = "BFS"
 DFS = "DFS"
-Single_Iteration = "Single_Iteration"
+Offline_Learning = "Offline_Learning"
 
 class Planner(object):
     '''
@@ -67,7 +67,7 @@ class Planner(object):
             preprocess_runner_script.write(preprocess_script_path)
             preprocess_runner_script.write(preprocess_sas_file_input)
 
-    def prepere_planning_config(self, problem_name, num_of_traces_to_use, planner_mode, experiment_details, timeoutInMS, planner_iteration_method = None, C_value = 2):
+    def prepere_planning_config(self, problem_name, num_of_traces_to_use, total_traces_bucket, planner_mode, experiment_details, timeoutInMS, planner_iteration_method = None, C_value = 2):
      
         logger.info("prepere_planning_config")
         
@@ -83,6 +83,7 @@ class Planner(object):
         planner_config.domainFileName = self.config.domainName
         planner_config.problemFileName = problem_name
         planner_config.numOfTracesToUse = num_of_traces_to_use
+        planner_config.totalTracesBucket = total_traces_bucket
         planner_config.agentsFileName = problem_name.split(".")[0] + ".agents"
         planner_config.verificationModel = self.config.problemPlannerVerificationModel
         planner_config.planningModel = self.config.problemPlannerPlanningModel
@@ -140,11 +141,11 @@ class Planner(object):
     def delete_output(self):
         clear_directory(self.config.problemPlannerOutput)
 
-    def plan(self, problem_name, num_of_traces_to_use, planner_mode, experiment_details, timeoutInMS, planner_iteration_method=None, C_value = 2):
+    def plan(self, problem_name, num_of_traces_to_use, total_traces_bucket, planner_mode, experiment_details, timeoutInMS, planner_iteration_method=None, C_value = 2):
            
         logger.info("plan")
         
-        self.prepere_planning_config(problem_name, num_of_traces_to_use, planner_mode, experiment_details, timeoutInMS, planner_iteration_method, C_value)
+        self.prepere_planning_config(problem_name, num_of_traces_to_use, total_traces_bucket, planner_mode, experiment_details, timeoutInMS, planner_iteration_method, C_value)
         
         self.run_planning()   
         
@@ -189,45 +190,65 @@ class Planner(object):
       
     '''  
             
-    def plan_and_learn_by_iteration_method(self,problem_config, problem_name, solved_threshold):
+    def plan_and_learn_by_iteration_method(self,problem_config, problem_name, max_traces_to_generate, 
+                                           grounded_output_path, traces_generator):
             
         experiment_setup = problem_config.experimentSetup    
-        
+        iteration_methods = problem_config.iterationMethods    
+
         thresholdTimeoutInMS = problem_config.thresholdSearchSetup.timeoutInMS
         experimentTimeoutInMS = problem_config.experimentSetup.timeoutInMS
-
-                    
-        experiment_traces_amounts = [int(t * solved_threshold) for t in experiment_setup.amountOfTraces]
-        experiment_traces_amounts.sort(reverse=True)
         
+        max_traces_bucket = traces_generator.get_num_of_random_walk_steps() * max_traces_to_generate
+
+        experiment_traces_buckets = [int(t * max_traces_bucket) for t in experiment_setup.amountOfTraces]
+        experiment_traces_buckets.sort(reverse=False)
+        
+        experiment_traces_amounts = [int(t * max_traces_to_generate) for t in experiment_setup.amountOfTraces]
+        experiment_traces_amounts.sort(reverse=False)
+               
         experiment_counter = 0
         
-        for traces_amount in experiment_traces_amounts:
+        for experiment_traces_bucket in experiment_traces_buckets: 
+            
+            experiment_traces_amount =  experiment_traces_amounts[experiment_counter]          
             
             experiment_counter+=1
     
             for i in range(0 , experiment_setup.numberOfExperiments):
                 
-                #self.write_line_to_ourplanner_results("Experiment #" + str(i) + " - number of traces used: " + str(traces_amount))      
+                generated_traces_amount = traces_generator.generate_traces(grounded_output_path, problem_name, experiment_traces_amount)
                 
-                experiment_details = "Experiment #" + str(experiment_counter + i) + " - traces: " + str(traces_amount)
-                  
-                shuffled_traces_copy_path = self.planner_output_folder + "/" + experiment_details
-                self.shuffle_traces(shuffled_traces_copy_path)
+                amount_of_traces_to_use = min(experiment_traces_bucket ,generated_traces_amount)
+                
+                self.copy_input_files()                                                                       
+                                           
+                #experiment_details = "Experiment #" + str(experiment_counter + i) + " - traces: " + str(amount_of_traces_to_use)        
+                experiment_details = "Experiment #" + str(i) + " traces: " + str(amount_of_traces_to_use) + " bucket: " + str(experiment_traces_bucket)       
+ 
+                traces_generator.copy_generation_output(problem_name, experiment_details)               
                                                 
-                self.plan(problem_name, traces_amount, planning_mode, experiment_details, thresholdTimeoutInMS, Single_Iteration)
+                self.plan(problem_name, amount_of_traces_to_use, experiment_traces_bucket, planning_mode, experiment_details, thresholdTimeoutInMS, Offline_Learning)
                 agents, solved, timeout = self.get_ourplanner_results()
                 
                 if solved == 0:     
-                    self.plan(problem_name, traces_amount, planning_and_learning_mode, experiment_details, experimentTimeoutInMS, BFS)
-                    self.plan(problem_name, traces_amount, planning_and_learning_mode, experiment_details, experimentTimeoutInMS, Random)
-                    self.plan(problem_name, traces_amount, planning_and_learning_mode, experiment_details, experimentTimeoutInMS, Plan_Length_And_Reliability_Heuristic)
-                    self.plan(problem_name, traces_amount, planning_and_learning_mode, experiment_details, experimentTimeoutInMS, Monte_Carlo_Reliability_Heuristic, 2)
-                    #self.plan(problem_name, traces_amount, planning_and_learning_mode, experiment_details, experimentTimeoutInMS, Monte_Carlo_Reliability_Heuristic, 100)
-                    self.plan(problem_name, traces_amount, planning_and_learning_mode, experiment_details, experimentTimeoutInMS, Monte_Carlo_Goal_Proximity_Heuristic, 2)
-                    #self.plan(problem_name, traces_amount, planning_and_learning_mode, experiment_details, experimentTimeoutInMS, Monte_Carlo_Goal_Proximity_Heuristic, 100)
-                    self.plan(problem_name, traces_amount, planning_and_learning_mode, experiment_details, experimentTimeoutInMS, Monte_Carlo_Plan_Length_Heuristic, 2)
-                    #self.plan(problem_name, traces_amount, planning_and_learning_mode, experiment_details, experimentTimeoutInMS, Monte_Carlo_Plan_Length_Heuristic, 100)
+                    for iteration_method in iteration_methods:
+                        self.plan(problem_name, amount_of_traces_to_use, experiment_traces_bucket, planning_and_learning_mode, experiment_details, experimentTimeoutInMS, iteration_method)
+
+                    #self.plan(problem_name, amount_of_traces_to_use, experiment_traces_bucket, planning_and_learning_mode, experiment_details, experimentTimeoutInMS, BFS)
+                    #self.plan(problem_name, amount_of_traces_to_use, experiment_traces_bucket, planning_and_learning_mode, experiment_details, experimentTimeoutInMS, Random)
+                    #self.plan(problem_name, amount_of_traces_to_use, experiment_traces_bucket, planning_and_learning_mode, experiment_details, experimentTimeoutInMS, Plan_Length_And_Reliability_Heuristic)
+                    #self.plan(problem_name, amount_of_traces_to_use, experiment_traces_bucket, planning_and_learning_mode, experiment_details, experimentTimeoutInMS, Monte_Carlo_Reliability_Heuristic, 2)
+                    #self.plan(problem_name, amount_of_traces_to_use, experiment_traces_bucket, planning_and_learning_mode, experiment_details, experimentTimeoutInMS, Monte_Carlo_Reliability_Heuristic, 100)
+                    #self.plan(problem_name, amount_of_traces_to_use, experiment_traces_bucket, planning_and_learning_mode, experiment_details, experimentTimeoutInMS, Monte_Carlo_Goal_Proximity_Heuristic, 2)
+                    #self.plan(problem_name, amount_of_traces_to_use, experiment_traces_bucket, planning_and_learning_mode, experiment_details, experimentTimeoutInMS, Monte_Carlo_Goal_Proximity_Heuristic, 100)
+                    #self.plan(problem_name, amount_of_traces_to_use, experiment_traces_bucket, planning_and_learning_mode, experiment_details, experimentTimeoutInMS, Monte_Carlo_Plan_Length_Heuristic, 2)
+                    #self.plan(problem_name, amount_of_traces_to_use, experiment_traces_bucket, planning_and_learning_mode, experiment_details, experimentTimeoutInMS, Monte_Carlo_Plan_Length_Heuristic, 100)
+                
+                traces_generator.delete_output()
+
+                #shuffled_traces_copy_path = self.planner_output_folder + "/" + experiment_details
+                #self.shuffle_traces(shuffled_traces_copy_path)
 
     def search_solved_threshold(self, problem_config, problem_name, total_num_of_traces):
            
@@ -248,7 +269,7 @@ class Planner(object):
             
             details = "Searching threshold"
                         
-            self.plan(problem_name, current_traces_amount, planning_mode, details, timeoutInMS, Single_Iteration)
+            self.plan(problem_name, current_traces_amount, planning_mode, details, timeoutInMS, Offline_Learning)
             agents, solved, timeout = self.get_ourplanner_results()
             
             solved_counter += solved

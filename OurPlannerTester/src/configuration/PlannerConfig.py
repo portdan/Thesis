@@ -10,12 +10,12 @@ class PlannerConfig(object):
     '''
     def __init__(self, agentsFileName : str, domainFileName : str, inputAgentsDirName : str, inputDirPath : str, 
                 inputGoundedDirName : str, inputLocalViewDirName : str, inputTracesDirName : str, 
-                numOfTracesToUse : int, outputSoundModelLearningDirName : str, outputCopyDirPath : str, outputDirPath : str, 
-                outputSASFileName : str, outputSafeModelLearningDirName : str, outputTempDirPath : str, 
-                outputUnSafeModelLearningDirName : str, planningModel : str, problemFileName : str, 
-                pythonScriptsPath : str, testOutputCSVFilePath : str, tracesLearinigInterval : int, 
-                verificationModel : str, plannerMode : str, timeoutInMS : int, iterationMethod : str, 
-                experimentDetails : str, cValue : int): 
+                numOfTracesToUse : int, totalTracesBucket : int, outputSoundModelLearningDirName : str, 
+                outputCopyDirPath : str, outputDirPath : str, outputSASFileName : str, 
+                outputSafeModelLearningDirName : str, outputTempDirPath : str, outputUnSafeModelLearningDirName : str,
+                planningModel : str, problemFileName : str, pythonScriptsPath : str, testOutputCSVFilePath : str,
+                tracesLearinigInterval : int, verificationModel : str, plannerMode : str, timeoutInMS : int,
+                iterationMethod : str, experimentDetails : str, cValue : int, planningTimeoutInMS : int): 
         '''
         Constructor
         '''
@@ -27,7 +27,8 @@ class PlannerConfig(object):
         self.inputGoundedDirName = inputGoundedDirName
         self.inputLocalViewDirName = inputLocalViewDirName
         self.inputTracesDirName = inputTracesDirName
-        self.numOfTracesToUse = numOfTracesToUse
+        self.numOfTracesToUse = numOfTracesToUse                
+        self.totalTracesBucket = totalTracesBucket
         self.outputSoundModelLearningDirName = outputSoundModelLearningDirName
         self.outputCopyDirPath = outputCopyDirPath
         self.outputDirPath = outputDirPath
@@ -46,3 +47,4 @@ class PlannerConfig(object):
         self.iterationMethod = iterationMethod
         self.experimentDetails = experimentDetails
         self.cValue = cValue
+        self.planningTimeoutInMS = planningTimeoutInMS
