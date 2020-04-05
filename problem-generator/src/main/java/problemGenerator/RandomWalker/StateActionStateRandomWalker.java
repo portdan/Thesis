@@ -108,7 +108,7 @@ public class StateActionStateRandomWalker {
 		return current;
 	}
 
-	public static State RandomWalk(List<StateActionState> sasList, State startState, SuperState goalState, 
+	public static State RandomWalk(Set<StateActionState> sasList, State startState, SuperState goalState, 
 			int numOfExpands, List<Problem> problems, int trace_number) {
 
 		// Random rand = new Random(1); // fixed seed

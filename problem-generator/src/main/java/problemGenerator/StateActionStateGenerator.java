@@ -2,15 +2,10 @@ package problemGenerator;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.ProcessBuilder.Redirect;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
@@ -25,7 +20,6 @@ import cz.agents.alite.creator.Creator;
 import cz.agents.dimaptools.input.addl.ADDLObject;
 import cz.agents.dimaptools.input.addl.ADDLParser;
 import cz.agents.dimaptools.model.Problem;
-import cz.agents.dimaptools.model.State;
 import problemGenerator.FileGenerator.SASGenerator;
 import problemGenerator.RandomWalker.StateActionStateRandomWalker;
 
@@ -37,6 +31,8 @@ public class StateActionStateGenerator implements Creator {
 
 	private static final String TRANSLATOR = "translate/translate.py";
 	private static final String CONVERTOR = "convert/ma-pddl/ma-to-pddl.py";
+
+	private final static int MAX_ITERATIONS = 5000;
 
 	private String tempDirPath = "";
 	private String tracesDirPath = "";
@@ -73,10 +69,15 @@ public class StateActionStateGenerator implements Creator {
 
 	//private Map<String, List<StateActionState>> newStateActionStates = new HashMap<String, List<StateActionState>>();
 
+	/*
 	private Set<String> newStateActionStatesMap = new HashSet<String>();
 	private Map<String, List<String>> actionOwnerToActionName = new HashMap<String, List<String>>();
 
 	private Set<String> endStates = new HashSet<String>();
+	 */
+
+	private Set<StateActionState> ExistingSASlist = new HashSet<StateActionState>();
+
 	@Override
 	public void init(String[] args) {
 
@@ -315,6 +316,8 @@ public class StateActionStateGenerator implements Creator {
 		deleteSasFile();
 	}
 	 */
+
+	/*
 	private void runEntities() {
 		LOGGER.info("run entities:");
 
@@ -328,17 +331,20 @@ public class StateActionStateGenerator implements Creator {
 			e.printStackTrace();
 		}
 
-		int problemCounter = 0;
+		int generatedTracesTarget = numOfTracesToGenerate*numOfRandomWalkSteps;
+		int generatedTracesAmount = 0;
+		int iterations = 0;
 
 		// generate problems
-		for (int i = 1; i <= numOfTracesToGenerate; i++) {
+		//for (int i = 1; i <= numOfTracesToGenerate; i++) {
+		while(generatedTracesAmount < generatedTracesTarget && iterations < MAX_ITERATIONS ) {
 
-			LOGGER.info("generating trace number : " + i);
+			LOGGER.info("generating traces iteration : " + iterations++);
 
 			List<StateActionState> sasList = new ArrayList<StateActionState>();
 			// perform random walk
 			State endState = StateActionStateRandomWalker.RandomWalk(sasList, preprocessor.getGlobalInit(),
-					preprocessor.getGlobalGoal(), numOfRandomWalkSteps, problems, i);
+					preprocessor.getGlobalGoal(), numOfRandomWalkSteps, problems, iterations);
 
 			//			State endState = StateActionStateRandomWalker.RandomWalk(sasList, preprocessor,
 			//					numOfRandomWalkSteps, problems, i);
@@ -355,19 +361,82 @@ public class StateActionStateGenerator implements Creator {
 					e.printStackTrace();
 				}
 
-				problemCounter += sasList.size();
+				generatedTracesAmount += sasList.size();
 			}
+
+			LOGGER.info("total generated traces: " + generatedTracesAmount);
 		}
 
-		LOGGER.info("total number of traces generated: " + problemCounter);
+		LOGGER.info("total number of traces generated: " + generatedTracesAmount);
 
 		try {
 			sasGenerator.mixOutputFile();
-			sasGenerator.renameFile(problemFileName + "_Traces_" + problemCounter);
+			sasGenerator.renameFile(problemFileName + "_Traces_" + generatedTracesAmount);
 		} catch (IOException | InterruptedException e) {
 			e.printStackTrace();
 		}
-		
+
+		delelteTemporaryFiles();
+
+		deleteSasFile();
+	}
+	 */
+	private void runEntities() {
+		LOGGER.info("run entities:");
+
+		SASGenerator sasGenerator = new SASGenerator();
+
+		String TracesFolder = tracesDirPath;
+
+		try {
+			sasGenerator.generateFile(TracesFolder,problemFileName + "_Traces");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		int generatedTracesTarget = numOfTracesToGenerate*numOfRandomWalkSteps;
+		int iterations = 1;
+
+		// generate problems
+		//for (int i = 1; i <= numOfTracesToGenerate; i++) {
+		while(ExistingSASlist.size() < generatedTracesTarget && iterations < MAX_ITERATIONS ) {
+
+			LOGGER.info("generating traces iteration : " + iterations++);
+
+			Set<StateActionState> sasList = new HashSet<StateActionState>();
+
+			// perform random walk
+			StateActionStateRandomWalker.RandomWalk(sasList, preprocessor.getGlobalInit(),
+					preprocessor.getGlobalGoal(), numOfRandomWalkSteps, problems, iterations);
+
+
+			sasList.removeAll(ExistingSASlist);
+
+			int excesSAS = ExistingSASlist.size() + sasList.size() - generatedTracesTarget;
+
+			while(excesSAS>0) {
+				sasList.remove(sasList.toArray()[sasList.size()-1]); // Remove the last entry of the set
+				excesSAS--;				
+			}
+
+			ExistingSASlist.addAll(sasList);
+
+			try {
+				sasGenerator.appendSASList(sasList);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+			LOGGER.info("total generated traces: " + ExistingSASlist.size());
+		}
+
+		try {
+			sasGenerator.mixOutputFile();
+			sasGenerator.renameFile(problemFileName + "_Traces_" + ExistingSASlist.size());
+		} catch (IOException | InterruptedException e) {
+			e.printStackTrace();
+		}
+
 		delelteTemporaryFiles();
 
 		deleteSasFile();

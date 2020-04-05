@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.lang.ProcessBuilder.Redirect;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import problemGenerator.ExecCommand;
 import problemGenerator.StateActionState;
@@ -16,7 +17,7 @@ public class SASGenerator extends FileGenerator{
 
 		generateFile(folderPath, fileName, FILE_TYPE);
 	}
-	
+
 	public void renameFile(String newFileName) throws IOException{
 
 		renameFile(newFileName, FILE_TYPE);
@@ -44,6 +45,29 @@ public class SASGenerator extends FileGenerator{
 			sb.setLength(0);
 
 			sb.append(sasList.get(i).toString());
+			sb.append("\n");
+
+			String sasStr = sb.toString();
+
+			sasListStr.add(sasStr);
+		}
+
+		writeToFile(sasListStr);
+	}
+
+	public void appendSASList(Set<StateActionState> sasSet) throws IOException {	
+
+		StringBuilder sb = new StringBuilder();
+		List<String> sasListStr = new ArrayList<String>();
+
+		String traceStart = sb.toString();
+		sasListStr.add(traceStart);
+
+		for (StateActionState sas : sasSet) {	
+
+			sb.setLength(0);
+
+			sb.append(sas.toString());
 			sb.append("\n");
 
 			String sasStr = sb.toString();
