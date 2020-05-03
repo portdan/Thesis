@@ -11,7 +11,7 @@ class TesterConfig(object):
     '''
     classdocs
     '''
-    def __init__(self, domainPath: str, domainName: str, problemsPath: str, problems: List[TesterConfigProblem],
+    def __init__(self, domainPath: str, domainName: str, domainFileName: str, problemsPath: str, problems: List[TesterConfigProblem],
                  problemGrounderInput: str, problemGrounderOutput: str, problemGeneratorInput: str, 
                  problemGeneratorOutput: str, problemGrounderConfig: str, problemGeneratorConfig: str ,
                  problemGrounderJAR: str, problemGeneratorJAR: str, problemGrounderCreator: str, 
@@ -26,6 +26,7 @@ class TesterConfig(object):
         '''
         self.domainPath = domainPath
         self.domainName = domainName
+        self.domainFileName = domainFileName
         self.problemsPath = problemsPath
         self.problems = problems
         
@@ -62,8 +63,9 @@ class TesterConfig(object):
         res = ""
         phrases = []
         
+        phrases.append("Domain Name: " + str(self.domainName) + "\n" )
         phrases.append("Domain File Path: " + str(self.domainPath) + "\n" )
-        phrases.append("Domain File Name: " + str(self.domainName) + "\n" )
+        phrases.append("Domain File Name: " + str(self.domainFileName) + "\n" )
         phrases.append("Problems To Test Path: " + str(self.problemsPath) + "\n" )
         
         phrases.append("Output Destination Path: " + str(self.outputDestination) + "\n" )

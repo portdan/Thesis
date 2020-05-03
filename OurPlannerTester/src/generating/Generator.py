@@ -39,7 +39,8 @@ class Generator(object):
         return generator_config.numOfRandomWalkSteps
 
         
-    def prepere_to_generate(self, grounded_output_path, problem_name, num_of_traces_to_generate):
+    def prepere_to_generate(self, grounded_output_path, problem_name, 
+                            num_of_traces_to_generate, num_of_random_walk_steps):
      
         logger.info("prepere_to_generate")
            
@@ -50,7 +51,7 @@ class Generator(object):
     
         shutil.copytree(grounded_output_path, self.config.problemGeneratorInput)
 
-        domain_file_path_input = self.config.problemGeneratorInput + "/" + self.config.domainName
+        domain_file_path_input = self.config.problemGeneratorInput + "/" + self.config.domainFileName
         problem_file_path_input = self.config.problemGeneratorInput + "/" + problem_name
         
         generator_config = None
@@ -61,6 +62,7 @@ class Generator(object):
         generator_config.domainFilePath = domain_file_path_input
         generator_config.problemFilePath = problem_file_path_input
         generator_config.numOfTracesToGenerate = num_of_traces_to_generate
+        generator_config.numOfRandomWalkSteps = num_of_random_walk_steps
         
         self.max_traces_bucket = generator_config.numOfRandomWalkSteps * generator_config.numOfTracesToGenerate
         
@@ -105,11 +107,13 @@ class Generator(object):
         clear_directory(self.config.problemGeneratorInput)
         clear_directory(self.config.problemGeneratorOutput)
         
-    def generate_traces(self, grounded_output_path, problem_name, num_of_traces_to_generate):
+    def generate_traces(self, grounded_output_path, problem_name,
+                         num_of_traces_to_generate, num_of_random_walk_steps):
         
         logger.info("generate traces")
         
-        self.prepere_to_generate(grounded_output_path, problem_name, num_of_traces_to_generate)
+        self.prepere_to_generate(grounded_output_path, problem_name, 
+                                 num_of_traces_to_generate, num_of_random_walk_steps)
 
         self.run_generation() 
         

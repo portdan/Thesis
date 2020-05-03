@@ -81,7 +81,7 @@ def run_tests(config):
 
     #clear_directory(config.outputDestination)
     
-    origin_domain_file_path = config.domainPath + '/' + config.domainName
+    origin_domain_file_path = config.domainPath + '/' + config.domainFileName
     
     logger.info("origin_domain_file_path : " + str(origin_domain_file_path))
     
@@ -107,7 +107,7 @@ def run_tests(config):
             #solved_threshold = planner.search_solved_threshold(problem, problem_name, total_num_of_traces)
             #solved_threshold = total_num_of_traces
                         
-            planner.plan_and_learn_by_iteration_method(problem, problem_name, problem.thresholdSearchSetup.maxTracesToUse, grounder.grounded_output_path, generator)
+            planner.plan_and_learn_by_iteration_method(problem, problem_name, grounder, generator)
                        
             grounder.delete_output()
             #generator.delete_output()

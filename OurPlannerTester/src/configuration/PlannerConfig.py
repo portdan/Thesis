@@ -8,7 +8,7 @@ class PlannerConfig(object):
     '''
     classdocs
     '''
-    def __init__(self, agentsFileName : str, domainFileName : str, inputAgentsDirName : str, inputDirPath : str, 
+    def __init__(self, agentsFileName : str, domainFileName : str,domainName : str, inputAgentsDirName : str, inputDirPath : str, 
                 inputGoundedDirName : str, inputLocalViewDirName : str, inputTracesDirName : str, 
                 numOfTracesToUse : int, totalTracesBucket : int, outputSoundModelLearningDirName : str, 
                 outputCopyDirPath : str, outputDirPath : str, outputSASFileName : str, 
@@ -22,6 +22,7 @@ class PlannerConfig(object):
         
         self.agentsFileName = agentsFileName
         self.domainFileName = domainFileName
+        self.domainName = domainName
         self.inputAgentsDirName =inputAgentsDirName
         self.inputDirPath = inputDirPath
         self.inputGoundedDirName = inputGoundedDirName

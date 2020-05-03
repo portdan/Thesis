@@ -80,7 +80,8 @@ class Planner(object):
                         
         self.preprocess_runner_script_write(planner_config)
             
-        planner_config.domainFileName = self.config.domainName
+        planner_config.domainName = self.config.domainName
+        planner_config.domainFileName = self.config.domainFileName
         planner_config.problemFileName = problem_name
         planner_config.numOfTracesToUse = num_of_traces_to_use
         planner_config.totalTracesBucket = total_traces_bucket
@@ -190,8 +191,8 @@ class Planner(object):
       
     '''  
             
-    def plan_and_learn_by_iteration_method(self,problem_config, problem_name, max_traces_to_generate, 
-                                           grounded_output_path, traces_generator):
+    def plan_and_learn_by_iteration_method(self,problem_config, problem_name, 
+                                           grounder, traces_generator):
             
         experiment_setup = problem_config.experimentSetup    
         iteration_methods = problem_config.iterationMethods    
@@ -199,29 +200,39 @@ class Planner(object):
         thresholdTimeoutInMS = problem_config.thresholdSearchSetup.timeoutInMS
         experimentTimeoutInMS = problem_config.experimentSetup.timeoutInMS
         
-        max_traces_bucket = traces_generator.get_num_of_random_walk_steps() * max_traces_to_generate
+        #traces_Amount_max = traces_generator.get_num_of_random_walk_steps() * max_traces_to_generate
+        traces_Amount_max = experiment_setup.tracesAmountMax
+        random_walk_steps = experiment_setup.randomWalkSteps
+        
+        experiment_traces_buckets = None
 
-        experiment_traces_buckets = [int(t * max_traces_bucket) for t in experiment_setup.amountOfTraces]
-        experiment_traces_buckets.sort(reverse=False)
+        if experiment_setup.TestSizeInPercent is True:
+            #experiment_traces_buckets = [int(t * traces_Amount_max) for t in experiment_setup.TestSizeOfTracesAmaount]
+            experiment_traces_buckets = [t for t in experiment_setup.TestSizeOfTracesAmaount]
+        else:
+            experiment_traces_buckets = [int(t) for t in experiment_setup.TestSizeOfTracesAmaount]
         
-        experiment_traces_amounts = [int(t * max_traces_to_generate) for t in experiment_setup.amountOfTraces]
-        experiment_traces_amounts.sort(reverse=False)
-               
-        experiment_counter = 0
+        experiment_traces_buckets.sort()
         
-        for experiment_traces_bucket in experiment_traces_buckets: 
+        for i in range(0 , experiment_setup.numberOfExperiments):
+                
+            generated_traces_amount = traces_generator.generate_traces(grounder.grounded_output_path, problem_name,
+                                                                     traces_Amount_max, random_walk_steps)            
+            self.copy_input_files() 
             
-            experiment_traces_amount =  experiment_traces_amounts[experiment_counter]          
+            experiment_counter = 0
+            experiment_traces_amounts = None
+
+            if experiment_setup.TestSizeInPercent is True:
+                experiment_traces_amounts = [int(t * generated_traces_amount) for t in experiment_setup.TestSizeOfTracesAmaount]
+            else:
+                experiment_traces_amounts = [int(min(t,generated_traces_amount)) for t in experiment_setup.TestSizeOfTracesAmaount]
+                        
+            for test_size in sorted(experiment_traces_amounts): 
             
-            experiment_counter+=1
-    
-            for i in range(0 , experiment_setup.numberOfExperiments):
+                experiment_traces_bucket = experiment_traces_buckets[experiment_counter]
                 
-                generated_traces_amount = traces_generator.generate_traces(grounded_output_path, problem_name, experiment_traces_amount)
-                
-                amount_of_traces_to_use = min(experiment_traces_bucket ,generated_traces_amount)
-                
-                self.copy_input_files()                                                                       
+                amount_of_traces_to_use = test_size          
                                            
                 #experiment_details = "Experiment #" + str(experiment_counter + i) + " - traces: " + str(amount_of_traces_to_use)        
                 experiment_details = "Experiment #" + str(i) + " traces: " + str(amount_of_traces_to_use) + " bucket: " + str(experiment_traces_bucket)       
@@ -235,20 +246,13 @@ class Planner(object):
                     for iteration_method in iteration_methods:
                         self.plan(problem_name, amount_of_traces_to_use, experiment_traces_bucket, planning_and_learning_mode, experiment_details, experimentTimeoutInMS, iteration_method)
 
-                    #self.plan(problem_name, amount_of_traces_to_use, experiment_traces_bucket, planning_and_learning_mode, experiment_details, experimentTimeoutInMS, BFS)
-                    #self.plan(problem_name, amount_of_traces_to_use, experiment_traces_bucket, planning_and_learning_mode, experiment_details, experimentTimeoutInMS, Random)
-                    #self.plan(problem_name, amount_of_traces_to_use, experiment_traces_bucket, planning_and_learning_mode, experiment_details, experimentTimeoutInMS, Plan_Length_And_Reliability_Heuristic)
-                    #self.plan(problem_name, amount_of_traces_to_use, experiment_traces_bucket, planning_and_learning_mode, experiment_details, experimentTimeoutInMS, Monte_Carlo_Reliability_Heuristic, 2)
-                    #self.plan(problem_name, amount_of_traces_to_use, experiment_traces_bucket, planning_and_learning_mode, experiment_details, experimentTimeoutInMS, Monte_Carlo_Reliability_Heuristic, 100)
-                    #self.plan(problem_name, amount_of_traces_to_use, experiment_traces_bucket, planning_and_learning_mode, experiment_details, experimentTimeoutInMS, Monte_Carlo_Goal_Proximity_Heuristic, 2)
-                    #self.plan(problem_name, amount_of_traces_to_use, experiment_traces_bucket, planning_and_learning_mode, experiment_details, experimentTimeoutInMS, Monte_Carlo_Goal_Proximity_Heuristic, 100)
-                    #self.plan(problem_name, amount_of_traces_to_use, experiment_traces_bucket, planning_and_learning_mode, experiment_details, experimentTimeoutInMS, Monte_Carlo_Plan_Length_Heuristic, 2)
-                    #self.plan(problem_name, amount_of_traces_to_use, experiment_traces_bucket, planning_and_learning_mode, experiment_details, experimentTimeoutInMS, Monte_Carlo_Plan_Length_Heuristic, 100)
-                
-                traces_generator.delete_output()
-
                 #shuffled_traces_copy_path = self.planner_output_folder + "/" + experiment_details
                 #self.shuffle_traces(shuffled_traces_copy_path)
+                
+                experiment_counter += 1
+                
+            traces_generator.delete_output()
+
 
     def search_solved_threshold(self, problem_config, problem_name, total_num_of_traces):
            
