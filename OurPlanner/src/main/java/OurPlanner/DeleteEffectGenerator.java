@@ -234,8 +234,11 @@ public class DeleteEffectGenerator {
 					int preVar = getFactVarByVal(problem, preVal);
 
 					if(effVar == preVar) { 
-						res.add("not ("+ preFact +")");
+						
 						isExistsBoth = true;
+						
+						if(effVal != preVal)
+							res.add("not ("+ preFact +")");					
 					}
 				}
 

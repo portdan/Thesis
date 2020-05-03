@@ -83,6 +83,9 @@ public class PlanToStateActionState {
 
 		if (!generateProblems())
 			return null;
+		
+		if (plan.size() == 0)
+			return null;
 
 		State initialState = preprocessor.getGlobalInit();
 

@@ -481,7 +481,7 @@ public class PlanVerifier {
 		}
 		else {
 			LOGGER.info("agent " + agentName + " is not the owner of this action - plan not verified!");
-			return new VerificationResult(-1, false);
+			return new VerificationResult(actionIndex, false);
 		}
 
 		if(actionIndex == plan.size() - 1) {

@@ -1,6 +1,8 @@
 package Utils;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import org.apache.log4j.Logger;
 
@@ -13,10 +15,40 @@ public class MCTS {
 	ModelSearchNode root;
 	double C;
 
+	Random rnd = new Random(2);
+
 	public MCTS( ModelSearchNode root, double C) {
 		this.root = root;
 		this.C = C;
 	}
+
+	public List<ModelSearchNode> selectAllUnVisited(ModelSearchNode node) {
+
+		List<ModelSearchNode> res = new ArrayList<ModelSearchNode>();
+
+		if(node.getNumOfVisits() == 0)
+			res.add(node);
+
+		else if(node.getChildren() == null || node.getChildren().isEmpty())
+			res.add(node);
+
+		else {
+			for (ModelSearchNode child : node.getChildren()) {
+
+				res.addAll(selectAllUnVisited(child));
+			}
+		}
+
+		return res;
+	}
+
+	public ModelSearchNode selectRandom(ModelSearchNode node) {
+
+		List<ModelSearchNode> u = selectAllUnVisited(node);
+
+		return u.get(rnd.nextInt(u.size()));
+	}
+
 
 	public ModelSearchNode selectBestNode(ModelSearchNode node) {
 
@@ -28,8 +60,10 @@ public class MCTS {
 		if(node.getChildren() == null || node.getChildren().isEmpty())
 			return node;
 
-		ModelSearchNode maxScoreChild = node.getChildren().get(0);
+		//ModelSearchNode maxScoreChild = node.getChildren().get(0);
 		double maxScore = 0;
+		
+		List<ModelSearchNode> maxScoreChildren = new ArrayList<ModelSearchNode>();
 
 		for (ModelSearchNode child : node.getChildren()) {
 
@@ -44,11 +78,18 @@ public class MCTS {
 
 			if(score > maxScore) {
 				maxScore = score;
-				maxScoreChild = child;
+				//maxScoreChild = child;
+				
+				maxScoreChildren.clear();
 			}
+			
+			if(score == maxScore)
+				maxScoreChildren.add(child);
 		}
+		
+		int idx = rnd.nextInt(maxScoreChildren.size());
 
-		return selectBestNode(maxScoreChild);
+		return selectBestNode(maxScoreChildren.get(idx));
 	}
 
 	public void backpropogateNode(ModelSearchNode node, double value, int visit) {
@@ -80,7 +121,7 @@ public class MCTS {
 	}
 
 	public void removeNode(ModelSearchNode searchNode) {
-		
+
 		if(searchNode.equals(root))
 			return;
 
@@ -92,7 +133,7 @@ public class MCTS {
 		//backpropogateNode(parent, calcValueAverage(parent)); 
 
 		searchNode = null;
-		
+
 		if(parent.getChildren().isEmpty())
 			removeNode(parent);
 

@@ -8,6 +8,7 @@ import enums.VerificationModel;
 public class OurPlannerConfiguration {
 
 	public String agentsFileName;
+	public String domainName;
 	public String domainFileName;
 	public String inputAgentsDirName;
 	public String inputDirPath;
@@ -15,7 +16,7 @@ public class OurPlannerConfiguration {
 	public String inputLocalViewDirName;
 	public String inputTracesDirName;
 	public int numOfTracesToUse;
-	public int totalTracesBucket;
+	public double totalTracesBucket;
 	public int timeoutInMS;
 	public String outputSoundModelLearningDirName;
 	public String outputCopyDirPath;

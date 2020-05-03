@@ -244,7 +244,7 @@ public class PlanVerifierSASPreprocessor {
 
 				}
 			}
-		}else{
+		}else if(agents.size() == 1){
 			String a = agents.get(0);
 			for(SASOperator op1 : agentOperators.get(a)){
 

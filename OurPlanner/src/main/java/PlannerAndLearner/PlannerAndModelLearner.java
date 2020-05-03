@@ -270,7 +270,7 @@ public class PlannerAndModelLearner {
 					}
 					else {
 
-						PlanToStateActionStateResult result = planToSASList(plan, res.lastActionIndex);
+						PlanToStateActionStateResult result = planToSASList(plan, res.lastOKActionIndex);
 
 						if(result.isTimeout())
 							continue;
@@ -384,6 +384,7 @@ public class PlannerAndModelLearner {
 			numOfIterations += 1;
 
 			ModelSearchNode searchNode = mcts.selectBestNode(searchNodeRoot);
+			//ModelSearchNode searchNode = mcts.selectRandom(searchNodeRoot);
 
 			Model currModel = unsafeModel.extendModel(searchNode.getTempModel());
 
@@ -413,7 +414,7 @@ public class PlannerAndModelLearner {
 					}
 					else {
 
-						PlanToStateActionStateResult result = planToSASList(plan, res.lastActionIndex);
+						PlanToStateActionStateResult result = planToSASList(plan, res.lastOKActionIndex);
 
 						if(result.isTimeout())
 							continue;
@@ -899,7 +900,7 @@ public class PlannerAndModelLearner {
 		return res;
 	}
 
-	private PlanToStateActionStateResult planToSASList(List<String> plan, int lastActionIndex) {
+	private PlanToStateActionStateResult planToSASList(List<String> plan, int lastOKActionIndex) {
 
 		LOGGER.info("generate SAS List from plan");
 
@@ -917,16 +918,18 @@ public class PlannerAndModelLearner {
 		PlanToStateActionState plan2SAS = new PlanToStateActionState(domainFileName, problemFileName,
 				problemFilesPath,sequancingStartTime, planToSASListTimeoutMS);
 
-		List<StateActionState> planSASList = plan2SAS.generateSASList(plan, lastActionIndex);
+		List<StateActionState> planSASList = plan2SAS.generateSASList(plan, lastOKActionIndex);
 		StateActionState failedActionSAS = null;
 
 		if(planSASList == null)
 			return new PlanToStateActionStateResult(null, null, true);		
 
-		failedActionSAS = planSASList.get(lastActionIndex);
-		planSASList.remove(lastActionIndex);
+		if(plan.size() > planSASList.size()) {
+			failedActionSAS = planSASList.get(lastOKActionIndex);
+			planSASList.remove(lastOKActionIndex);
+		}
 
-		sequancingAmountTotal = planSASList.size() + 1;
+		sequancingAmountTotal = planSASList.size();
 
 		long sequancingEndTime = System.currentTimeMillis();
 

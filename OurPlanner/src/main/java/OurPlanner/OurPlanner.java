@@ -41,7 +41,7 @@ public class OurPlanner implements Creator  {
 
 	/* Class variables */
 	private String configurationFilePath = "";
-
+	private String domainName = "";
 	private String domainFileName = "";
 	private String problemFileName = "";
 
@@ -72,7 +72,7 @@ public class OurPlanner implements Creator  {
 	//private	Random rnd = new Random();
 
 	private int numOftracesToUse = 0;
-	private int tracesBucket = 0;
+	private double tracesBucket = 0;
 	private int tracesLearinigInterval = 0;
 	private int num_agents_solved = 0;
 	private int num_agents_not_solved = 0;
@@ -123,7 +123,7 @@ public class OurPlanner implements Creator  {
 			System.exit(1);
 		}
 
-		TestDataAccumulator.startNewAccumulator(domainFileName, problemFileName, agentList);
+		TestDataAccumulator.startNewAccumulator(domainName, problemFileName, agentList);
 
 		TestDataAccumulator.getAccumulator().setOutputFile(Globals.OUTPUT_TEST_FILE_PATH);
 
@@ -256,6 +256,8 @@ public class OurPlanner implements Creator  {
 		tracesLearinigInterval = configuration.tracesLearinigInterval;
 
 		domainFileName = configuration.domainFileName;
+		domainName = configuration.domainName;
+		
 		extension = domainFileName.substring(domainFileName.lastIndexOf(".") + 1);
 		//Checks if input domain name is of .pddl type
 		if (!extension.equals("pddl")) {

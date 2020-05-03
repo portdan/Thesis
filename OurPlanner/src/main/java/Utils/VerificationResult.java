@@ -2,18 +2,18 @@ package Utils;
 
 public class VerificationResult {
 
-	public int lastActionIndex = -1;
+	public int lastOKActionIndex = -1;
 	public boolean isVerified = false;
 	public boolean isTimeout = false;
 
-	public VerificationResult(int lastActionIndex, boolean isVerified, boolean isTimeout) {
-		this.lastActionIndex = lastActionIndex;
+	public VerificationResult(int lastOKActionIndex, boolean isVerified, boolean isTimeout) {
+		this.lastOKActionIndex = lastOKActionIndex;
 		this.isVerified = isVerified;
 		this.isTimeout = isTimeout;
 	}
 
-	public VerificationResult(int lastActionIndex, boolean isVerified) {
-		this(lastActionIndex,isVerified,false);
+	public VerificationResult(int lastOKActionIndex, boolean isVerified) {
+		this(lastOKActionIndex,isVerified,false);
 	}
 
 }

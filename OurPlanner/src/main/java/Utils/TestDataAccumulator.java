@@ -40,7 +40,7 @@ public class TestDataAccumulator {
 	public long totalPlaningTimeMs = 0;
 	public long totalVerifingTimeMs = 0;
 	public int initialTrainingSize = 0;
-	public int trainingSizeBucket = 0;
+	public double trainingSizeBucket = 0;
 	public int numOfAgentsSolved = 0;
 	public int numOfAgentsTimeout = 0;
 	public int numOfAgentsNotSolved = 0;
@@ -161,6 +161,18 @@ public class TestDataAccumulator {
 	}
 
 	public String toString() {
+
+		numOfAgentsSolved = 0;
+		numOfAgentsTimeout = 0;
+		numOfAgentsNotSolved = 0;
+
+		if(finishStatus.equals("SOLVED"))
+			numOfAgentsSolved = 1;
+		if(finishStatus.equals("TIMEOUT"))
+			numOfAgentsTimeout = 1;
+		if(finishStatus.equals("NOT SOLVED"))
+			numOfAgentsNotSolved = 1;
+
 		StringBuilder sb = new StringBuilder();
 
 		sb.append(domain).append(sep);
