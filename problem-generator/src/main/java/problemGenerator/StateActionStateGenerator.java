@@ -32,7 +32,7 @@ public class StateActionStateGenerator implements Creator {
 	private static final String TRANSLATOR = "translate/translate.py";
 	private static final String CONVERTOR = "convert/ma-pddl/ma-to-pddl.py";
 
-	private final static int MAX_ITERATIONS = 5000;
+	private final static int MAX_ITERATIONS = 50000;
 
 	private String tempDirPath = "";
 	private String tracesDirPath = "";
@@ -394,12 +394,11 @@ public class StateActionStateGenerator implements Creator {
 			e.printStackTrace();
 		}
 
-		int generatedTracesTarget = numOfTracesToGenerate*numOfRandomWalkSteps;
 		int iterations = 1;
 
 		// generate problems
 		//for (int i = 1; i <= numOfTracesToGenerate; i++) {
-		while(ExistingSASlist.size() < generatedTracesTarget && iterations < MAX_ITERATIONS ) {
+		while(ExistingSASlist.size() < numOfTracesToGenerate && iterations < MAX_ITERATIONS ) {
 
 			LOGGER.info("generating traces iteration : " + iterations++);
 
@@ -412,7 +411,7 @@ public class StateActionStateGenerator implements Creator {
 
 			sasList.removeAll(ExistingSASlist);
 
-			int excesSAS = ExistingSASlist.size() + sasList.size() - generatedTracesTarget;
+			int excesSAS = ExistingSASlist.size() + sasList.size() - numOfTracesToGenerate;
 
 			while(excesSAS>0) {
 				sasList.remove(sasList.toArray()[sasList.size()-1]); // Remove the last entry of the set
