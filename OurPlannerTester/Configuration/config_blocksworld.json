@@ -1,6 +1,6 @@
 {
   "domainName": "domain.pddl", 
-  "domainPath": "/home/daniel/Desktop/PROBLEMS/logistics00", 
+  "domainPath": "/home/daniel/Desktop/PROBLEMS/blocksworld", 
   "originDestination": "Origin", 
   "outputDestination": "/home/daniel/Work/WorkSpace/Thesis/OurPlannerTester/Output", 
   "problemGeneratorConfig": "/home/daniel/Work/WorkSpace/Thesis/problem-generator/Configuration/config.json", 
@@ -31,44 +31,33 @@
         ], 
         "numberOfExperiments": 2
       }, 
-      "maxTracesToUse": 500, 
+      "maxTracesToUse": 100, 
       "minTracesToUse": 0, 
-      "problemName": "probLOGISTICS-4-1.pddl"
+      "problemName": "probBLOCKS-4-0.pddl"
     },
- {
+{
       "experimentSetup": {
         "amountOfTraces": [
           1
         ], 
         "numberOfExperiments": 2
       }, 
-      "maxTracesToUse": 500, 
+      "maxTracesToUse": 100, 
       "minTracesToUse": 0, 
-      "problemName": "probLOGISTICS-4-2.pddl"
+      "problemName": "probBLOCKS-4-2.pddl"
     },
- {
+{
       "experimentSetup": {
         "amountOfTraces": [
           1
         ], 
         "numberOfExperiments": 2
       }, 
-      "maxTracesToUse": 500, 
+      "maxTracesToUse": 100, 
       "minTracesToUse": 0, 
-      "problemName": "probLOGISTICS-4-3.pddl"
-    },
- {
-      "experimentSetup": {
-        "amountOfTraces": [
-          1
-        ], 
-        "numberOfExperiments": 2
-      }, 
-      "maxTracesToUse": 2500, 
-      "minTracesToUse": 0, 
-      "problemName": "probLOGISTICS-4-0.pddl"
+      "problemName": "probBLOCKS-5-0.pddl"
     }
   ], 
-  "problemsPath": "/home/daniel/Desktop/PROBLEMS/logistics00"
+  "problemsPath": "/home/daniel/Desktop/PROBLEMS/blocksworld"
 }
 

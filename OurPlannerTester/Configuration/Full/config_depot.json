@@ -1,6 +1,6 @@
 {
   "domainName": "domain.pddl", 
-  "domainPath": "/home/daniel/Desktop/PROBLEMS/logistics00", 
+  "domainPath": "/home/daniel/Desktop/PROBLEMS/depot", 
   "originDestination": "Origin", 
   "outputDestination": "/home/daniel/Work/WorkSpace/Thesis/OurPlannerTester/Output", 
   "problemGeneratorConfig": "/home/daniel/Work/WorkSpace/Thesis/problem-generator/Configuration/config.json", 
@@ -24,51 +24,44 @@
   "problemPlannerPlanningModel": "SafeModel", 
   "problemPlannerVerificationModel": "GroundedModel", 
   "problems": [
-    {
+   {
       "experimentSetup": {
         "amountOfTraces": [
           1
         ], 
-        "numberOfExperiments": 2
+        "numberOfExperiments": 1, 
+        "timeoutInMS": 600000
       }, 
-      "maxTracesToUse": 500, 
-      "minTracesToUse": 0, 
-      "problemName": "probLOGISTICS-4-1.pddl"
-    },
- {
-      "experimentSetup": {
-        "amountOfTraces": [
-          1
-        ], 
-        "numberOfExperiments": 2
-      }, 
-      "maxTracesToUse": 500, 
-      "minTracesToUse": 0, 
-      "problemName": "probLOGISTICS-4-2.pddl"
-    },
- {
-      "experimentSetup": {
-        "amountOfTraces": [
-          1
-        ], 
-        "numberOfExperiments": 2
-      }, 
-      "maxTracesToUse": 500, 
-      "minTracesToUse": 0, 
-      "problemName": "probLOGISTICS-4-3.pddl"
-    },
- {
-      "experimentSetup": {
-        "amountOfTraces": [
-          1
-        ], 
-        "numberOfExperiments": 2
-      }, 
-      "maxTracesToUse": 2500, 
-      "minTracesToUse": 0, 
-      "problemName": "probLOGISTICS-4-0.pddl"
+      "problemNames": [
+        "pfile0.pddl", 
+        "pfile1.pddl", 
+        "pfile2.pddl", 
+        "pfile3.pddl", 
+        "pfile4.pddl", 
+        "pfile5.pddl", 
+        "pfile6.pddl", 
+        "pfile7.pddl", 
+        "pfile8.pddl", 
+        "pfile9.pddl", 
+        "pfile10.pddl", 
+        "pfile11.pddl", 
+        "pfile12.pddl", 
+        "pfile13.pddl", 
+        "pfile14.pddl", 
+        "pfile15.pddl", 
+        "pfile16.pddl", 
+        "pfile17.pddl", 
+        "pfile18.pddl", 
+        "pfile19.pddl", 
+        "pfile20.pddl"
+      ], 
+      "thresholdSearchSetup": {
+        "maxTracesToUse": 300, 
+        "minTracesToUse": 0, 
+        "timeoutInMS": 300000
+      }
     }
   ], 
-  "problemsPath": "/home/daniel/Desktop/PROBLEMS/logistics00"
+  "problemsPath": "/home/daniel/Desktop/PROBLEMS/depot"
 }
 

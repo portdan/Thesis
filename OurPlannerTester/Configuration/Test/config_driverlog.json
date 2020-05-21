@@ -1,6 +1,7 @@
 {
-  "domainName": "domain.pddl", 
-  "domainPath": "/home/daniel/Desktop/PROBLEMS/logistics00", 
+  "domainFileName": "domain.pddl", 
+  "domainName": "driverlog", 
+  "domainPath": "/home/daniel/Desktop/PROBLEMS/driverlog", 
   "originDestination": "Origin", 
   "outputDestination": "/home/daniel/Work/WorkSpace/Thesis/OurPlannerTester/Output", 
   "problemGeneratorConfig": "/home/daniel/Work/WorkSpace/Thesis/problem-generator/Configuration/config.json", 
@@ -26,49 +27,42 @@
   "problems": [
     {
       "experimentSetup": {
-        "amountOfTraces": [
+        "TestSizeInPercent": true, 
+        "TestSizeOfTracesAmaount": [
+          0, 
+          0.01, 
+          0.05, 
+          0.2, 
+          0.5, 
           1
         ], 
-        "numberOfExperiments": 2
+        "numberOfExperiments": 3, 
+        "randomWalkSteps": 100, 
+        "timeoutInMS": 600000, 
+        "tracesAmountMax": 20000
       }, 
-      "maxTracesToUse": 500, 
-      "minTracesToUse": 0, 
-      "problemName": "probLOGISTICS-4-1.pddl"
-    },
- {
-      "experimentSetup": {
-        "amountOfTraces": [
-          1
-        ], 
-        "numberOfExperiments": 2
-      }, 
-      "maxTracesToUse": 500, 
-      "minTracesToUse": 0, 
-      "problemName": "probLOGISTICS-4-2.pddl"
-    },
- {
-      "experimentSetup": {
-        "amountOfTraces": [
-          1
-        ], 
-        "numberOfExperiments": 2
-      }, 
-      "maxTracesToUse": 500, 
-      "minTracesToUse": 0, 
-      "problemName": "probLOGISTICS-4-3.pddl"
-    },
- {
-      "experimentSetup": {
-        "amountOfTraces": [
-          1
-        ], 
-        "numberOfExperiments": 2
-      }, 
-      "maxTracesToUse": 2500, 
-      "minTracesToUse": 0, 
-      "problemName": "probLOGISTICS-4-0.pddl"
+      "iterationMethods": [
+        "BFS", 
+        "Random", 
+        "Plan_Length_And_Reliability_Heuristic", 
+        "Monte_Carlo_Reliability_Heuristic"
+      ], 
+      "problemNames": [
+        "pfile1-0.pddl", 
+        "pfile1-1.pddl", 
+        "pfile1-2.pddl", 
+        "pfile1-3.pddl", 
+        "pfile1-4.pddl", 
+        "pfile1-5.pddl", 
+        "pfile1-6.pddl"
+      ], 
+      "thresholdSearchSetup": {
+        "maxTracesToUse": 200, 
+        "minTracesToUse": 0, 
+        "timeoutInMS": 300000
+      }
     }
   ], 
-  "problemsPath": "/home/daniel/Desktop/PROBLEMS/logistics00"
+  "problemsPath": "/home/daniel/Desktop/PROBLEMS/driverlog"
 }
 

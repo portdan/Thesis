@@ -204,52 +204,50 @@ class Planner(object):
         traces_Amount_max = experiment_setup.tracesAmountMax
         random_walk_steps = experiment_setup.randomWalkSteps
         
-        experiment_traces_buckets = None
-
-        if experiment_setup.TestSizeInPercent is True:
-            #experiment_traces_buckets = [int(t * traces_Amount_max) for t in experiment_setup.TestSizeOfTracesAmaount]
-            experiment_traces_buckets = [t for t in experiment_setup.TestSizeOfTracesAmaount]
-        else:
-            experiment_traces_buckets = [int(t) for t in experiment_setup.TestSizeOfTracesAmaount]
-        
-        experiment_traces_buckets.sort()
-        
+                 
         for i in range(0 , experiment_setup.numberOfExperiments):
                 
             generated_traces_amount = traces_generator.generate_traces(grounder.grounded_output_path, problem_name,
                                                                      traces_Amount_max, random_walk_steps)            
             self.copy_input_files() 
             
-            experiment_counter = 0
             experiment_traces_amounts = None
+            experiment_traces_buckets = None
 
             if experiment_setup.TestSizeInPercent is True:
+                #experiment_traces_buckets = [int(t * traces_Amount_max) for t in experiment_setup.TestSizeOfTracesAmaount]
+                experiment_traces_buckets = [t for t in experiment_setup.TestSizeOfTracesAmaount]
                 experiment_traces_amounts = [int(t * generated_traces_amount) for t in experiment_setup.TestSizeOfTracesAmaount]
             else:
+                experiment_traces_buckets = [int(t) for t in experiment_setup.TestSizeOfTracesAmaount]
                 experiment_traces_amounts = [int(min(t,generated_traces_amount)) for t in experiment_setup.TestSizeOfTracesAmaount]
-                        
-            for test_size in sorted(experiment_traces_amounts): 
-            
-                experiment_traces_bucket = experiment_traces_buckets[experiment_counter]
+
+            finish = False              
+            while not finish and experiment_traces_buckets:
+    
+                experiment_traces_bucket_max = max(experiment_traces_buckets)
+                experiment_traces_buckets.remove(experiment_traces_bucket_max)
                 
-                amount_of_traces_to_use = test_size          
-                                           
+                experiment_traces_amount_max = max(experiment_traces_amounts)
+                experiment_traces_amounts.remove(experiment_traces_amount_max)
+                                                       
                 #experiment_details = "Experiment #" + str(experiment_counter + i) + " - traces: " + str(amount_of_traces_to_use)        
-                experiment_details = "Experiment #" + str(i) + " traces: " + str(amount_of_traces_to_use) + " bucket: " + str(experiment_traces_bucket)       
- 
+                experiment_details = "Experiment #" + str(i) + " traces: " + str(experiment_traces_amount_max) + " bucket: " + str(experiment_traces_bucket_max)       
+        
                 traces_generator.copy_generation_output(problem_name, experiment_details)               
-                                                
-                self.plan(problem_name, amount_of_traces_to_use, experiment_traces_bucket, planning_mode, experiment_details, thresholdTimeoutInMS, Offline_Learning)
+                                                   
+                self.plan(problem_name, experiment_traces_amount_max, experiment_traces_bucket_max, planning_mode, experiment_details, thresholdTimeoutInMS, Offline_Learning)
                 agents, solved, timeout = self.get_ourplanner_results()
                 
                 if solved == 0:     
                     for iteration_method in iteration_methods:
-                        self.plan(problem_name, amount_of_traces_to_use, experiment_traces_bucket, planning_and_learning_mode, experiment_details, experimentTimeoutInMS, iteration_method)
-
-                #shuffled_traces_copy_path = self.planner_output_folder + "/" + experiment_details
-                #self.shuffle_traces(shuffled_traces_copy_path)
-                
-                experiment_counter += 1
+                        self.plan(problem_name, experiment_traces_amount_max, experiment_traces_bucket_max, planning_and_learning_mode, experiment_details, experimentTimeoutInMS, iteration_method)
+                        agents, solved, timeout = self.get_ourplanner_results()
+                        #if solved == 1:
+                            #finish = True
+                            
+                if solved == 1:
+                    finish = True
                 
             traces_generator.delete_output()
 

@@ -1,6 +1,7 @@
 {
-  "domainName": "domain.pddl", 
-  "domainPath": "/home/daniel/Desktop/PROBLEMS/logistics00", 
+  "domainFileName": "domain.pddl", 
+  "domainName": "satellites", 
+  "domainPath": "/home/daniel/Desktop/PROBLEMS/satellites", 
   "originDestination": "Origin", 
   "outputDestination": "/home/daniel/Work/WorkSpace/Thesis/OurPlannerTester/Output", 
   "problemGeneratorConfig": "/home/daniel/Work/WorkSpace/Thesis/problem-generator/Configuration/config.json", 
@@ -26,49 +27,74 @@
   "problems": [
     {
       "experimentSetup": {
-        "amountOfTraces": [
+        "TestSizeInPercent": true, 
+        "TestSizeOfTracesAmaount": [
+          0.25, 
+          0.5,  
           1
         ], 
-        "numberOfExperiments": 2
+        "numberOfExperiments": 3, 
+        "randomWalkSteps": 100, 
+        "timeoutInMS": 600000, 
+        "tracesAmountMax": 20000
       }, 
-      "maxTracesToUse": 500, 
-      "minTracesToUse": 0, 
-      "problemName": "probLOGISTICS-4-1.pddl"
+      "iterationMethods": [
+        "BFS", 
+        "Random", 
+        "Plan_Length_And_Reliability_Heuristic", 
+        "Monte_Carlo_Reliability_Heuristic"
+      ], 
+      "problemNames": [
+        "p03-pfile3.pddl", 
+        "p04-pfile4.pddl", 
+        "p05-pfile5.pddl", 
+        "p06-pfile6.pddl", 
+        "p07-pfile7.pddl", 
+        "p08-pfile8.pddl", 
+        "p09-pfile9.pddl", 
+        "p10-pfile10.pddl", 
+        "p11-pfile11.pddl", 
+        "p12-pfile12.pddl", 
+        "p13-pfile13.pddl", 
+        "p14-pfile14.pddl"
+      ], 
+      "thresholdSearchSetup": {
+        "maxTracesToUse": 200, 
+        "minTracesToUse": 0, 
+        "timeoutInMS": 300000
+      }
     },
- {
+{
       "experimentSetup": {
-        "amountOfTraces": [
+        "TestSizeInPercent": true, 
+        "TestSizeOfTracesAmaount": [
           1
         ], 
-        "numberOfExperiments": 2
+        "numberOfExperiments": 3, 
+        "randomWalkSteps": 100, 
+        "timeoutInMS": 600000, 
+        "tracesAmountMax": 20000
       }, 
-      "maxTracesToUse": 500, 
-      "minTracesToUse": 0, 
-      "problemName": "probLOGISTICS-4-2.pddl"
-    },
- {
-      "experimentSetup": {
-        "amountOfTraces": [
-          1
-        ], 
-        "numberOfExperiments": 2
-      }, 
-      "maxTracesToUse": 500, 
-      "minTracesToUse": 0, 
-      "problemName": "probLOGISTICS-4-3.pddl"
-    },
- {
-      "experimentSetup": {
-        "amountOfTraces": [
-          1
-        ], 
-        "numberOfExperiments": 2
-      }, 
-      "maxTracesToUse": 2500, 
-      "minTracesToUse": 0, 
-      "problemName": "probLOGISTICS-4-0.pddl"
+      "iterationMethods": [
+        "BFS", 
+        "Random", 
+        "Plan_Length_And_Reliability_Heuristic", 
+        "Monte_Carlo_Reliability_Heuristic"
+      ], 
+      "problemNames": [
+        "p15-pfile15.pddl", 
+        "p16-pfile16.pddl", 
+        "p17-pfile17.pddl", 
+        "p18-pfile18.pddl", 
+        "p19-pfile19.pddl", 
+        "p20-pfile20.pddl"
+      ], 
+      "thresholdSearchSetup": {
+        "maxTracesToUse": 200, 
+        "minTracesToUse": 0, 
+        "timeoutInMS": 300000
+      }
     }
   ], 
-  "problemsPath": "/home/daniel/Desktop/PROBLEMS/logistics00"
+  "problemsPath": "/home/daniel/Desktop/PROBLEMS/satellites"
 }
-

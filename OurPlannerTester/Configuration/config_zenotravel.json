@@ -1,6 +1,6 @@
 {
   "domainName": "domain.pddl", 
-  "domainPath": "/home/daniel/Desktop/PROBLEMS/logistics00", 
+  "domainPath": "/home/daniel/Desktop/PROBLEMS/zenotravel", 
   "originDestination": "Origin", 
   "outputDestination": "/home/daniel/Work/WorkSpace/Thesis/OurPlannerTester/Output", 
   "problemGeneratorConfig": "/home/daniel/Work/WorkSpace/Thesis/problem-generator/Configuration/config.json", 
@@ -29,46 +29,35 @@
         "amountOfTraces": [
           1
         ], 
-        "numberOfExperiments": 2
+        "numberOfExperiments": 1
       }, 
-      "maxTracesToUse": 500, 
+      "maxTracesToUse": 1000, 
       "minTracesToUse": 0, 
-      "problemName": "probLOGISTICS-4-1.pddl"
+      "problemName": "pfile3.pddl"
     },
- {
+{
       "experimentSetup": {
         "amountOfTraces": [
           1
         ], 
-        "numberOfExperiments": 2
+        "numberOfExperiments": 1
       }, 
-      "maxTracesToUse": 500, 
+      "maxTracesToUse": 1000, 
       "minTracesToUse": 0, 
-      "problemName": "probLOGISTICS-4-2.pddl"
+      "problemName": "pfile4.pddl"
     },
- {
+{
       "experimentSetup": {
         "amountOfTraces": [
           1
         ], 
-        "numberOfExperiments": 2
+        "numberOfExperiments": 1
       }, 
-      "maxTracesToUse": 500, 
+      "maxTracesToUse": 1000, 
       "minTracesToUse": 0, 
-      "problemName": "probLOGISTICS-4-3.pddl"
-    },
- {
-      "experimentSetup": {
-        "amountOfTraces": [
-          1
-        ], 
-        "numberOfExperiments": 2
-      }, 
-      "maxTracesToUse": 2500, 
-      "minTracesToUse": 0, 
-      "problemName": "probLOGISTICS-4-0.pddl"
+      "problemName": "pfile5.pddl"
     }
   ], 
-  "problemsPath": "/home/daniel/Desktop/PROBLEMS/logistics00"
+  "problemsPath": "/home/daniel/Desktop/PROBLEMS/zenotravel"
 }
 

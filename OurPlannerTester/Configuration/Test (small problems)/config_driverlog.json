@@ -1,0 +1,186 @@
+{
+  "domainName": "driverlog",
+  "domainFileName": "domain.pddl",
+  "domainPath": "/home/daniel/Desktop/PROBLEMS/driverlog", 
+  "originDestination": "Origin", 
+  "outputDestination": "/home/daniel/Work/WorkSpace/Thesis/OurPlannerTester/Output", 
+  "problemGeneratorConfig": "/home/daniel/Work/WorkSpace/Thesis/problem-generator/Configuration/config.json", 
+  "problemGeneratorCreator": "problemGenerator.StateActionStateGenerator", 
+  "problemGeneratorInput": "/home/daniel/Work/WorkSpace/Thesis/problem-generator/Input", 
+  "problemGeneratorJAR": "/home/daniel/Work/WorkSpace/Thesis/problem-generator/target/problem-generator-0.0.1-SNAPSHOT-jar-with-dependencies.jar", 
+  "problemGeneratorOutput": "/home/daniel/Work/WorkSpace/Thesis/problem-generator/Output", 
+  "problemGeneratorOutputDestination": "ProblemGenerator", 
+  "problemGrounderConfig": "/home/daniel/Work/WorkSpace/Thesis/ProblemGrounder/Configuration/config.json", 
+  "problemGrounderCreator": "ProblemGrounder.ProblemGrounder", 
+  "problemGrounderInput": "/home/daniel/Work/WorkSpace/Thesis/ProblemGrounder/Input", 
+  "problemGrounderJAR": "/home/daniel/Work/WorkSpace/Thesis/ProblemGrounder/target/ProblemGrounder-0.0.1-SNAPSHOT-jar-with-dependencies.jar", 
+  "problemGrounderOutput": "/home/daniel/Work/WorkSpace/Thesis/ProblemGrounder/Output", 
+  "problemGrounderOutputDestination": "ProblemGrounder", 
+  "problemPlannerConfig": "/home/daniel/Work/WorkSpace/Thesis/OurPlanner/Configuration/config.json", 
+  "problemPlannerCreator": "OurPlanner.OurPlanner", 
+  "problemPlannerInput": "/home/daniel/Work/WorkSpace/Thesis/OurPlanner/Input", 
+  "problemPlannerJAR": "/home/daniel/Work/WorkSpace/Thesis/OurPlanner/target/OurPlanner-0.0.1-SNAPSHOT-jar-with-dependencies.jar", 
+  "problemPlannerOutput": "/home/daniel/Work/WorkSpace/Thesis/OurPlanner/Output", 
+  "problemPlannerOutputDestination": "OurPlanner", 
+  "problemPlannerPlanningModel": "SafeModel", 
+  "problemPlannerVerificationModel": "GroundedModel", 
+  "problems": [
+    {
+      "experimentSetup": {
+        "TestSizeInPercent": false, 
+        "TestSizeOfTracesAmaount": [
+          0, 
+          2, 
+          4, 
+          6, 
+          8, 
+          10
+        ], 
+        "numberOfExperiments": 3, 
+        "randomWalkSteps": 100, 
+        "timeoutInMS": 600000, 
+        "tracesAmountMax": 20000
+      }, 
+      "iterationMethods": [
+        "BFS", 
+        "Random", 
+        "Plan_Length_And_Reliability_Heuristic", 
+        "Monte_Carlo_Reliability_Heuristic"
+      ], 
+      "problemNames": [
+        "pfile1-0.pddl"
+      ], 
+      "thresholdSearchSetup": {
+        "maxTracesToUse": 200, 
+        "minTracesToUse": 0, 
+        "timeoutInMS": 300000
+      }
+    }, 
+    {
+      "experimentSetup": {
+        "TestSizeInPercent": false, 
+        "TestSizeOfTracesAmaount": [
+          0, 
+          5, 
+          10, 
+          20, 
+          50, 
+          100
+        ], 
+        "numberOfExperiments": 3, 
+        "randomWalkSteps": 100, 
+        "timeoutInMS": 600000, 
+        "tracesAmountMax": 20000
+      }, 
+      "iterationMethods": [
+        "BFS", 
+        "Random", 
+        "Plan_Length_And_Reliability_Heuristic", 
+        "Monte_Carlo_Reliability_Heuristic"
+      ], 
+      "problemNames": [
+        "pfile1-1.pddl"
+      ], 
+      "thresholdSearchSetup": {
+        "maxTracesToUse": 200, 
+        "minTracesToUse": 0, 
+        "timeoutInMS": 300000
+      }
+    }, 
+    {
+      "experimentSetup": {
+        "TestSizeInPercent": false, 
+        "TestSizeOfTracesAmaount": [
+          0, 
+          10, 
+          25, 
+          50, 
+          250, 
+          1000
+        ], 
+        "numberOfExperiments": 3, 
+        "randomWalkSteps": 100, 
+        "timeoutInMS": 600000, 
+        "tracesAmountMax": 20000
+      }, 
+      "iterationMethods": [
+        "BFS", 
+        "Random", 
+        "Plan_Length_And_Reliability_Heuristic", 
+        "Monte_Carlo_Reliability_Heuristic"
+      ], 
+      "problemNames": [
+        "pfile1-2.pddl"
+      ], 
+      "thresholdSearchSetup": {
+        "maxTracesToUse": 200, 
+        "minTracesToUse": 0, 
+        "timeoutInMS": 300000
+      }
+    }, 
+    {
+      "experimentSetup": {
+        "TestSizeInPercent": false, 
+        "TestSizeOfTracesAmaount": [
+          0, 
+          50, 
+          100, 
+          250, 
+          1000, 
+          5000
+        ], 
+        "numberOfExperiments": 3, 
+        "randomWalkSteps": 100, 
+        "timeoutInMS": 600000, 
+        "tracesAmountMax": 20000
+      }, 
+      "iterationMethods": [
+        "BFS", 
+        "Random", 
+        "Plan_Length_And_Reliability_Heuristic", 
+        "Monte_Carlo_Reliability_Heuristic"
+      ], 
+      "problemNames": [
+        "pfile1-3.pddl"
+      ], 
+      "thresholdSearchSetup": {
+        "maxTracesToUse": 200, 
+        "minTracesToUse": 0, 
+        "timeoutInMS": 300000
+      }
+    },
+{
+      "experimentSetup": {
+        "TestSizeInPercent": false, 
+        "TestSizeOfTracesAmaount": [
+          0, 
+          75, 
+          150, 
+          400, 
+          2000, 
+          8000
+        ], 
+        "numberOfExperiments": 3, 
+        "randomWalkSteps": 100, 
+        "timeoutInMS": 600000, 
+        "tracesAmountMax": 20000
+      }, 
+      "iterationMethods": [
+        "BFS", 
+        "Random", 
+        "Plan_Length_And_Reliability_Heuristic", 
+        "Monte_Carlo_Reliability_Heuristic"
+      ], 
+      "problemNames": [
+        "pfile1-4.pddl"
+      ], 
+      "thresholdSearchSetup": {
+        "maxTracesToUse": 200, 
+        "minTracesToUse": 0, 
+        "timeoutInMS": 300000
+      }
+    }
+  ], 
+  "problemsPath": "/home/daniel/Desktop/PROBLEMS/driverlog"
+}
+

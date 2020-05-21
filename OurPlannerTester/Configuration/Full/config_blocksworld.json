@@ -1,6 +1,6 @@
 {
   "domainName": "domain.pddl", 
-  "domainPath": "/home/daniel/Desktop/PROBLEMS/logistics00", 
+  "domainPath": "/home/daniel/Desktop/PROBLEMS/blocksworld", 
   "originDestination": "Origin", 
   "outputDestination": "/home/daniel/Work/WorkSpace/Thesis/OurPlannerTester/Output", 
   "problemGeneratorConfig": "/home/daniel/Work/WorkSpace/Thesis/problem-generator/Configuration/config.json", 
@@ -29,46 +29,52 @@
         "amountOfTraces": [
           1
         ], 
-        "numberOfExperiments": 2
+        "numberOfExperiments": 1, 
+        "timeoutInMS": 600000
       }, 
-      "maxTracesToUse": 500, 
-      "minTracesToUse": 0, 
-      "problemName": "probLOGISTICS-4-1.pddl"
-    },
- {
-      "experimentSetup": {
-        "amountOfTraces": [
-          1
-        ], 
-        "numberOfExperiments": 2
-      }, 
-      "maxTracesToUse": 500, 
-      "minTracesToUse": 0, 
-      "problemName": "probLOGISTICS-4-2.pddl"
-    },
- {
-      "experimentSetup": {
-        "amountOfTraces": [
-          1
-        ], 
-        "numberOfExperiments": 2
-      }, 
-      "maxTracesToUse": 500, 
-      "minTracesToUse": 0, 
-      "problemName": "probLOGISTICS-4-3.pddl"
-    },
- {
-      "experimentSetup": {
-        "amountOfTraces": [
-          1
-        ], 
-        "numberOfExperiments": 2
-      }, 
-      "maxTracesToUse": 2500, 
-      "minTracesToUse": 0, 
-      "problemName": "probLOGISTICS-4-0.pddl"
+      "problemNames": [
+        "probBLOCKS-4-0.pddl", 
+        "probBLOCKS-4-2.pddl", 
+        "probBLOCKS-5-0.pddl", 
+        "probBLOCKS-5-1.pddl", 
+        "probBLOCKS-5-2.pddl", 
+	"probBLOCKS-6-0.pddl", 
+        "probBLOCKS-6-1.pddl", 
+        "probBLOCKS-6-2.pddl", 
+	"probBLOCKS-7-0.pddl", 
+        "probBLOCKS-7-1.pddl", 
+        "probBLOCKS-7-2.pddl", 
+	"probBLOCKS-8-0.pddl", 
+        "probBLOCKS-8-1.pddl", 
+        "probBLOCKS-8-2.pddl",
+	"probBLOCKS-9-0.pddl", 
+        "probBLOCKS-9-1.pddl", 
+        "probBLOCKS-9-2.pddl",
+	"probBLOCKS-10-0.pddl", 
+        "probBLOCKS-10-1.pddl", 
+        "probBLOCKS-10-2.pddl", 
+	"probBLOCKS-11-0.pddl", 
+        "probBLOCKS-11-1.pddl", 
+        "probBLOCKS-11-2.pddl",
+	"probBLOCKS-12-0.pddl", 
+        "probBLOCKS-12-1.pddl", 
+        "probBLOCKS-13-0.pddl",
+	"probBLOCKS-13-1.pddl", 
+        "probBLOCKS-14-0.pddl", 
+        "probBLOCKS-14-1.pddl", 
+	"probBLOCKS-15-0.pddl", 
+        "probBLOCKS-15-1.pddl", 
+        "probBLOCKS-16-1.pddl",
+	"probBLOCKS-16-2.pddl", 
+        "probBLOCKS-17-0.pddl"
+      ], 
+      "thresholdSearchSetup": {
+        "maxTracesToUse": 300, 
+        "minTracesToUse": 0, 
+        "timeoutInMS": 300000
+      }
     }
   ], 
-  "problemsPath": "/home/daniel/Desktop/PROBLEMS/logistics00"
+  "problemsPath": "/home/daniel/Desktop/PROBLEMS/blocksworld"
 }
 

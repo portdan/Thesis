@@ -1,6 +1,6 @@
 {
   "domainName": "domain.pddl", 
-  "domainPath": "/home/daniel/Desktop/PROBLEMS/logistics00", 
+  "domainPath": "/home/daniel/Desktop/PROBLEMS/rovers", 
   "originDestination": "Origin", 
   "outputDestination": "/home/daniel/Work/WorkSpace/Thesis/OurPlannerTester/Output", 
   "problemGeneratorConfig": "/home/daniel/Work/WorkSpace/Thesis/problem-generator/Configuration/config.json", 
@@ -29,46 +29,39 @@
         "amountOfTraces": [
           1
         ], 
-        "numberOfExperiments": 2
+        "numberOfExperiments": 1, 
+        "timeoutInMS": 300000
       }, 
-      "maxTracesToUse": 500, 
-      "minTracesToUse": 0, 
-      "problemName": "probLOGISTICS-4-1.pddl"
-    },
- {
+      "problemNames": [
+        "p03.pddl", 
+        "p04.pddl", 
+        "p07.pddl"
+      ], 
+      "thresholdSearchSetup": {
+        "maxTracesToUse": 2, 
+        "minTracesToUse": 0, 
+        "timeoutInMS": 120000
+      }
+    }, 
+    {
       "experimentSetup": {
         "amountOfTraces": [
           1
         ], 
-        "numberOfExperiments": 2
+        "numberOfExperiments": 1, 
+        "timeoutInMS": 300000
       }, 
-      "maxTracesToUse": 500, 
-      "minTracesToUse": 0, 
-      "problemName": "probLOGISTICS-4-2.pddl"
-    },
- {
-      "experimentSetup": {
-        "amountOfTraces": [
-          1
-        ], 
-        "numberOfExperiments": 2
-      }, 
-      "maxTracesToUse": 500, 
-      "minTracesToUse": 0, 
-      "problemName": "probLOGISTICS-4-3.pddl"
-    },
- {
-      "experimentSetup": {
-        "amountOfTraces": [
-          1
-        ], 
-        "numberOfExperiments": 2
-      }, 
-      "maxTracesToUse": 2500, 
-      "minTracesToUse": 0, 
-      "problemName": "probLOGISTICS-4-0.pddl"
+      "problemNames": [
+        "p05.pddl", 
+        "p06.pddl"
+      ], 
+      "thresholdSearchSetup": {
+        "maxTracesToUse": 100, 
+        "minTracesToUse": 0, 
+        "timeoutInMS": 120000
+      }
     }
   ], 
-  "problemsPath": "/home/daniel/Desktop/PROBLEMS/logistics00"
+  "problemsPath": "/home/daniel/Desktop/PROBLEMS/rovers"
 }
 
