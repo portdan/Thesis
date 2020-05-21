@@ -91,6 +91,9 @@ public class PlanToStateActionState {
 
 		for (int i = 0; i <= lastActionIndex; i++)
 			res.add(generateSASForStep(plan, i, initialState));
+		
+		if(lastActionIndex + 1 < plan.size())
+			res.add(generateSASForStep(plan, lastActionIndex + 1, initialState));
 
 		delelteTemporaryFiles();
 

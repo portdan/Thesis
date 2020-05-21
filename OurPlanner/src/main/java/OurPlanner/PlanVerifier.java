@@ -454,7 +454,7 @@ public class PlanVerifier {
 
 		if(agentProblem == null) {
 			LOGGER.info("Plan cannot be verified!");
-			return new VerificationResult(actionIndex, false);
+			return new VerificationResult(-1, false);
 		}
 
 		passedTimeMS = System.currentTimeMillis() - startTimeMs;
@@ -476,12 +476,12 @@ public class PlanVerifier {
 			}
 			else {
 				LOGGER.info("Action " + action.getSimpleLabel() + " is not applicable!");
-				return new VerificationResult(actionIndex, false);
+				return new VerificationResult(actionIndex-1, false);
 			}
 		}
 		else {
 			LOGGER.info("agent " + agentName + " is not the owner of this action - plan not verified!");
-			return new VerificationResult(actionIndex, false);
+			return new VerificationResult(actionIndex-1, false);
 		}
 
 		if(actionIndex == plan.size() - 1) {

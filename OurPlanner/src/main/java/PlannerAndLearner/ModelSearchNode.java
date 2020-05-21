@@ -72,7 +72,8 @@ public class ModelSearchNode {
 		this.children = null;
 		this.tempModel = tempModel;
 		this.goalProximity = 0;
-		this.numOfVisits = 0;
+		//this.numOfVisits = 0;
+		this.numOfVisits = 1;
 		this.value = 0;
 	}
 

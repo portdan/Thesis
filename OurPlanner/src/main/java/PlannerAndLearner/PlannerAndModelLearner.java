@@ -391,7 +391,7 @@ public class PlannerAndModelLearner {
 			writeDomainFile(currModel.reconstructModelString());
 
 			plan = planForAgent();
-
+			
 			if(plan == null) {
 				//mcts.backpropogateNode(searchNode, searchNode.getReliabilityHeuristic(learner.actionsPreconditionsScore));					
 				mcts.removeNode(searchNode);
@@ -923,10 +923,12 @@ public class PlannerAndModelLearner {
 
 		if(planSASList == null)
 			return new PlanToStateActionStateResult(null, null, true);		
-
-		if(plan.size() > planSASList.size()) {
-			failedActionSAS = planSASList.get(lastOKActionIndex);
-			planSASList.remove(lastOKActionIndex);
+		
+		if(lastOKActionIndex == planSASList.size() - 1)
+			failedActionSAS = null;
+		else if(lastOKActionIndex < planSASList.size()) {
+			failedActionSAS = planSASList.get(lastOKActionIndex+1);
+			planSASList.remove(lastOKActionIndex+1);
 		}
 
 		sequancingAmountTotal = planSASList.size();

@@ -26,7 +26,9 @@ public class MCTS {
 
 		List<ModelSearchNode> res = new ArrayList<ModelSearchNode>();
 
-		if(node.getNumOfVisits() == 0)
+//		if(node.getNumOfVisits() == 0)
+//			res.add(node);
+		if(node.getNumOfVisits() == 1)
 			res.add(node);
 
 		else if(node.getChildren() == null || node.getChildren().isEmpty())
@@ -54,7 +56,10 @@ public class MCTS {
 
 		double n = node.getNumOfVisits();
 
-		if(node.getNumOfVisits() == 0)
+//		if(n == 0)
+//			return node;
+		
+		if(n == 1)
 			return node;
 		
 		if(node.getChildren() == null || node.getChildren().isEmpty())
@@ -69,10 +74,13 @@ public class MCTS {
 
 			double cn = child.getNumOfVisits();
 			double v = child.getValue();
+			double pv = node.getValue();
 			double score = 0;
 
-			if(cn == 0)
-				score = Double.POSITIVE_INFINITY;
+//			if(cn == 0)
+//				score = Double.POSITIVE_INFINITY;
+			if(cn == 1)
+				score = pv + C*Math.sqrt(Math.log(n));
 			else
 				score = v/cn + C*Math.sqrt(Math.log(n)/cn);
 
@@ -108,7 +116,11 @@ public class MCTS {
 		int count = 0;
 
 		for (ModelSearchNode child : node.getChildren()) {
-			if(child.getNumOfVisits()>0) {
+//			if(child.getNumOfVisits()>0) {
+//				sum+=child.getValue();
+//				count++;
+//			}
+			if(child.getNumOfVisits()>1) {
 				sum+=child.getValue();
 				count++;
 			}
@@ -129,7 +141,9 @@ public class MCTS {
 
 		parent.getChildren().remove(searchNode);
 
-		backpropogateNode(parent, -searchNode.getValue(), -searchNode.getNumOfVisits()); 
+		//backpropogateNode(parent, -searchNode.getValue(), -searchNode.getNumOfVisits()); 
+		backpropogateNode(parent, -searchNode.getValue(), -searchNode.getNumOfVisits() + 1); 
+
 		//backpropogateNode(parent, calcValueAverage(parent)); 
 
 		searchNode = null;
