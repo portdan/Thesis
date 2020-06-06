@@ -1,0 +1,4 @@
+# general things to ignore
+__pycache__/
+*.so
+*~
