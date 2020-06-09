@@ -1,40 +1,93 @@
 import pandas as pd
 import os
-import likelymodelgenerator
+from ast import literal_eval
+import pickle
 
 
-def pre_process_traces():
-    root_dir = os.path.dirname(os.path.abspath(likelymodelgenerator.__file__))  # This is Project Root
-    data_dir = root_dir + "/data"  # This is Data Root
-    out_dir = root_dir + "/preprocessed"  # This is Preprocessed Root
+def pre_process_data2(data_file, pre_processed_file):
+    unique_pre = set()
+    action_pre_count = dict()
 
+    if os.path.exists(data_file):
+        with open(data_file) as file:
+            for line in file:
+                row = pre_process_sas(line)
+                unique_pre = unique_pre.union(set(row['Preconditions']))
+                if not row['Action'] in action_pre_count:
+                    action_pre_count[row['Action']] = dict()
+                for pre in row['Preconditions']:
+                    if pre in action_pre_count[row['Action']]:
+                        (action_pre_count[row['Action']])[pre] += 1
+                    else:
+                        (action_pre_count[row['Action']])[pre] = 1
+
+    with open(pre_processed_file, 'wb') as file:
+        pickle.dump(action_pre_count, file, pickle.HIGHEST_PROTOCOL)
+
+    return action_pre_count
+
+
+def load_pre_process_data2(pre_processed_file):
+    if os.path.exists(pre_processed_file):
+        with open(pre_processed_file, 'rb') as file:
+            return pickle.load(file)
+    else:
+        return None
+
+
+def pre_process_append_new_traces2(pre_processed_file, new_traces_list):
+    if os.path.exists(pre_processed_file):
+        action_pre_count = load_pre_process_data2(pre_processed_file)
+        for line in new_traces_list:
+            row = pre_process_sas(line)
+            if not row['Action'] in action_pre_count:
+                action_pre_count[row['Action']] = dict()
+            for pre in row['Preconditions']:
+                if pre in action_pre_count[row['Action']]:
+                    (action_pre_count[row['Action']])[pre] += 1
+                else:
+                    (action_pre_count[row['Action']])[pre] = 1
+        return action_pre_count
+    else:
+        return None
+
+
+def pre_process_data(data_file, pre_processed_file):
     df = pd.DataFrame(columns=['Agent', 'Action', 'Preconditions', 'Effects'])
 
-    for dir_path, dir_names, file_names in os.walk(data_dir):
-        data_file = data_dir + "/" + file_names[0]
-
+    if os.path.exists(data_file):
         with open(data_file) as file:
             for line in file:
                 row = pre_process_sas(line)
                 df = df.append(row, ignore_index=True)
 
-            df.to_csv(out_dir + "/preprocessed.csv", index=False)
-            break
-
+    df.to_csv(pre_processed_file, index=False)
     return df
 
 
-def pre_process_append_new_traces(new_traces_list):
-    root_dir = os.path.dirname(os.path.abspath(likelymodelgenerator.__file__))  # This is Project Root
-    preprocessed_file = root_dir + "/preprocessed/preprocessed.csv"  # This is Preprocessed Root
+def load_pre_process_data(pre_processed_file):
+    if os.path.exists(pre_processed_file):
+        converter = {"Preconditions": literal_eval, "Effects": literal_eval}
+        df = pd.read_csv(pre_processed_file, converters=converter)
+        return df
+    else:
+        return None
 
-    df = pd.read_csv(preprocessed_file)
 
-    for line in new_traces_list:
-        row = pre_process_sas(line)
-        df = df.append(row, ignore_index=True)
+def pre_process_append_new_traces(pre_processed_file, new_traces_list):
+    if os.path.exists(pre_processed_file):
+        converter = {"Preconditions": literal_eval, "Effects": literal_eval}
+        df = pd.read_csv(pre_processed_file, converters=converter)
 
-    df.to_csv(preprocessed_file, index=False)
+        for line in new_traces_list:
+            row = pre_process_sas(line)
+            df = df.append(row, ignore_index=True)
+
+        df.to_csv(pre_processed_file, index=False)
+
+        return df
+    else:
+        return None
 
 
 def pre_process_sas(data):
