@@ -22,14 +22,14 @@ setup(
     # package, this name will be registered for you. It will determine how
     # users can install this project, e.g.:
     #
-    # $ pip install src
+    # $ pip install likelymodelgenerator
     #
     # And where it will live on PyPI: https://<company name>.org/project/src/
     #
     # There are some restrictions on what makes a valid project name
     # specification here:
     # https://packaging.python.org/specifications/core-metadata/#name
-    name='src',  # Required
+    name='likelymodelgenerator',  # Required
 
     # Versions should comply with PEP 440:
     # https://www.python.org/dev/peps/pep-0440/
@@ -141,7 +141,7 @@ setup(
     #
     # For an analysis of "install_requires" vs pip's requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
-    install_requires=['scikit-learn','pandas'],  # Optional
+    install_requires=['scikit-learn', 'pandas', 'numpy', 'scipy'],  # Optional
 
     # List additional groups of dependencies here (e.g. development
     # dependencies). Users will be able to install these using the "extras"
