@@ -521,4 +521,11 @@ public class StateActionStateSASPreprocessor {
 		}
 	}
 
+	public Map<String,Set<String>> getAllVarVals(){
+		if(agentVarVals!=null && agentVarVals.get(ALL)!=null)
+			return agentVarVals.get(ALL);
+		else
+			return null;
+	}
+
 }

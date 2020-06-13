@@ -53,6 +53,9 @@ public class TraceLearner {
 	Map<String, Set<String>> agentLearnedUnSafeActionsEffects = new HashMap<String,Set<String>>();
 	public Set<String> LearnedActionsNames = new HashSet<String>();
 
+	public Map<String, Set<StateActionState>> agentFailedSAS = new HashMap<String,Set<StateActionState>>();
+
+
 	StateActionStateSequencer sasSequencer = null;
 	DeleteEffectGenerator DEGenerator = null;
 
@@ -184,7 +187,10 @@ public class TraceLearner {
 			}
 		}
 
-		return writeNewSafeLearnedProblemFiles() && writeNewUnSafeLearnedProblemFiles();
+		writeNewSafeLearnedProblemFiles();
+		writeNewUnSafeLearnedProblemFiles();
+
+		return true;
 	}
 
 	private void initializeActionsPreconditionsScore(Set<String> allFacts, Set<String> actionLabels) {
@@ -201,8 +207,8 @@ public class TraceLearner {
 
 	}
 
-	public boolean expandSafeAndUnSafeModelsWithPlan(List<StateActionState> planSASList, String pathToSafeModel,
-			String pathUnSafeModel, long sequancingTimeTotal, long sequancingAmountTotal) {
+	public boolean expandSafeAndUnSafeModelsWithPlan(List<StateActionState> planSASList,
+			String pathToSafeModel, String pathUnSafeModel, long sequancingTimeTotal, long sequancingAmountTotal) {
 
 		LOGGER.info("Learning new actions from plan");
 		long passedTimeMS = 0;
@@ -212,6 +218,7 @@ public class TraceLearner {
 
 		DEGenerator = new DeleteEffectGenerator (problemFiles,
 				domainFileName, problemFileName);
+
 
 		List<StateActionState> sasList = new ArrayList<StateActionState>(planSASList); 
 
@@ -252,7 +259,15 @@ public class TraceLearner {
 
 		}
 
-		return writeNewSafeLearnedProblemFiles() && writeNewUnSafeLearnedProblemFiles();
+		boolean isAnyUpdates = false;
+
+		if(IsSafeModelUpdated)
+			isAnyUpdates |= writeNewSafeLearnedProblemFiles();
+
+		if(IsUnSafeModelUpdated)
+			isAnyUpdates |= writeNewUnSafeLearnedProblemFiles();
+
+		return isAnyUpdates;
 	}
 
 	private void updateActionPriconditionsScore(String actionName, List<StateActionState> sasListForAction) {
@@ -868,5 +883,17 @@ public class TraceLearner {
 
 	public Set<String> getGoalFacts() {
 		return DEGenerator.generateGoalFacts();
+	}
+
+	public void addFailedSAS(StateActionState failedSAS) {
+
+		Set<StateActionState> failedSASofAction = agentFailedSAS.get(failedSAS.action);
+
+		if(failedSASofAction == null) {
+			failedSASofAction = new LinkedHashSet<StateActionState>();
+			agentFailedSAS.put(failedSAS.action, failedSASofAction);
+		}
+
+		failedSASofAction.add(failedSAS);
 	}
 }

@@ -4,11 +4,14 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import com.sun.management.OperatingSystemMXBean;
+
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
@@ -24,6 +27,7 @@ import OurPlanner.PlanToStateActionStateResult;
 import OurPlanner.PlanVerifier;
 import OurPlanner.StateActionState;
 import OurPlanner.TraceLearner;
+import OurPlanner.VariableValueExtractor;
 import Utils.ArrayUtils;
 import Utils.FileDeleter;
 import Utils.MCTS;
@@ -70,6 +74,8 @@ public class PlannerAndModelLearner {
 	Model unsafeModel = null;
 
 	OperatingSystemMXBean OSstatistics = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
+
+	Map<String, Set<String>> variableToValuesMapping = null;
 
 	public PlannerAndModelLearner(String agentName, List<String> agentList, String domainFileName,
 			String problemFileName, TraceLearner learner, Set<String> goalFacts,
@@ -136,12 +142,14 @@ public class PlannerAndModelLearner {
 	}
 
 
-	public List<String> planAndLearn (IterationMethod method) {
+	public List<String> planAndLearn(IterationMethod method) {
 
 		LOGGER.info("test");
 
 		List<String> plan = null;
 		long passedTimeMS = 0;
+
+		variableToValuesMapping = getVariableToValuesMapping();
 
 		if(!copyProblemFiles()) {
 			LOGGER.info("Coping domain file failure");
@@ -229,6 +237,17 @@ public class PlannerAndModelLearner {
 				currModel = unsafeModel.extendModel(currTempModel);
 			 */
 
+
+			StateActionState failedSAS = getFailedSAS(searchNode);
+
+			if(failedSAS != null) {			
+				Set<ModelSearchNode> newModels = ExtendSafe(searchNode, failedSAS);
+				open.addAll(newModels);	
+				open.removeAll(closed);
+				continue;
+			}
+
+
 			Model currModel = unsafeModel.extendModel(searchNode.getTempModel());
 
 			writeDomainFile(currModel.reconstructModelString());
@@ -282,12 +301,13 @@ public class PlannerAndModelLearner {
 						searchNode.calcGoalProximity(goalFacts);
 
 						//useSafeModel = UpdateModels(planSASList);
-						UpdateModels(planSASList);
-						FilterOpenListModels(open, closed, planSASList, failedActionSAS);
+						UpdateModelsWithNewPlan(planSASList, failedActionSAS);
+						FilterOldModels(open, closed, planSASList, failedActionSAS);
+						//FilterContradictingModels(open, closed, variableToValuesMapping);
 
 						//if(res.lastActionIndex > 0) {
 						Set<ModelSearchNode> newModels = ExtendSafe(searchNode, failedActionSAS);
-						open.addAll(newModels);		
+						open.addAll(newModels);	
 						open.removeAll(closed);
 						//}
 					}
@@ -308,12 +328,37 @@ public class PlannerAndModelLearner {
 
 	}
 
+	private StateActionState getFailedSAS(ModelSearchNode searchNode) {
+
+		for (Entry<String, Set<StateActionState>> failed : learner.agentFailedSAS.entrySet()) {
+
+			TempAction act = searchNode.getTempModel().getTempActionByName(failed.getKey());
+
+			if(act == null)
+				continue;
+
+			Set<String> modelPre = act.preconditionsAdd;
+
+			for (StateActionState failedSAS : failed.getValue()) {
+
+				Set<String> failedSASPre = formatFacts(failedSAS.pre);
+
+				if(failedSASPre.equals(modelPre))
+					return failedSAS;
+			}
+		}
+
+		return null;
+	}
+
 	public List<String> planAndLearnMonteCarlo(IterationMethod method, int Cvalue) {
 
 		LOGGER.info("test");
 
 		List<String> plan = null;
 		long passedTimeMS = 0;
+
+		variableToValuesMapping = getVariableToValuesMapping();
 
 		if(!copyProblemFiles()) {
 			LOGGER.info("Coping domain file failure");
@@ -386,12 +431,23 @@ public class PlannerAndModelLearner {
 			ModelSearchNode searchNode = mcts.selectBestNode(searchNodeRoot);
 			//ModelSearchNode searchNode = mcts.selectRandom(searchNodeRoot);
 
+			StateActionState failedSAS = getFailedSAS(searchNode);
+
+			if(failedSAS != null) {			
+				Set<ModelSearchNode> newModels = ExtendSafe(searchNode, failedSAS);
+				searchNode.setChildren(new ArrayList<ModelSearchNode>(newModels));
+				mcts.backpropogateNode(searchNode, calcNodeHeuristic(searchNode, method), 1);					
+
+				continue;
+			}
+
+
 			Model currModel = unsafeModel.extendModel(searchNode.getTempModel());
 
 			writeDomainFile(currModel.reconstructModelString());
 
 			plan = planForAgent();
-			
+
 			if(plan == null) {
 				//mcts.backpropogateNode(searchNode, searchNode.getReliabilityHeuristic(learner.actionsPreconditionsScore));					
 				mcts.removeNode(searchNode);
@@ -425,8 +481,8 @@ public class PlannerAndModelLearner {
 						searchNode.setPlanSASList(planSASList);
 						searchNode.calcGoalProximity(goalFacts);
 
-						UpdateModels(planSASList);
-						FilterMCTSModels(mcts, searchNodeRoot, planSASList);
+						UpdateModelsWithNewPlan(planSASList, failedActionSAS);
+						FilterOldModels(mcts, searchNodeRoot, planSASList);
 
 						Set<ModelSearchNode> newModels = ExtendSafe(searchNode, failedActionSAS);
 
@@ -507,7 +563,7 @@ public class PlannerAndModelLearner {
 		return 0;
 	}
 
-	private boolean UpdateModels(List<StateActionState> planSASList) {
+	private boolean UpdateModelsWithNewPlan(List<StateActionState> planSASList, StateActionState failedSAS) {
 
 		LOGGER.info("Updating safe and unsafe models with new plan training set");
 
@@ -516,16 +572,16 @@ public class PlannerAndModelLearner {
 		String safeModelPath = Globals.OUTPUT_SAFE_MODEL_PATH + "/" + agentName + "/" + domainFileName;
 		String unsafeModelPath = Globals.OUTPUT_UNSAFE_MODEL_PATH + "/" + agentName + "/" + domainFileName;
 
+		learner.addFailedSAS(failedSAS);
+
 		if(planSASList != null && planSASList.size() > 0) {
-			learner.expandSafeAndUnSafeModelsWithPlan(planSASList, Globals.OUTPUT_SAFE_MODEL_PATH, Globals.OUTPUT_UNSAFE_MODEL_PATH, 
+			res = learner.expandSafeAndUnSafeModelsWithPlan(planSASList, Globals.OUTPUT_SAFE_MODEL_PATH, Globals.OUTPUT_UNSAFE_MODEL_PATH, 
 					sequancingTimeTotal, sequancingAmountTotal);
 
 			addedTrainingSize += planSASList.size();
 
 			safeModel.readModel(safeModelPath);
 			unsafeModel.readModel(unsafeModelPath);
-
-			res =  learner.IsSafeModelUpdated || learner.IsUnSafeModelUpdated;
 		}
 
 		LOGGER.info("Garbage collection!");
@@ -534,10 +590,10 @@ public class PlannerAndModelLearner {
 		return res;
 	}
 
-	private boolean FilterOpenListModels(Set<ModelSearchNode> open, Set<ModelSearchNode> closed,
+	private void FilterOldModels(Set<ModelSearchNode> open, Set<ModelSearchNode> closed,
 			List<StateActionState> planSASList, StateActionState failedActionSAS) {
 
-		LOGGER.info("Updating open list models with new plan training set");
+		LOGGER.info("Filtering open list models that does not allow OK actions");
 
 		Set<ModelSearchNode> toRemove = new LinkedHashSet<ModelSearchNode>();
 
@@ -546,15 +602,15 @@ public class PlannerAndModelLearner {
 			Model testedModel = unsafeModel.extendModel(searchModel.getTempModel());
 
 			// remove open list models that does not allow OK actions
-			for (StateActionState sas : planSASList) {				
-				if(!sas.actionOwner.equals(agentName) 
-						//&& learner.LearnedActionsNames.contains(sas.action)
-						){
+			for (StateActionState sas : planSASList) {	
 
-					Action modelAction = testedModel.actions.get(sas.action); 
-					Set<String> modelActionPre = new LinkedHashSet<String>(modelAction.preconditions);
+				if(sas.actionOwner.equals(agentName) )
+					continue;
 
-					/*
+				Action modelAction = testedModel.actions.get(sas.action); 
+				Set<String> modelActionPre = new LinkedHashSet<String>(modelAction.preconditions);
+
+				/*
 					Set<String> modelActionEff = new LinkedHashSet<String>(modelAction.effects);
 
 					Set<String> verifiedActionPre = new LinkedHashSet<String>(sas.pre);
@@ -575,16 +631,15 @@ public class PlannerAndModelLearner {
 						toRemove.add(tempModel);
 					}
 
-					 */
+				 */
 
 
-					Action safeModelAction = safeModel.actions.get(sas.action); 					
-					Set<String> safeModelActionPre = new LinkedHashSet<String>(safeModelAction.preconditions);
+				Action safeModelAction = safeModel.actions.get(sas.action); 					
+				Set<String> safeModelActionPre = new LinkedHashSet<String>(safeModelAction.preconditions);
 
-					if(!safeModelActionPre.containsAll(modelActionPre)) {
-						toRemove.add(searchModel);
-					}
-
+				if(!safeModelActionPre.containsAll(modelActionPre)) {
+					toRemove.add(searchModel);
+					break;
 				}
 			}
 
@@ -623,11 +678,70 @@ public class PlannerAndModelLearner {
 
 		open.removeAll(toRemove);
 		closed.addAll(toRemove);
-
-		return true;
 	}
 
-	public void FilterMCTSModels(MCTS mcts, ModelSearchNode node, List<StateActionState> planSASList) {
+	private void FilterContradictingModels(Set<ModelSearchNode> open, Set<ModelSearchNode> closed,
+			Map<String, Set<String>> variableToValuesMapping) {
+
+		LOGGER.info("Filtering open list models that have actions with contradicting preconditions");
+
+		Set<ModelSearchNode> toRemove = new LinkedHashSet<ModelSearchNode>();
+
+		for (ModelSearchNode searchModel : open) {
+
+			boolean isRemoved = false;
+
+			Model testedModel = unsafeModel.extendModel(searchModel.getTempModel());
+
+			// remove open list models that has contradicting preconditions
+			for (Action action : testedModel.actions.values()) { 
+
+				if(!action.isParam)
+					continue;
+
+				Map<String, Integer> valuesCounters = new HashMap<String, Integer>();
+
+				for (String key : variableToValuesMapping.keySet()) { 
+					valuesCounters.put(key, 0);
+				}
+
+				Set<String> modelActionPre = new LinkedHashSet<String>(action.preconditions);
+
+				for (String modelPre : modelActionPre) {
+
+					for (Entry<String, Set<String>> entry : variableToValuesMapping.entrySet()) {
+
+						Set<String> values = entry.getValue();
+						String variable = entry.getKey();
+
+						if(values.contains(modelPre)) {
+							int counter = valuesCounters.get(variable) + 1;
+							valuesCounters.put(variable,counter);
+						}					
+					}
+				}
+
+				for (int counter : valuesCounters.values()) {
+					if(counter>1) {
+						toRemove.add(searchModel);
+						isRemoved = true;
+						break;						
+					}
+				}
+
+				if(isRemoved)
+					break;
+			}
+
+			if(isRemoved)
+				break;
+		}
+
+		open.removeAll(toRemove);
+		closed.addAll(toRemove);
+	}
+
+	public void FilterOldModels(MCTS mcts, ModelSearchNode node, List<StateActionState> planSASList) {
 
 		LOGGER.info("Updating search nodes models with new plan training set");
 
@@ -641,7 +755,8 @@ public class PlannerAndModelLearner {
 			Model testedModel = unsafeModel.extendModel(child.getTempModel());
 
 			// remove open list models that does not allow OK actions
-			for (StateActionState sas : planSASList) {				
+			for (StateActionState sas : planSASList) {
+
 				if(!sas.actionOwner.equals(agentName)){
 
 					Action modelAction = testedModel.actions.get(sas.action); 
@@ -652,6 +767,7 @@ public class PlannerAndModelLearner {
 
 					if(!safeModelActionPre.containsAll(modelActionPre)) {
 						toRemove.add(child);
+						break;
 					}
 				}
 			}
@@ -662,7 +778,7 @@ public class PlannerAndModelLearner {
 		}
 
 		for (ModelSearchNode child : node.getChildren()) {
-			FilterMCTSModels(mcts, child, planSASList);
+			FilterOldModels(mcts, child, planSASList);
 		}
 	}
 
@@ -684,12 +800,28 @@ public class PlannerAndModelLearner {
 		Set<String> safePreconditions = new LinkedHashSet<String>(preconditions);
 
 		preconditions = failedActionSAS.pre;
-		Set<String> statePreconditions = new LinkedHashSet<String>(failedActionSAS.pre);
+		Set<String> failedStateFacts = new LinkedHashSet<String>(preconditions);
+		failedStateFacts = formatFacts(failedStateFacts);
 
-		statePreconditions = formatFacts(statePreconditions);
+		Model testedModel = unsafeModel.extendModel(searchNode.getTempModel());
+		preconditions = testedModel.actions.get(failedActionName).preconditions;
+		Set<String> modelPreconditions = new LinkedHashSet<String>(preconditions);
 
-		safePreconditions.removeAll(statePreconditions);
-		preconditions = new LinkedHashSet<String>(safePreconditions);		 
+		Set<String> contradictingPreconditions = new LinkedHashSet<String>();
+
+		for (String modelPre : modelPreconditions) {
+			for (Set<String> values : variableToValuesMapping.values()) {
+				if(values.contains(modelPre)) {
+					contradictingPreconditions.addAll(values);
+					contradictingPreconditions.remove(modelPre);
+				}
+			}
+		}
+
+		preconditions = new LinkedHashSet<String>(safePreconditions);
+
+		preconditions.removeAll(failedStateFacts);
+		preconditions.removeAll(contradictingPreconditions);
 
 		for (String pre : preconditions) {
 
@@ -900,6 +1032,24 @@ public class PlannerAndModelLearner {
 		return res;
 	}
 
+	private Map<String, Set<String>> getVariableToValuesMapping() {
+
+		LOGGER.info("Getting mapping");
+
+		String problemFilesPath = Globals.INPUT_GROUNDED_PATH;
+
+		VariableValueExtractor extractor = new VariableValueExtractor(agentName,domainFileName,problemFileName,problemFilesPath);	
+
+		Map<String, Set<String>> res = extractor.getMapping();
+
+		if(!FileDeleter.deleteTempFiles()) {
+			LOGGER.info("Deleting Temporary files failure");
+			return null;	
+		}
+
+		return res;
+	}
+
 	private PlanToStateActionStateResult planToSASList(List<String> plan, int lastOKActionIndex) {
 
 		LOGGER.info("generate SAS List from plan");
@@ -923,7 +1073,7 @@ public class PlannerAndModelLearner {
 
 		if(planSASList == null)
 			return new PlanToStateActionStateResult(null, null, true);		
-		
+
 		if(lastOKActionIndex == planSASList.size() - 1)
 			failedActionSAS = null;
 		else if(lastOKActionIndex < planSASList.size()) {
