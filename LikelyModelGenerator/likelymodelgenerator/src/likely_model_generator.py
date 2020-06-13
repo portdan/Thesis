@@ -3,6 +3,9 @@ import likelymodelgenerator
 import likelymodelgenerator.src.helpers as helpers
 from sklearn.feature_extraction.text import TfidfTransformer
 import time
+from sklearn.cluster import KMeans
+import numpy as np
+import _collections
 
 
 def dummy(s):
@@ -56,3 +59,22 @@ def run():
     tfidf_transformer = TfidfTransformer()
     tfidf = tfidf_transformer.fit_transform(counts)
     print("\ntfidf_transformer fit_transform time: ", time.clock() - start)
+
+    asd = tfidf.toarray()
+    asdasd = _collections.OrderedDict()
+
+    for l in range(0, len(actions_loaded)):
+        max = np.max(asd[l])
+        aaa = np.argwhere(asd[l] > 0.8 * max)
+
+        bbb = []
+        for pre, index in vocabulary.items():
+            for i in aaa:
+                if i == index:
+                    bbb.append(pre)
+
+        asdasd[list(actions_loaded.keys())[l]] = bbb
+
+    # a = [[v] for v in asd[2] ]
+    # kmeans = KMeans(n_clusters=5, random_state=0).fit(a)
+    # print(kmeans.labels_)
