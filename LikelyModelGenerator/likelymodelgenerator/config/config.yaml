@@ -1,0 +1,24 @@
+appName: likely_model_generator
+logLevel: INFO
+
+input:
+  traces:
+    path: "/data"
+    fileName: "p03-pfile3-3_Traces_20000.txt"
+  preprocessed:
+    path: "/preprocessed"
+    fileName: "preprocessed"
+    from_pkl: True
+    from_csv: False
+
+output:
+  path: "/preprocessed"
+  fileName: "preprocessed"
+  as_pkl: True
+  as_csv: False
+
+preprocess:
+  learn: True
+  load: True
+
+update: False

@@ -6,18 +6,23 @@ import time
 from sklearn.cluster import KMeans
 import numpy as np
 import _collections
-
+import yaml
 
 def dummy(s):
     return s
 
 
 def run():
+
     root_dir = os.path.dirname(os.path.abspath(likelymodelgenerator.__file__))  # This is Project Root
     data_file = root_dir + "/data/p03-pfile3-3_Traces_20000.txt"  # This is Data File
     # data_file = root_dir + "/data/probLOGISTICS-4-0-1_Traces_44.txt"  # This is Data File
     pre_processed_file_csv = root_dir + "/preprocessed/preprocessed.csv"  # This is Preprocessed Root
     pre_processed_file_pkl = root_dir + "/preprocessed/preprocessed.pkl"  # This is Preprocessed Root
+    config = root_dir + "/config/config.yaml"  # This is Preprocessed Root
+
+    with open(config) as file:
+        a = yaml.safe_load(file)
 
     # start = time.clock()
     # df = helpers.pre_process_data_csv(data_file, pre_processed_file_csv)
