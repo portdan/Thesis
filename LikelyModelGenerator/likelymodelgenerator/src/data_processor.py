@@ -31,12 +31,12 @@ def get_counts_as_arrays(actions_preconditions_counts, unique_preconditions):
     return actions_counts
 
 
-def pre_process_data_pkl(data_file, pre_processed_file):
+def pre_process_data_pkl(config):
     unique_preconditions = set()
     actions_preconditions_counts = _collections.OrderedDict()
 
-    if os.path.exists(data_file):
-        with open(data_file) as file:
+    if os.path.exists(config.traces_file_path):
+        with open(config.traces_file_path, 'r') as file:
             for line in file:
                 row = pre_process_sas(line)
                 unique_preconditions = unique_preconditions.union(set(row['Preconditions']))
@@ -48,15 +48,16 @@ def pre_process_data_pkl(data_file, pre_processed_file):
                     else:
                         (actions_preconditions_counts[row['Action']])[precondition] = 1
 
-    with open(pre_processed_file, 'wb') as file:
-        pickle.dump(actions_preconditions_counts, file, pickle.HIGHEST_PROTOCOL)
+    if config.preprocess_write_format == "pkl":
+        with open(config.preprocess_path, 'wb') as file:
+            pickle.dump(actions_preconditions_counts, file, pickle.HIGHEST_PROTOCOL)
 
     return actions_preconditions_counts, unique_preconditions
 
 
-def load_pre_process_data_pkl(pre_processed_file):
-    if os.path.exists(pre_processed_file):
-        with open(pre_processed_file, 'rb') as file:
+def load_pre_process_data_pkl(config):
+    if os.path.exists(config.preprocessed_path):
+        with open(config.preprocessed_path, 'rb') as file:
             actions_preconditions_counts = pickle.load(file)
             unique_preconditions = set()
             for action, preconditions_count in actions_preconditions_counts.items():
@@ -67,9 +68,9 @@ def load_pre_process_data_pkl(pre_processed_file):
         return None
 
 
-def pre_process_append_new_traces_pkl(pre_processed_file, new_traces_list):
-    if os.path.exists(pre_processed_file):
-        actions_preconditions_counts, unique_preconditions = load_pre_process_data_pkl(pre_processed_file)
+def pre_process_append_new_traces_pkl(config, new_traces_list):
+    if os.path.exists(config.preprocessed_path):
+        actions_preconditions_counts, unique_preconditions = load_pre_process_data_pkl(config)
         for line in new_traces_list:
             row = pre_process_sas(line)
             unique_preconditions = unique_preconditions.union(row['Preconditions'])
@@ -85,38 +86,38 @@ def pre_process_append_new_traces_pkl(pre_processed_file, new_traces_list):
         return None
 
 
-def pre_process_data_csv(data_file, pre_processed_file):
+def pre_process_data_csv(config):
     df = pd.DataFrame(columns=['Agent', 'Action', 'Preconditions', 'Effects'])
 
-    if os.path.exists(data_file):
-        with open(data_file) as file:
+    if os.path.exists(config.traces_file_path):
+        with open(config.traces_file_path, 'w') as file:
             for line in file:
                 row = pre_process_sas(line)
                 df = df.append(row, ignore_index=True)
 
-    df.to_csv(pre_processed_file, index=False)
+    df.to_csv(config.preprocess_path, index=False)
     return df
 
 
-def load_pre_process_data_csv(pre_processed_file):
-    if os.path.exists(pre_processed_file):
+def load_pre_process_data_csv(config):
+    if os.path.exists(config.preprocessed_path):
         converter = {"Preconditions": literal_eval, "Effects": literal_eval}
-        df = pd.read_csv(pre_processed_file, converters=converter)
+        df = pd.read_csv(config.preprocessed_path, converters=converter)
         return df
     else:
         return None
 
 
-def pre_process_append_new_traces_csv(pre_processed_file, new_traces_list):
-    if os.path.exists(pre_processed_file):
+def pre_process_append_new_traces_csv(config, new_traces_list):
+    if os.path.exists(config.preprocessed_path):
         converter = {"Preconditions": literal_eval, "Effects": literal_eval}
-        df = pd.read_csv(pre_processed_file, converters=converter)
+        df = pd.read_csv(config.preprocessed_path, converters=converter)
 
         for line in new_traces_list:
             row = pre_process_sas(line)
             df = df.append(row, ignore_index=True)
 
-        df.to_csv(pre_processed_file, index=False)
+        df.to_csv(config.preprocessed_path, index=False)
 
         return df
     else:

@@ -1,35 +1,28 @@
-import os
-import likelymodelgenerator
-import likelymodelgenerator.src.helpers as helpers
+import likelymodelgenerator.src.data_processor as dp
+import likelymodelgenerator.src.config_reader as cr
+
 from sklearn.feature_extraction.text import TfidfTransformer
 import time
 from sklearn.cluster import KMeans
 import numpy as np
 import _collections
-import yaml
+
 
 def dummy(s):
     return s
 
 
-def run():
+def run(args):
+    config_path = args.config
 
-    root_dir = os.path.dirname(os.path.abspath(likelymodelgenerator.__file__))  # This is Project Root
-    data_file = root_dir + "/data/p03-pfile3-3_Traces_20000.txt"  # This is Data File
-    # data_file = root_dir + "/data/probLOGISTICS-4-0-1_Traces_44.txt"  # This is Data File
-    pre_processed_file_csv = root_dir + "/preprocessed/preprocessed.csv"  # This is Preprocessed Root
-    pre_processed_file_pkl = root_dir + "/preprocessed/preprocessed.pkl"  # This is Preprocessed Root
-    config = root_dir + "/config/config.yaml"  # This is Preprocessed Root
-
-    with open(config) as file:
-        a = yaml.safe_load(file)
+    config = cr.read_config(config_path)
 
     # start = time.clock()
-    # df = helpers.pre_process_data_csv(data_file, pre_processed_file_csv)
+    # df = dp.pre_process_data_csv(data_file, pre_processed_file_csv)
     # print("\npre_process_data time: ", time.clock() - start)
     #
     # start = time.clock()
-    # df = helpers.load_pre_process_data_csv(pre_processed_file_csv)
+    # df = dp.load_pre_process_data_csv(pre_processed_file_csv)
     # print("\nload_pre_process_data time: ", time.clock() - start)
     #
     # filtered = (df.groupby('Action', sort=False)['Preconditions'].apply(sum)).to_frame().reset_index()
@@ -41,26 +34,47 @@ def run():
     # tfidf = tfidf_transformer.fit_transform(count)
 
     start = time.clock()
-    actions_preprocessed, preconditions_preprocessed = helpers.pre_process_data_pkl(data_file, pre_processed_file_pkl)
-    print("\npre_process_data2 time: ", time.clock() - start)
+
+    if config.preprocess:
+        if config.preprocessed_read_format == "pkl":
+            actions_preprocessed, preconditions_preprocessed = dp.pre_process_data_pkl(config)
+        elif config.preprocessed_read_format == "csv":
+            actions_preprocessed, preconditions_preprocessed = dp.pre_process_data_csv(config)
+
+    print("\npre_process_data time: ", time.clock() - start)
 
     start = time.clock()
-    actions_loaded, preconditions_loaded = helpers.load_pre_process_data_pkl(pre_processed_file_pkl)
-    print("\nload_pre_process_data2 time: ", time.clock() - start)
+
+    if config.load_preprocessed:
+        if config.preprocessed_read_format == "pkl":
+            actions_loaded, preconditions_loaded = dp.load_pre_process_data_pkl(config)
+        elif config.preprocessed_read_format == "csv":
+            actions_loaded, preconditions_loaded = dp.load_pre_process_data_csv(config)
+
+    print("\nload_pre_process_data time: ", time.clock() - start)
 
     start = time.clock()
-    actions_loaded, preconditions_loaded = helpers.pre_process_append_new_traces_pkl(pre_processed_file_pkl, [
-        'StateActionState [ pre[ b ]  ; action[ asd ]  '
-        '; actionOwner[ satellite0 ]  ; post[ a ]  ; '
-        'traceNum[ 438 ] ]'])
-    print("\npre_process_append_new_traces_pkl time: ", time.clock() - start)
+
+    if config.update_preprocessed:
+        if config.preprocessed_read_format == "pkl":
+            actions_loaded, preconditions_loaded = dp.pre_process_append_new_traces_pkl(config, [
+                'StateActionState [ pre[ b ]  ; action[ asd ]  '
+                '; actionOwner[ satellite0 ]  ; post[ a ]  ; '
+                'traceNum[ 438 ] ]'])
+        elif config.preprocessed_read_format == "csv":
+            actions_loaded, preconditions_loaded = dp.pre_process_append_new_traces_csv(config, [
+                'StateActionState [ pre[ b ]  ; action[ asd ]  '
+                '; actionOwner[ satellite0 ]  ; post[ a ]  ; '
+                'traceNum[ 438 ] ]'])
+
+    print("\npre_process_append_new_traces time: ", time.clock() - start)
 
     start = time.clock()
-    vocabulary = helpers.get_vocabulary(preconditions_loaded)
+    vocabulary = dp.get_vocabulary(preconditions_loaded)
     print("\nget_vocabulary time: ", time.clock() - start)
 
     start = time.clock()
-    counts = helpers.get_counts_as_arrays(actions_loaded, vocabulary.keys())
+    counts = dp.get_counts_as_arrays(actions_loaded, vocabulary.keys())
     tfidf_transformer = TfidfTransformer()
     tfidf = tfidf_transformer.fit_transform(counts)
     print("\ntfidf_transformer fit_transform time: ", time.clock() - start)
