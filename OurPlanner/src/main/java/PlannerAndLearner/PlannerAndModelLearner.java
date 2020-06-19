@@ -226,18 +226,6 @@ public class PlannerAndModelLearner {
 			open.remove(searchNode);
 			closed.add(searchNode);	
 
-			/*
-			Model currModel = null;
-
-			if(useSafeModel) {
-				currModel = safeModel.extendModel(currTempModel);
-				useSafeModel = false;
-			}
-			else
-				currModel = unsafeModel.extendModel(currTempModel);
-			 */
-
-
 			StateActionState failedSAS = getFailedSAS(searchNode);
 
 			if(failedSAS != null) {			
