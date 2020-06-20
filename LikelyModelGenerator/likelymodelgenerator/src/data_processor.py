@@ -1,8 +1,20 @@
-import pandas as pd
 import os
-from ast import literal_eval
 import pickle
 import _collections
+import copy
+
+
+class Data:
+
+    def __init__(self, preconditions, actions, actions_safe_preconditions,
+                 actions_preconditions_traces_counts, actions_preconditions_score_deltas,
+                 actions_preconditions_used_counts):
+        self.preconditions = preconditions
+        self.actions = actions
+        self.actions_safe_preconditions = actions_safe_preconditions
+        self.actions_preconditions_traces_counts = actions_preconditions_traces_counts
+        self.actions_preconditions_score_deltas = actions_preconditions_score_deltas
+        self.actions_preconditions_used_counts = actions_preconditions_used_counts
 
 
 def get_vocabulary(unique_preconditions):
@@ -15,121 +27,114 @@ def get_vocabulary(unique_preconditions):
     return vocabulary
 
 
-def get_counts_as_arrays(actions_preconditions_counts, unique_preconditions):
+def get_actions_preconditions_counts_as_arrays(data):
     actions_counts = []
 
-    for action, preconditions_count in actions_preconditions_counts.items():
+    for action_name, preconditions_count in data.actions_preconditions_traces_counts.items():
         action_count = []
-        for precondition in unique_preconditions:
-            if precondition not in preconditions_count:
-                action_count.append(0)
-            else:
-                action_count.append(preconditions_count[precondition])
+        for precondition, count in preconditions_count.items():
+            action_count.append(count)
 
         actions_counts.append(action_count)
 
     return actions_counts
 
 
-def pre_process_data_pkl(config):
-    unique_preconditions = set()
-    actions_preconditions_counts = _collections.OrderedDict()
+def preprocess_data(config):
+    preconditions = read_preconditions(config)
+    actions = read_actions(config)
+
+    preconditions_dict = _collections.OrderedDict.fromkeys(preconditions, 0)
+    actions_preconditions_dict = _collections.OrderedDict.fromkeys(actions)
+
+    for action in actions:
+        actions_preconditions_dict[action] = copy.deepcopy(preconditions_dict)
+
+    actions_preconditions_traces_counts = _collections.OrderedDict(copy.deepcopy(actions_preconditions_dict))
+    actions_preconditions_score_deltas = _collections.OrderedDict(copy.deepcopy(actions_preconditions_dict))
+    actions_preconditions_used_counts = _collections.OrderedDict(copy.deepcopy(actions_preconditions_dict))
+
+    actions_safe_preconditions = _collections.OrderedDict.fromkeys(actions)
 
     if os.path.exists(config.traces_file_path):
         with open(config.traces_file_path, 'r') as file:
             for line in file:
-                row = pre_process_sas(line)
-                unique_preconditions = unique_preconditions.union(set(row['Preconditions']))
-                if row['Action'] not in actions_preconditions_counts:
-                    actions_preconditions_counts[row['Action']] = _collections.OrderedDict()
-                for precondition in row['Preconditions']:
-                    if precondition in actions_preconditions_counts[row['Action']]:
-                        (actions_preconditions_counts[row['Action']])[precondition] += 1
-                    else:
-                        (actions_preconditions_counts[row['Action']])[precondition] = 1
+                row = process_sas_string(line)
 
-    if config.preprocess_write_format == "pkl":
-        with open(config.preprocess_path, 'wb') as file:
-            pickle.dump(actions_preconditions_counts, file, pickle.HIGHEST_PROTOCOL)
-
-    return actions_preconditions_counts, unique_preconditions
-
-
-def load_pre_process_data_pkl(config):
-    if os.path.exists(config.preprocessed_path):
-        with open(config.preprocessed_path, 'rb') as file:
-            actions_preconditions_counts = pickle.load(file)
-            unique_preconditions = set()
-            for action, preconditions_count in actions_preconditions_counts.items():
-                unique_preconditions = unique_preconditions.union(preconditions_count.keys())
-
-            return actions_preconditions_counts, unique_preconditions
-    else:
-        return None
-
-
-def pre_process_append_new_traces_pkl(config, new_traces_list):
-    if os.path.exists(config.preprocessed_path):
-        actions_preconditions_counts, unique_preconditions = load_pre_process_data_pkl(config)
-        for line in new_traces_list:
-            row = pre_process_sas(line)
-            unique_preconditions = unique_preconditions.union(row['Preconditions'])
-            if row['Action'] not in actions_preconditions_counts:
-                actions_preconditions_counts[row['Action']] = _collections.OrderedDict()
-            for precondition in row['Preconditions']:
-                if precondition in actions_preconditions_counts[row['Action']]:
-                    (actions_preconditions_counts[row['Action']])[precondition] += 1
+                if actions_safe_preconditions[row['Action']] is None:
+                    actions_safe_preconditions[row['Action']] = set(row['Preconditions'])
                 else:
-                    (actions_preconditions_counts[row['Action']])[precondition] = 1
-        return actions_preconditions_counts, unique_preconditions
+                    actions_safe_preconditions[row['Action']] = \
+                        actions_safe_preconditions[row['Action']] & set(row['Preconditions'])
+
+                for precondition in row['Preconditions']:
+                    a = actions_preconditions_traces_counts[row['Action']]
+                    a[precondition] += 1
+
+    for action_name in actions_safe_preconditions.keys():
+        if actions_safe_preconditions[action_name] is None:
+            actions_safe_preconditions[action_name] = set(preconditions)
+
+    data = Data(preconditions, actions, actions_safe_preconditions,
+                actions_preconditions_traces_counts, actions_preconditions_score_deltas,
+                actions_preconditions_used_counts)
+
+    with open(config.data_file_path, 'wb') as file:
+        pickle.dump(data, file, pickle.HIGHEST_PROTOCOL)
+
+    return data
+
+
+def read_actions(config):
+    actions = set()
+    if os.path.exists(config.actions_file_path):
+        with open(config.actions_file_path, 'r') as file:
+            lines = file.read().splitlines()
+            for line in lines:
+                actions.add(line)
+
+    return sorted(list(actions))
+
+
+def read_preconditions(config):
+    preconditions = set()
+    if os.path.exists(config.preconditions_file_path):
+        with open(config.preconditions_file_path, 'r') as file:
+            lines = file.read().splitlines()
+            for line in lines:
+                preconditions.add(line)
+
+    return sorted(list(preconditions))
+
+
+def load_preprocessed_data(config):
+    if os.path.exists(config.data_file_path):
+        with open(config.data_file_path, 'rb') as file:
+            data = pickle.load(file)
+            return data
     else:
         return None
 
 
-def pre_process_data_csv(config):
-    df = pd.DataFrame(columns=['Agent', 'Action', 'Preconditions', 'Effects'])
+def update_preprocessed_data(data, new_traces_list, failed_trace):
+    for line in new_traces_list:
+        row = process_sas_string(line)
 
-    if os.path.exists(config.traces_file_path):
-        with open(config.traces_file_path, 'w') as file:
-            for line in file:
-                row = pre_process_sas(line)
-                df = df.append(row, ignore_index=True)
+        data.actions_safe_preconditions[row['Action']] = \
+            data.actions_safe_preconditions[row['Action']] & set(row['Preconditions'])
 
-    df.to_csv(config.preprocess_path, index=False)
-    return df
+        for precondition in row['Preconditions']:
+            (data.actions_preconditions_traces_counts[row['Action']])[precondition] += 1
 
-
-def load_pre_process_data_csv(config):
-    if os.path.exists(config.preprocessed_path):
-        converter = {"Preconditions": literal_eval, "Effects": literal_eval}
-        df = pd.read_csv(config.preprocessed_path, converters=converter)
-        return df
-    else:
-        return None
+    return data
 
 
-def pre_process_append_new_traces_csv(config, new_traces_list):
-    if os.path.exists(config.preprocessed_path):
-        converter = {"Preconditions": literal_eval, "Effects": literal_eval}
-        df = pd.read_csv(config.preprocessed_path, converters=converter)
-
-        for line in new_traces_list:
-            row = pre_process_sas(line)
-            df = df.append(row, ignore_index=True)
-
-        df.to_csv(config.preprocessed_path, index=False)
-
-        return df
-    else:
-        return None
-
-
-def pre_process_sas(data):
-    data = data.replace('[', ':')
-    data = data.replace(']', ':')
-    line_split = [x.strip() for x in data.split(':')]
+def process_sas_string(sas_string):
+    sas_string = sas_string.replace('[', ':')
+    sas_string = sas_string.replace(']', ':')
+    line_split = [x.strip() for x in sas_string.split(':')]
     agent = line_split[6]
-    action = line_split[4].replace(' ', '-param-')
+    action = line_split[4]  # line_split[4].replace(' ', '-param-')
     preconditions = [x.strip() for x in line_split[2].split(';')]
     effects = [x.strip() for x in line_split[8].split(';')]
     row = {'Agent': agent, 'Action': action, 'Preconditions': preconditions,

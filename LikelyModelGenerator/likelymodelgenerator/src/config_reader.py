@@ -3,44 +3,37 @@ import yaml
 
 class Configuration:
 
-    def __init__(self):
+    def __init__(self, config_path=None):
+        # input
         self.traces_file_path = ""
-        self.preprocessed_path = ""
-        self.preprocessed_read_format = ""
+        self.actions_file_path = ""
+        self.preconditions_file_path = ""
+        # working
+        self.data_file_path = ""
+        # preprocess
         self.preprocess_path = ""
         self.preprocess_write_format = ""
-        self.preprocess = False
-        self.load_preprocessed = False
-        self.update_preprocessed = False
+        self.preprocess_traces = False
+        self.load_data = False
+        self.update_data = False
 
+        if config_path is not None:
+            self.read_config(config_path)
 
-def read_config(config_path):
-    config = Configuration()
+    def read_config(self, config_path):
+        with open(config_path) as file:
+            ymal_config = yaml.safe_load(file)
 
-    with open(config_path) as file:
-        ymal_config = yaml.safe_load(file)
+            root_dir = ymal_config['rootDir']
+            data_dir = root_dir + '/' + ymal_config['input']['path']
+            working_dir = root_dir + '/' + ymal_config['working']['path']
 
-        traces_read_format = ymal_config['input']['traces']['fileFormat']
+            self.traces_file_path = data_dir + '/' + ymal_config['input']['traces']['fileName']
+            self.actions_file_path = data_dir + '/' + ymal_config['input']['actions']['fileName']
+            self.preconditions_file_path = data_dir + '/' + ymal_config['input']['preconditions']['fileName']
 
-        config.traces_file_path = ymal_config['input']['traces']['path'] + '/' \
-                                  + ymal_config['input']['traces']['fileName'] + '.' \
-                                  + traces_read_format
+            self.data_file_path = working_dir + '/' + ymal_config['working']['fileName']
 
-        config.preprocessed_read_format = ymal_config['input']['preprocessed']['fileFormat']
-
-        config.preprocessed_path = ymal_config['input']['preprocessed']['path'] + '/' \
-                                  + ymal_config['input']['preprocessed']['fileName'] + '.' \
-                                  + config.preprocessed_read_format
-
-        config.preprocess_write_format = ymal_config['output']['preprocess']['fileFormat']
-
-        config.preprocess_path = ymal_config['output']['preprocess']['path'] + '/' \
-                                  + ymal_config['output']['preprocess']['fileName'] + '.' \
-                                  + config.preprocess_write_format
-
-        config.preprocess = ymal_config['workMode']['preprocess']
-        config.load_preprocessed = ymal_config['workMode']['load']
-        config.update_preprocessed = ymal_config['workMode']['update']
-
-
-    return config
+            self.preprocess_traces = ymal_config['workMode']['preprocess']
+            self.load_data = ymal_config['workMode']['load']
+            self.update_data = ymal_config['workMode']['update']

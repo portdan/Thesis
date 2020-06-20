@@ -1,0 +1,12 @@
+unload-airplane-agent-apn1 apn1 obj1 apt1
+fly-airplane-agent-apn1 apn1 apt2 apt1
+unload-airplane-agent-apn1 apn1 obj1 apt2
+load-truck-agent-tru1 tru1 obj1 pos1
+unload-truck-agent-tru1 tru1 obj1 apt1
+drive-truck-agent-tru1 tru1 pos1 apt1 cit1
+fly-airplane-agent-apn1 apn1 apt1 apt2
+load-airplane-agent-apn1 apn1 obj1 apt2
+drive-truck-agent-tru1 tru1 apt1 pos1 cit1
+load-airplane-agent-apn1 apn1 obj1 apt1
+load-truck-agent-tru1 tru1 obj1 apt1
+unload-truck-agent-tru1 tru1 obj1 pos1
