@@ -1,19 +1,19 @@
 appName: likely_model_generator
 logLevel: INFO
-rootDir: '/home/daniel/Work/WorkSpace/Thesis/LikelyModelGenerator/likelymodelgenerator' #"C:\\Users/User/PycharmProjects/Thesis/LikelyModelGenerator/likelymodelgenerator"
+rootDir: '/home/daniel/Work/WorkSpace/Thesis/LikelyModelGenerator/likelymodelgenerator' #'C:\Users\User\PycharmProjects\Thesis\LikelyModelGenerator\likelymodelgenerator'
 
 input:
   path: 'data'
   traces:
-    fileName: "probLOGISTICS-4-0-1_Traces_44.txt"
+    fileName: 'probLOGISTICS-4-0-1_Traces_44.txt'
   actions:
-    fileName: "ActionNames.txt"
+    fileName: 'ActionNames.txt'
   preconditions:
-    fileName: "Facts.txt"
+    fileName: 'Facts.txt'
 
 working:
   path: 'working'
-  fileName: "Data.pkl"
+  fileName: 'Data.pkl'
 
 workMode:
   preprocess: True

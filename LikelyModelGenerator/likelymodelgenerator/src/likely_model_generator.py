@@ -42,6 +42,7 @@ def run(args):
         print("\nload_preprocessed_data time: ", time.clock() - start)
 
     if config.update_data:
+        '''        
         start = time.clock()
         data = dp.update_preprocessed_data(data, [
             'StateActionState [ pre[ at(tru1, pos1) ; in(obj1, tru1) ; at(apn1, apt1) ]  ; '
@@ -56,23 +57,9 @@ def run(args):
                                            'post[ at(tru1, pos1) ; at(obj1, pos1) ; at(apn1, apt1) ]  ; '
                                            'traceNum[ 2 ] ]')
         print("\nupdate_preprocessed_data time: ", time.clock() - start)
+        
+        '''
 
-    start = time.clock()
-    counts = dp.get_actions_preconditions_counts_as_arrays(data)
-    tfidf_transformer = TfidfTransformer()
-    tfidf = tfidf_transformer.fit_transform(counts)
-    print("\ntfidf_transformer fit_transform time: ", time.clock() - start)
-
-    asd = tfidf.toarray()
-    asdasd = _collections.OrderedDict()
-
-    for l in range(0, len(data.actions)):
-        max = np.max(asd[l])
-        indices = np.argwhere(asd[l] >= 0.8 * max).flatten()
-        aaa = [data.preconditions[i] for i in indices]
-
-        asdasd[data.actions[l]] = aaa
-
-    # a = [[v] for v in asd[2] ]
-    # kmeans = KMeans(n_clusters=5, random_state=0).fit(a)
-    # print(kmeans.labels_)
+        start = time.clock()
+        model = dp.create_model(data)
+        print("\ncreate_model time: ", time.clock() - start)
