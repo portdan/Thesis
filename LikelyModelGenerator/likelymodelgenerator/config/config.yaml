@@ -6,6 +6,7 @@ input:
   path: 'data'
   traces:
     fileName: 'probLOGISTICS-4-0-1_Traces_44.txt'
+    tracesToUse : 0
   actions:
     fileName: 'ActionNames.txt'
   preconditions:
@@ -13,7 +14,18 @@ input:
 
 working:
   path: 'working'
-  fileName: 'Data.pkl'
+  iteration: 1
+  deltaBase: 0.1 # TODO
+  thresholdsBase: 0.8 # TODO
+  data:
+    fileName: 'Data.pkl'
+  model:
+    fileName: 'LastLikelyModel.pkl'
+
+
+output:
+  path: 'output'
+  fileName: 'LikelyModel.txt'
 
 workMode:
   preprocess: True

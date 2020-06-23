@@ -1,10 +1,6 @@
 import likelymodelgenerator.src.data_processor as dp
 import likelymodelgenerator.src.config_reader as cr
-
-from sklearn.feature_extraction.text import TfidfTransformer
 import time
-import numpy as np
-import _collections
 
 
 def dummy(s):
@@ -38,13 +34,13 @@ def run(args):
 
     if config.load_data:
         start = time.clock()
-        data = dp.load_preprocessed_data(config)
+        data, last_model = dp.load_preprocessed_data(config)
         print("\nload_preprocessed_data time: ", time.clock() - start)
 
     if config.update_data:
-        '''        
         start = time.clock()
-        data = dp.update_preprocessed_data(data, [
+
+        data = dp.update_preprocessed_data(config, data, last_model, [
             'StateActionState [ pre[ at(tru1, pos1) ; in(obj1, tru1) ; at(apn1, apt1) ]  ; '
             'action[ unload-truck-agent-tru1 tru1 obj1 pos1 ]  ; '
             'actionOwner[ tru1 ]  ; '
@@ -57,9 +53,7 @@ def run(args):
                                            'post[ at(tru1, pos1) ; at(obj1, pos1) ; at(apn1, apt1) ]  ; '
                                            'traceNum[ 2 ] ]')
         print("\nupdate_preprocessed_data time: ", time.clock() - start)
-        
-        '''
 
         start = time.clock()
-        model = dp.create_model(data)
+        model = dp.create_model(config, data)
         print("\ncreate_model time: ", time.clock() - start)
