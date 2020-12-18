@@ -9,7 +9,6 @@ import logging.config
 import time
 import os
 import shutil
-from _ast import Num
 
 
 logging.config.fileConfig("Configuration/logger_config.conf", disable_existing_loggers=False)
@@ -114,9 +113,9 @@ def unify(args):
                     else:
                         if line_count == 1:
                             num_of_agents = row[2]
-                            del header[16: 16 + 5*int(num_of_agents)]
+                            del header[16: 16 + 6*int(num_of_agents)]
                         
-                        del row[16: 16 + 5*int(num_of_agents)]
+                        del row[16: 16 + 6*int(num_of_agents)]
                         row[0] = args.domainName
                         rows.append(row)
                             

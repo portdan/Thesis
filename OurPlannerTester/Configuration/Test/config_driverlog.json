@@ -42,6 +42,7 @@
         "tracesAmountMax": 20000
       }, 
       "iterationMethods": [
+"Likely_Model_Learning",
         "BFS", 
         "Random", 
         "Plan_Length_And_Reliability_Heuristic", 

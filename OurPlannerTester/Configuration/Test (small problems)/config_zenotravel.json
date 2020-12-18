@@ -1,6 +1,6 @@
 {
-  "domainName": "zenotravel",
   "domainFileName": "domain.pddl", 
+  "domainName": "zenotravel", 
   "domainPath": "/home/daniel/Desktop/PROBLEMS/zenotravel", 
   "originDestination": "Origin", 
   "outputDestination": "/home/daniel/Work/WorkSpace/Thesis/OurPlannerTester/Output", 
@@ -27,14 +27,14 @@
   "problems": [
     {
       "experimentSetup": {
-        "TestSizeInPercent": false, 
+        "TestSizeInPercent": true, 
         "TestSizeOfTracesAmaount": [
           0, 
-          2, 
-          5, 
-          10, 
-          20, 
-          40
+          0.01, 
+          0.05, 
+          0.2, 
+          0.5, 
+          1
         ], 
         "numberOfExperiments": 3, 
         "randomWalkSteps": 100, 
@@ -42,106 +42,16 @@
         "tracesAmountMax": 20000
       }, 
       "iterationMethods": [
-        "BFS", 
-        "Random", 
-        "Plan_Length_And_Reliability_Heuristic", 
-        "Monte_Carlo_Reliability_Heuristic"
+"Likely_Model_Learning"
       ], 
       "problemNames": [
-        "pfile3-0.pddl"
-      ], 
-      "thresholdSearchSetup": {
-        "maxTracesToUse": 200, 
-        "minTracesToUse": 0, 
-        "timeoutInMS": 300000
-      }
-    }, 
-    {
-      "experimentSetup": {
-        "TestSizeInPercent": false, 
-        "TestSizeOfTracesAmaount": [
-          0, 
-          5, 
-          15, 
-          50, 
-          100, 
-          250
-        ], 
-        "numberOfExperiments": 3, 
-        "randomWalkSteps": 100, 
-        "timeoutInMS": 600000, 
-        "tracesAmountMax": 20000
-      }, 
-      "iterationMethods": [
-        "BFS", 
-        "Random", 
-        "Plan_Length_And_Reliability_Heuristic", 
-        "Monte_Carlo_Reliability_Heuristic"
-      ], 
-      "problemNames": [
-        "pfile3-1.pddl"
-      ], 
-      "thresholdSearchSetup": {
-        "maxTracesToUse": 200, 
-        "minTracesToUse": 0, 
-        "timeoutInMS": 300000
-      }
-    }, 
-    {
-      "experimentSetup": {
-        "TestSizeInPercent": false, 
-        "TestSizeOfTracesAmaount": [
-          0, 
-          10, 
-          50, 
-          100, 
-          500, 
-          4000
-        ], 
-        "numberOfExperiments": 3, 
-        "randomWalkSteps": 100, 
-        "timeoutInMS": 600000, 
-        "tracesAmountMax": 20000
-      }, 
-      "iterationMethods": [
-        "BFS", 
-        "Random", 
-        "Plan_Length_And_Reliability_Heuristic", 
-        "Monte_Carlo_Reliability_Heuristic"
-      ], 
-      "problemNames": [
-        "pfile3-2.pddl"
-      ], 
-      "thresholdSearchSetup": {
-        "maxTracesToUse": 200, 
-        "minTracesToUse": 0, 
-        "timeoutInMS": 300000
-      }
-    }, 
-    {
-      "experimentSetup": {
-        "TestSizeInPercent": false, 
-        "TestSizeOfTracesAmaount": [
-          0, 
-          50, 
-          200, 
-          2000, 
-          10000, 
-          20000
-        ], 
-        "numberOfExperiments": 3, 
-        "randomWalkSteps": 100, 
-        "timeoutInMS": 600000, 
-        "tracesAmountMax": 20000
-      }, 
-      "iterationMethods": [
-        "BFS", 
-        "Random", 
-        "Plan_Length_And_Reliability_Heuristic", 
-        "Monte_Carlo_Reliability_Heuristic"
-      ], 
-      "problemNames": [
-        "pfile3-3.pddl"
+        "pfile3-0.pddl", 
+        "pfile3-1.pddl", 
+        "pfile3-2.pddl", 
+        "pfile3-3.pddl", 
+        "pfile3-4.pddl", 
+        "pfile3-5.pddl", 
+        "pfile3-6.pddl"
       ], 
       "thresholdSearchSetup": {
         "maxTracesToUse": 200, 

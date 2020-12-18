@@ -1,6 +1,6 @@
 {
-  "domainName": "driverlog",
-  "domainFileName": "domain.pddl",
+  "domainFileName": "domain.pddl", 
+  "domainName": "driverlog", 
   "domainPath": "/home/daniel/Desktop/PROBLEMS/driverlog", 
   "originDestination": "Origin", 
   "outputDestination": "/home/daniel/Work/WorkSpace/Thesis/OurPlannerTester/Output", 
@@ -27,14 +27,14 @@
   "problems": [
     {
       "experimentSetup": {
-        "TestSizeInPercent": false, 
+        "TestSizeInPercent": true, 
         "TestSizeOfTracesAmaount": [
           0, 
-          2, 
-          4, 
-          6, 
-          8, 
-          10
+          0.01, 
+          0.05, 
+          0.2, 
+          0.5, 
+          1
         ], 
         "numberOfExperiments": 3, 
         "randomWalkSteps": 100, 
@@ -42,137 +42,20 @@
         "tracesAmountMax": 20000
       }, 
       "iterationMethods": [
+"Likely_Model_Learning",
         "BFS", 
         "Random", 
         "Plan_Length_And_Reliability_Heuristic", 
         "Monte_Carlo_Reliability_Heuristic"
       ], 
       "problemNames": [
-        "pfile1-0.pddl"
-      ], 
-      "thresholdSearchSetup": {
-        "maxTracesToUse": 200, 
-        "minTracesToUse": 0, 
-        "timeoutInMS": 300000
-      }
-    }, 
-    {
-      "experimentSetup": {
-        "TestSizeInPercent": false, 
-        "TestSizeOfTracesAmaount": [
-          0, 
-          5, 
-          10, 
-          20, 
-          50, 
-          100
-        ], 
-        "numberOfExperiments": 3, 
-        "randomWalkSteps": 100, 
-        "timeoutInMS": 600000, 
-        "tracesAmountMax": 20000
-      }, 
-      "iterationMethods": [
-        "BFS", 
-        "Random", 
-        "Plan_Length_And_Reliability_Heuristic", 
-        "Monte_Carlo_Reliability_Heuristic"
-      ], 
-      "problemNames": [
-        "pfile1-1.pddl"
-      ], 
-      "thresholdSearchSetup": {
-        "maxTracesToUse": 200, 
-        "minTracesToUse": 0, 
-        "timeoutInMS": 300000
-      }
-    }, 
-    {
-      "experimentSetup": {
-        "TestSizeInPercent": false, 
-        "TestSizeOfTracesAmaount": [
-          0, 
-          10, 
-          25, 
-          50, 
-          250, 
-          1000
-        ], 
-        "numberOfExperiments": 3, 
-        "randomWalkSteps": 100, 
-        "timeoutInMS": 600000, 
-        "tracesAmountMax": 20000
-      }, 
-      "iterationMethods": [
-        "BFS", 
-        "Random", 
-        "Plan_Length_And_Reliability_Heuristic", 
-        "Monte_Carlo_Reliability_Heuristic"
-      ], 
-      "problemNames": [
-        "pfile1-2.pddl"
-      ], 
-      "thresholdSearchSetup": {
-        "maxTracesToUse": 200, 
-        "minTracesToUse": 0, 
-        "timeoutInMS": 300000
-      }
-    }, 
-    {
-      "experimentSetup": {
-        "TestSizeInPercent": false, 
-        "TestSizeOfTracesAmaount": [
-          0, 
-          50, 
-          100, 
-          250, 
-          1000, 
-          5000
-        ], 
-        "numberOfExperiments": 3, 
-        "randomWalkSteps": 100, 
-        "timeoutInMS": 600000, 
-        "tracesAmountMax": 20000
-      }, 
-      "iterationMethods": [
-        "BFS", 
-        "Random", 
-        "Plan_Length_And_Reliability_Heuristic", 
-        "Monte_Carlo_Reliability_Heuristic"
-      ], 
-      "problemNames": [
-        "pfile1-3.pddl"
-      ], 
-      "thresholdSearchSetup": {
-        "maxTracesToUse": 200, 
-        "minTracesToUse": 0, 
-        "timeoutInMS": 300000
-      }
-    },
-{
-      "experimentSetup": {
-        "TestSizeInPercent": false, 
-        "TestSizeOfTracesAmaount": [
-          0, 
-          75, 
-          150, 
-          400, 
-          2000, 
-          8000
-        ], 
-        "numberOfExperiments": 3, 
-        "randomWalkSteps": 100, 
-        "timeoutInMS": 600000, 
-        "tracesAmountMax": 20000
-      }, 
-      "iterationMethods": [
-        "BFS", 
-        "Random", 
-        "Plan_Length_And_Reliability_Heuristic", 
-        "Monte_Carlo_Reliability_Heuristic"
-      ], 
-      "problemNames": [
-        "pfile1-4.pddl"
+        "pfile1-0.pddl", 
+        "pfile1-1.pddl", 
+        "pfile1-2.pddl", 
+        "pfile1-3.pddl", 
+        "pfile1-4.pddl", 
+        "pfile1-5.pddl", 
+        "pfile1-6.pddl"
       ], 
       "thresholdSearchSetup": {
         "maxTracesToUse": 200, 

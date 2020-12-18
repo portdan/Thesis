@@ -27,14 +27,14 @@
   "problems": [
     {
       "experimentSetup": {
-        "TestSizeInPercent": false, 
+        "TestSizeInPercent": true, 
         "TestSizeOfTracesAmaount": [
           0, 
-          2, 
-          5, 
-          10, 
-          15, 
-          20
+          0.01, 
+          0.05, 
+          0.2, 
+          0.5, 
+          1
         ], 
         "numberOfExperiments": 3, 
         "randomWalkSteps": 100, 
@@ -42,137 +42,20 @@
         "tracesAmountMax": 20000
       }, 
       "iterationMethods": [
+        "Likely_Model_Learning",
         "BFS", 
         "Random", 
         "Plan_Length_And_Reliability_Heuristic", 
         "Monte_Carlo_Reliability_Heuristic"
       ], 
       "problemNames": [
-        "p03-0.pddl"
-      ], 
-      "thresholdSearchSetup": {
-        "maxTracesToUse": 200, 
-        "minTracesToUse": 0, 
-        "timeoutInMS": 300000
-      }
-    }, 
-    {
-      "experimentSetup": {
-        "TestSizeInPercent": false, 
-        "TestSizeOfTracesAmaount": [
-          0, 
-          10, 
-          25, 
-          50, 
-          100, 
-          150
-        ], 
-        "numberOfExperiments": 3, 
-        "randomWalkSteps": 100, 
-        "timeoutInMS": 600000, 
-        "tracesAmountMax": 20000
-      }, 
-      "iterationMethods": [
-        "BFS", 
-        "Random", 
-        "Plan_Length_And_Reliability_Heuristic", 
-        "Monte_Carlo_Reliability_Heuristic"
-      ], 
-      "problemNames": [
-        "p03-1.pddl"
-      ], 
-      "thresholdSearchSetup": {
-        "maxTracesToUse": 200, 
-        "minTracesToUse": 0, 
-        "timeoutInMS": 300000
-      }
-    }, 
-    {
-      "experimentSetup": {
-        "TestSizeInPercent": false, 
-        "TestSizeOfTracesAmaount": [
-          0, 
-          20, 
-          50, 
-          100, 
-          500, 
-          1250
-        ], 
-        "numberOfExperiments": 3, 
-        "randomWalkSteps": 100, 
-        "timeoutInMS": 600000, 
-        "tracesAmountMax": 20000
-      }, 
-      "iterationMethods": [
-        "BFS", 
-        "Random", 
-        "Plan_Length_And_Reliability_Heuristic", 
-        "Monte_Carlo_Reliability_Heuristic"
-      ], 
-      "problemNames": [
-        "p03-2.pddl"
-      ], 
-      "thresholdSearchSetup": {
-        "maxTracesToUse": 200, 
-        "minTracesToUse": 0, 
-        "timeoutInMS": 300000
-      }
-    }, 
-    {
-      "experimentSetup": {
-        "TestSizeInPercent": false, 
-        "TestSizeOfTracesAmaount": [
-          0, 
-          50, 
-          100, 
-          500, 
-          2000, 
-          8500
-        ], 
-        "numberOfExperiments": 3, 
-        "randomWalkSteps": 100, 
-        "timeoutInMS": 600000, 
-        "tracesAmountMax": 20000
-      }, 
-      "iterationMethods": [
-        "BFS", 
-        "Random", 
-        "Plan_Length_And_Reliability_Heuristic", 
-        "Monte_Carlo_Reliability_Heuristic"
-      ], 
-      "problemNames": [
-        "p03-3.pddl"
-      ], 
-      "thresholdSearchSetup": {
-        "maxTracesToUse": 200, 
-        "minTracesToUse": 0, 
-        "timeoutInMS": 300000
-      }
-    },
-{
-      "experimentSetup": {
-        "TestSizeInPercent": false, 
-        "TestSizeOfTracesAmaount": [
-          0, 
-          100, 
-          500, 
-          2000, 
-          10000, 
-          20000
-        ], 
-        "numberOfExperiments": 3, 
-        "randomWalkSteps": 100, 
-        "timeoutInMS": 600000, 
-        "tracesAmountMax": 20000
-      }, 
-      "iterationMethods": [
-        "BFS", 
-        "Random", 
-        "Plan_Length_And_Reliability_Heuristic", 
-        "Monte_Carlo_Reliability_Heuristic"
-      ], 
-      "problemNames": [
-        "p03-4.pddl"
+        "p03-0.pddl", 
+        "p03-1.pddl", 
+        "p03-2.pddl", 
+        "p03-3.pddl", 
+        "p03-4.pddl",
+	"p03-5.pddl", 
+        "p03-6.pddl"
       ], 
       "thresholdSearchSetup": {
         "maxTracesToUse": 200, 

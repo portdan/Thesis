@@ -29,11 +29,12 @@
       "experimentSetup": {
         "TestSizeInPercent": true, 
         "TestSizeOfTracesAmaount": [
-          0, 
           0.01, 
           0.05, 
+          0.1, 
+          0.15, 
           0.2, 
-          0.5, 
+          0.025, 
           1
         ], 
         "numberOfExperiments": 3, 
@@ -42,19 +43,13 @@
         "tracesAmountMax": 20000
       }, 
       "iterationMethods": [
-        "BFS", 
-        "Random", 
-        "Plan_Length_And_Reliability_Heuristic", 
-        "Monte_Carlo_Reliability_Heuristic"
+        "Likely_Model_Learning"
       ], 
       "problemNames": [
-        "p03-0.pddl", 
-        "p03-1.pddl", 
-        "p03-2.pddl", 
-        "p03-3.pddl", 
-        "p03-4.pddl",
-	"p03-5.pddl", 
-        "p03-6.pddl"
+        "p03.pddl", 
+        "p04.pddl", 
+        "p05.pddl",
+        "p06.pddl"
       ], 
       "thresholdSearchSetup": {
         "maxTracesToUse": 200, 

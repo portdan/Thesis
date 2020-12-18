@@ -1,6 +1,6 @@
 {
-  "domainName": "logistics00",
   "domainFileName": "domain.pddl", 
+  "domainName": "logistics00", 
   "domainPath": "/home/daniel/Desktop/PROBLEMS/logistics00", 
   "originDestination": "Origin", 
   "outputDestination": "/home/daniel/Work/WorkSpace/Thesis/OurPlannerTester/Output", 
@@ -27,14 +27,14 @@
   "problems": [
     {
       "experimentSetup": {
-        "TestSizeInPercent": false, 
+        "TestSizeInPercent": true, 
         "TestSizeOfTracesAmaount": [
           0, 
-          2, 
-          5, 
-          10, 
-          20, 
-          50
+          0.01, 
+          0.05, 
+          0.2, 
+          0.5, 
+          1
         ], 
         "numberOfExperiments": 3, 
         "randomWalkSteps": 100, 
@@ -42,106 +42,20 @@
         "tracesAmountMax": 20000
       }, 
       "iterationMethods": [
-        "BFS", 
+        "Likely_Model_Learning",
+	"BFS", 
         "Random", 
         "Plan_Length_And_Reliability_Heuristic", 
         "Monte_Carlo_Reliability_Heuristic"
       ], 
       "problemNames": [
-        "probLOGISTICS-4-0-0.pddl"
-      ], 
-      "thresholdSearchSetup": {
-        "maxTracesToUse": 200, 
-        "minTracesToUse": 0, 
-        "timeoutInMS": 300000
-      }
-    }, 
-    {
-      "experimentSetup": {
-        "TestSizeInPercent": false, 
-        "TestSizeOfTracesAmaount": [
-          0, 
-          10, 
-          25, 
-          50, 
-          200, 
-          400
-        ], 
-        "numberOfExperiments": 3, 
-        "randomWalkSteps": 100, 
-        "timeoutInMS": 600000, 
-        "tracesAmountMax": 20000
-      }, 
-      "iterationMethods": [
-        "BFS", 
-        "Random", 
-        "Plan_Length_And_Reliability_Heuristic", 
-        "Monte_Carlo_Reliability_Heuristic"
-      ], 
-      "problemNames": [
-        "probLOGISTICS-4-0-1.pddl"
-      ], 
-      "thresholdSearchSetup": {
-        "maxTracesToUse": 200, 
-        "minTracesToUse": 0, 
-        "timeoutInMS": 300000
-      }
-    }, 
-    {
-      "experimentSetup": {
-        "TestSizeInPercent": false, 
-        "TestSizeOfTracesAmaount": [
-          0, 
-          25, 
-          50, 
-          100, 
-          500, 
-          2000
-        ], 
-        "numberOfExperiments": 3, 
-        "randomWalkSteps": 100, 
-        "timeoutInMS": 600000, 
-        "tracesAmountMax": 20000
-      }, 
-      "iterationMethods": [
-        "BFS", 
-        "Random", 
-        "Plan_Length_And_Reliability_Heuristic", 
-        "Monte_Carlo_Reliability_Heuristic"
-      ], 
-      "problemNames": [
-        "probLOGISTICS-4-0-2.pddl"
-      ], 
-      "thresholdSearchSetup": {
-        "maxTracesToUse": 200, 
-        "minTracesToUse": 0, 
-        "timeoutInMS": 300000
-      }
-    }, 
-    {
-      "experimentSetup": {
-        "TestSizeInPercent": false, 
-        "TestSizeOfTracesAmaount": [
-          0, 
-          50, 
-          200, 
-          500, 
-          2000, 
-          20000
-        ], 
-        "numberOfExperiments": 3, 
-        "randomWalkSteps": 100, 
-        "timeoutInMS": 600000, 
-        "tracesAmountMax": 20000
-      }, 
-      "iterationMethods": [
-        "BFS", 
-        "Random", 
-        "Plan_Length_And_Reliability_Heuristic", 
-        "Monte_Carlo_Reliability_Heuristic"
-      ], 
-      "problemNames": [
-        "probLOGISTICS-4-0-3.pddl"
+        "probLOGISTICS-4-0-0.pddl", 
+        "probLOGISTICS-4-0-1.pddl", 
+        "probLOGISTICS-4-0-2.pddl", 
+        "probLOGISTICS-4-0-3.pddl", 
+        "probLOGISTICS-4-0-4.pddl", 
+        "probLOGISTICS-4-0-5.pddl", 
+        "probLOGISTICS-4-0-6.pddl"
       ], 
       "thresholdSearchSetup": {
         "maxTracesToUse": 200, 

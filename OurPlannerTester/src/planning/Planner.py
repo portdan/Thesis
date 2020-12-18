@@ -5,6 +5,8 @@ Created on Apr 25, 2019
 '''
 
 import pyckson
+import yaml
+import yamlordereddictloader
 import subprocess
 import shutil
 import csv
@@ -19,6 +21,7 @@ logger = logging.getLogger(__name__)
 
 planning_mode = "Planning"
 planning_and_learning_mode = "PlanningAndLearning"
+planning_and_learning_likely_mode = "PlanningAndLearningLikely"
 
 Monte_Carlo_Reliability_Heuristic = "Monte_Carlo_Reliability_Heuristic"
 Monte_Carlo_Plan_Length_Heuristic = "Monte_Carlo_Plan_Length_Heuristic"
@@ -32,6 +35,8 @@ Random = "Random"
 BFS = "BFS"
 DFS = "DFS"
 Offline_Learning = "Offline_Learning"
+
+Likely_Model_Learning = "Likely_Model_Learning"
 
 class Planner(object):
     '''
@@ -67,7 +72,7 @@ class Planner(object):
             preprocess_runner_script.write(preprocess_script_path)
             preprocess_runner_script.write(preprocess_sas_file_input)
 
-    def prepere_planning_config(self, problem_name, num_of_traces_to_use, total_traces_bucket, planner_mode, experiment_details, timeoutInMS, planner_iteration_method = None, C_value = 2):
+    def prepere_planning_config(self, problem_name, generated_traces_amount, num_of_traces_to_use, total_traces_bucket, planner_mode, experiment_details, timeoutInMS, planner_iteration_method = None, C_value = 2):
      
         logger.info("prepere_planning_config")
         
@@ -92,7 +97,20 @@ class Planner(object):
         planner_config.testOutputCSVFilePath = self.config.outputDestination + "/" + problem_name.split(".")[0] + ".csv"
         planner_config.experimentDetails = experiment_details
         planner_config.timeoutInMS = timeoutInMS
-
+        
+        with open(planner_config.configFilePath, 'r') as file:
+            ymal_config = yaml.load(file, Loader=yamlordereddictloader.Loader)               
+            ymal_config['input']['traces']['fileName'] = problem_name.split(".")[0] + "_Traces_" + str(generated_traces_amount) + ".txt"
+            ymal_config['input']['traces']['tracesToUse'] = num_of_traces_to_use
+            ymal_config['working']['iteration'] = 1
+        
+        with open(planner_config.configFilePath, 'w') as file:
+            yaml.dump(ymal_config, file, default_flow_style=False, Dumper=yamlordereddictloader.Dumper)
+            
+        clear_directory(planner_config.likelyModelGeneratorPath + "/input")
+        clear_directory(planner_config.likelyModelGeneratorPath + "/output")
+        clear_directory(planner_config.likelyModelGeneratorPath + "/working")
+        
         if planner_iteration_method is not None:
             planner_config.iterationMethod = planner_iteration_method
             
@@ -142,11 +160,11 @@ class Planner(object):
     def delete_output(self):
         clear_directory(self.config.problemPlannerOutput)
 
-    def plan(self, problem_name, num_of_traces_to_use, total_traces_bucket, planner_mode, experiment_details, timeoutInMS, planner_iteration_method=None, C_value = 2):
+    def plan(self, problem_name, generated_traces_amount, num_of_traces_to_use, total_traces_bucket, planner_mode, experiment_details, timeoutInMS, planner_iteration_method=None, C_value = 2):
            
         logger.info("plan")
         
-        self.prepere_planning_config(problem_name, num_of_traces_to_use, total_traces_bucket, planner_mode, experiment_details, timeoutInMS, planner_iteration_method, C_value)
+        self.prepere_planning_config(problem_name, generated_traces_amount, num_of_traces_to_use, total_traces_bucket, planner_mode, experiment_details, timeoutInMS, planner_iteration_method, C_value)
         
         self.run_planning()   
         
@@ -234,20 +252,22 @@ class Planner(object):
                 #experiment_details = "Experiment #" + str(experiment_counter + i) + " - traces: " + str(amount_of_traces_to_use)        
                 experiment_details = "Experiment #" + str(i) + " traces: " + str(experiment_traces_amount_max) + " bucket: " + str(experiment_traces_bucket_max)       
         
-                traces_generator.copy_generation_output(problem_name, experiment_details)               
-                                                   
-                self.plan(problem_name, experiment_traces_amount_max, experiment_traces_bucket_max, planning_mode, experiment_details, thresholdTimeoutInMS, Offline_Learning)
+                traces_generator.copy_generation_output(problem_name, experiment_details)
+                                                                   
+                self.plan(problem_name, generated_traces_amount, experiment_traces_amount_max, experiment_traces_bucket_max, 
+                          planning_mode, experiment_details, thresholdTimeoutInMS, Offline_Learning)
                 agents, solved, timeout = self.get_ourplanner_results()
-                
+                                
                 if solved == 0:     
                     for iteration_method in iteration_methods:
-                        self.plan(problem_name, experiment_traces_amount_max, experiment_traces_bucket_max, planning_and_learning_mode, experiment_details, experimentTimeoutInMS, iteration_method)
+                        self.plan(problem_name, generated_traces_amount, experiment_traces_amount_max, experiment_traces_bucket_max, 
+                                  planning_and_learning_likely_mode, experiment_details, experimentTimeoutInMS, iteration_method)
                         agents, solved, timeout = self.get_ourplanner_results()
                         #if solved == 1:
                             #finish = True
                             
                 if solved == 1:
-                    finish = True
+                    finish = False
                 
             traces_generator.delete_output()
 
