@@ -2,5 +2,5 @@
 __pycache__/
 *.so
 *~
-/likelymodelgenerator/working/
-/likelymodelgenerator/output/
+/working/
+/output/

@@ -1,0 +1,34 @@
+appName: likely_model_generator
+logLevel: INFO
+rootDir: /home/daniel/Work/WorkSpace/Thesis/LikelyModelGenerator
+input:
+  path: input
+  traces:
+    fileName: pfile1-1_Traces_82.txt
+    tracesToUse: 4
+  actions:
+    fileName: ActionNames.txt
+  factsGroups:
+    fileName: FactsGroups.txt
+  agents:
+    fileName: Agents.txt
+working:
+  path: working
+  iteration: 1
+  deltaBase: 0.1
+  thresholdsBase: 0.8
+  cValue: 2
+  data:
+    fileName: Data.pkl
+  model:
+    fileName: LastLikelyModel.pkl
+  planTraces:
+    fileName: PlanTraces.txt
+  failedTrace:
+    fileName: FailedTrace.txt
+output:
+  path: output
+  likelyModel:
+    fileName: LikelyModel.txt
+  status:
+    fileName: Status.txt
