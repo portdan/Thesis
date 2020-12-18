@@ -18,6 +18,11 @@ public class Globals {
 
 	public static String SAS_OUTPUT_FILE_PATH;
 	public static String PROCESSED_SAS_OUTPUT_FILE_PATH;
+	
+	public static String LIKELY_MODEL_GENERATOR_PATH;
+	public static final String LIKELY_MODEL_GENERATOR_INPUT_FOLDER = "/input";
+	public static final String LIKELY_MODEL_GENERATOR_OUTPUT_FOLDER= "/output";
+	public static final String LIKELY_MODEL_GENERATOR_WORKING_FOLDER= "/working";
 
 	public static final String INIT_KEYWORD = "init\n";
 	public static final String GOAL_KEYWORD = "goal\n";

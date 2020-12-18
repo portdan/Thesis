@@ -18,5 +18,6 @@ public enum IterationMethod {
 	Random,
 	BFS,
 	DFS,
-	Offline_Learning
+	Offline_Learning,
+	Likely_Model_Learning
 }

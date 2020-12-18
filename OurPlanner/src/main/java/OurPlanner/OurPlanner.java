@@ -3,13 +3,17 @@ package OurPlanner;
 import java.io.File;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Level;
@@ -19,6 +23,8 @@ import com.sun.management.OperatingSystemMXBean;
 
 import Configuration.ConfigurationManager;
 import Configuration.OurPlannerConfiguration;
+import PlannerAndLearner.LikelyModelStatus;
+import PlannerAndLearner.PlannerAndLikelyModelLearner;
 import PlannerAndLearner.PlannerAndModelLearner;
 import Utils.FileDeleter;
 import Utils.OSStatistics;
@@ -30,10 +36,11 @@ import enums.PlannerMode;
 import enums.PlanningModel;
 import enums.VerificationModel;
 
-public class OurPlanner implements Creator  {
+public class OurPlanner implements Creator {
 
 	/* Global variables */
 	private final static Logger LOGGER = Logger.getLogger(OurPlanner.class);
+
 	private final static int ARGS_NUM = 2;
 	private final static int SEED = 1;
 
@@ -44,6 +51,7 @@ public class OurPlanner implements Creator  {
 	private String domainName = "";
 	private String domainFileName = "";
 	private String problemFileName = "";
+	private String configFilePath = "";
 
 	public VerificationModel verificationModel = VerificationModel.GroundedModel;
 	public PlanningModel planningModel = PlanningModel.SafeModel;
@@ -63,13 +71,13 @@ public class OurPlanner implements Creator  {
 	private File agentsFile = null;
 
 	private List<String> agentList = null;
-	private	String currentLeaderAgent = "";
+	private String currentLeaderAgent = "";
 	private String experimentDetails = "";
-	private List<String> availableLeaders= null;
+	private List<String> availableLeaders = null;
 
 	// uses seed so agent order is same
-	private	Random rnd = new Random(SEED);
-	//private	Random rnd = new Random();
+	private Random rnd = new Random(SEED);
+	// private Random rnd = new Random();
 
 	private int numOftracesToUse = 0;
 	private double tracesBucket = 0;
@@ -99,26 +107,22 @@ public class OurPlanner implements Creator  {
 
 		LOGGER.info("OurPlanner start");
 
-		if(!ParseArgs(args))
-		{
+		if (!ParseArgs(args)) {
 			LOGGER.fatal("Args not valid");
 			System.exit(1);
 		}
 
-		if(!ConfigurationManager.getInstance().loadConfiguration(configurationFilePath))
-		{
+		if (!ConfigurationManager.getInstance().loadConfiguration(configurationFilePath)) {
 			LOGGER.fatal("Configuration loading failure");
 			System.exit(1);
 		}
 
-		if(!ApplyConfiguration(ConfigurationManager.getInstance().getCurrentConfiguration()))
-		{
+		if (!ApplyConfiguration(ConfigurationManager.getInstance().getCurrentConfiguration())) {
 			LOGGER.fatal("Configuration setting failure");
 			System.exit(1);
 		}
 
-		if(!ReadAgentsFile())
-		{
+		if (!ReadAgentsFile()) {
 			LOGGER.fatal("Agents file reading failure");
 			System.exit(1);
 		}
@@ -127,62 +131,57 @@ public class OurPlanner implements Creator  {
 
 		TestDataAccumulator.getAccumulator().setOutputFile(Globals.OUTPUT_TEST_FILE_PATH);
 
-
-		if(!FileDeleter.deleteLearnedFiles()) {
+		if (!FileDeleter.deleteLearnedFiles()) {
 			LOGGER.info("Deleting Learned files failure");
 			System.exit(1);
 		}
 
-		if(!FileDeleter.deleteTempFiles()) {
+		if (!FileDeleter.deleteTempFiles()) {
 			LOGGER.info("Deleting Temporary files failure");
 			System.exit(1);
 		}
 
-		if(!copyOriginalProblem()) {
+		if (!copyOriginalProblem()) {
 			LOGGER.info("Coping original files failure");
 			System.exit(1);
 		}
 
 		TestDataAccumulator.getAccumulator().experimentDetails = experimentDetails;
 		TestDataAccumulator.getAccumulator().method = iterationMethod.name();
-		TestDataAccumulator.getAccumulator().initialTrainingSize = numOftracesToUse;			
-		TestDataAccumulator.getAccumulator().trainingSizeBucket = tracesBucket;			
+		TestDataAccumulator.getAccumulator().initialTrainingSize = numOftracesToUse;
+		TestDataAccumulator.getAccumulator().trainingSizeBucket = tracesBucket;
 
 		/*
-		try {
-			FileUtils.copyDirectory(tracesFile, outputCopyDir);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		 * try { FileUtils.copyDirectory(tracesFile, outputCopyDir); } catch
+		 * (IOException e) { // TODO Auto-generated catch block e.printStackTrace(); }
 		 */
 
-		if(plannerMode == PlannerMode.Planning) {
+		if (plannerMode == PlannerMode.Planning) {
 
 			runPlanningAlgorithm();
 
 			TestDataAccumulator.getAccumulator().numOfAgentsSolved = num_agents_solved;
 			TestDataAccumulator.getAccumulator().numOfAgentsTimeout = num_agents_timeout;
-			TestDataAccumulator.getAccumulator().numOfAgentsNotSolved = num_agents_not_solved;				
-		}
-		else if(plannerMode == PlannerMode.PlanningAndLearning)
-			runPlanningAlgorithmWithModelUpdating();
+			TestDataAccumulator.getAccumulator().numOfAgentsNotSolved = num_agents_not_solved;
 
-		if(!copyOutputFolder()) {
+		} else if (plannerMode == PlannerMode.PlanningAndLearning)
+			runPlanningAlgorithmWithModelUpdating();
+		else if (plannerMode == PlannerMode.PlanningAndLearningLikely)
+			runPlanningAlgorithmWithLikelyModelUpdating();
+
+		if (!copyOutputFolder()) {
 			LOGGER.info("Coping output folder failure");
-			//System.exit(1);
+			// System.exit(1);
 		}
 
 		/*
-		if(!deleteOutputFiles()) {
-			LOGGER.info("Deleting Output files failure");
-			System.exit(1);
-		}
+		 * if(!deleteOutputFiles()) { LOGGER.info("Deleting Output files failure");
+		 * System.exit(1); }
 		 */
 
 		long finishTimeMs = System.currentTimeMillis();
 
-		TestDataAccumulator.getAccumulator().totalTimeMs = finishTimeMs-startTimeMs;
+		TestDataAccumulator.getAccumulator().totalTimeMs = finishTimeMs - startTimeMs;
 
 		TestDataAccumulator.getAccumulator().writeOutput();
 
@@ -211,18 +210,18 @@ public class OurPlanner implements Creator  {
 
 		planningTimeoutInMS = configuration.planningTimeoutInMS;
 
-		/*INPUT DIR PATH*/
+		/* INPUT DIR PATH */
 		Globals.INPUT_PATH = configuration.inputDirPath;
-		/*INPUT DIR PATH*/
+		/* INPUT DIR PATH */
 
-		/*OUTPUT DIR PATH*/
+		/* OUTPUT DIR PATH */
 		Globals.OUTPUT_PATH = configuration.outputDirPath;
-		/*OUTPUT DIR PATH*/
+		/* OUTPUT DIR PATH */
 
 		Globals.INPUT_GROUNDED_PATH = Globals.INPUT_PATH + "/" + configuration.inputGoundedDirName;
 		groundedFile = new File(Globals.INPUT_GROUNDED_PATH);
 
-		if( !groundedFile.exists()) {
+		if (!groundedFile.exists()) {
 			LOGGER.fatal("provided path to grounded folder not existing");
 			return false;
 		}
@@ -230,7 +229,7 @@ public class OurPlanner implements Creator  {
 		Globals.INPUT_LOCAL_VIEW_PATH = Globals.INPUT_PATH + "/" + configuration.inputLocalViewDirName;
 		localViewFile = new File(Globals.INPUT_LOCAL_VIEW_PATH);
 
-		if( !localViewFile.exists()) {
+		if (!localViewFile.exists()) {
 			LOGGER.fatal("provided path to local view folder not existing");
 			return false;
 		}
@@ -238,14 +237,15 @@ public class OurPlanner implements Creator  {
 		Globals.INPUT_TRACES_PATH = Globals.INPUT_PATH + "/" + configuration.inputTracesDirName;
 		tracesFile = new File(Globals.INPUT_TRACES_PATH);
 
-		if( !tracesFile.exists()) {
+		if (!tracesFile.exists()) {
 			LOGGER.fatal("provided path to traces folder not existing");
 			return false;
 		}
 
-		Globals.INPUT_AGENTS_PATH = Globals.INPUT_PATH + "/" + configuration.inputAgentsDirName + "/" + configuration.agentsFileName;
+		Globals.INPUT_AGENTS_PATH = Globals.INPUT_PATH + "/" + configuration.inputAgentsDirName + "/"
+				+ configuration.agentsFileName;
 		agentsFile = new File(Globals.INPUT_AGENTS_PATH);
-		if( !agentsFile.exists()) {
+		if (!agentsFile.exists()) {
 			LOGGER.fatal("provided path to .agents file not existing");
 			return false;
 		}
@@ -257,17 +257,20 @@ public class OurPlanner implements Creator  {
 
 		domainFileName = configuration.domainFileName;
 		domainName = configuration.domainName;
-		
+
 		extension = domainFileName.substring(domainFileName.lastIndexOf(".") + 1);
-		//Checks if input domain name is of .pddl type
+		// Checks if input domain name is of .pddl type
 		if (!extension.equals("pddl")) {
 			LOGGER.fatal("provided domain file name not existing");
 			return false;
 		}
 
+		Globals.LIKELY_MODEL_GENERATOR_PATH = configuration.likelyModelGeneratorPath;
+		configFilePath = configuration.configFilePath;
+
 		problemFileName = configuration.problemFileName;
 		extension = problemFileName.substring(problemFileName.lastIndexOf(".") + 1);
-		//Checks if input problem name is of .pddl type
+		// Checks if input problem name is of .pddl type
 		if (!extension.equals("pddl")) {
 			LOGGER.fatal("provided problem file name not existing");
 			return false;
@@ -276,45 +279,46 @@ public class OurPlanner implements Creator  {
 		Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 		String timestampFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(timestamp);
 
-		Globals.OUTPUT_COPY_PATH = configuration.outputCopyDirPath + "/" + experimentDetails + "/" + 
-				iterationMethod.name() + "/" + numOftracesToUse + "_traces" + "/" + timestampFormat;
+		Globals.OUTPUT_COPY_PATH = configuration.outputCopyDirPath + "/" + experimentDetails + "/"
+				+ iterationMethod.name() + "/" + numOftracesToUse + "_traces" + "/" + timestampFormat;
 
 		outputCopyDir = new File(Globals.OUTPUT_COPY_PATH);
 
-		if( !outputCopyDir.exists()) {
+		if (!outputCopyDir.exists()) {
 			outputCopyDir.getParentFile().mkdirs();
 		}
 
 		Globals.OUTPUT_TEST_FILE_PATH = configuration.testOutputCSVFilePath;
 		outputTestFile = new File(Globals.OUTPUT_TEST_FILE_PATH);
 
-		if( !outputTestFile.exists()) {
+		if (!outputTestFile.exists()) {
 			outputTestFile.getParentFile().mkdirs();
 		}
 
-		Globals.OUTPUT_TEMP_PATH = Globals.OUTPUT_PATH  + "/" + configuration.outputTempDirPath;
+		Globals.OUTPUT_TEMP_PATH = Globals.OUTPUT_PATH + "/" + configuration.outputTempDirPath;
 
-		Globals.OUTPUT_SAFE_MODEL_PATH = Globals.OUTPUT_PATH  + "/" + configuration.outputSafeModelLearningDirName;
+		Globals.OUTPUT_SAFE_MODEL_PATH = Globals.OUTPUT_PATH + "/" + configuration.outputSafeModelLearningDirName;
 		f = new File(Globals.OUTPUT_SAFE_MODEL_PATH);
-		if( !f.exists()) {
+		if (!f.exists()) {
 			f.mkdirs();
 		}
 
-		Globals.OUTPUT_UNSAFE_MODEL_PATH = Globals.OUTPUT_PATH  + "/" + configuration.outputUnSafeModelLearningDirName;
+		Globals.OUTPUT_UNSAFE_MODEL_PATH = Globals.OUTPUT_PATH + "/" + configuration.outputUnSafeModelLearningDirName;
 		f = new File(Globals.OUTPUT_UNSAFE_MODEL_PATH);
-		if( !f.exists()) {
+		if (!f.exists()) {
 			f.mkdirs();
 		}
 
-		Globals.OUTPUT_SOUND_MODEL_PATH = Globals.OUTPUT_PATH  + "/" + configuration.outputSoundModelLearningDirName;
+		Globals.OUTPUT_SOUND_MODEL_PATH = Globals.OUTPUT_PATH + "/" + configuration.outputSoundModelLearningDirName;
 		f = new File(Globals.OUTPUT_SOUND_MODEL_PATH);
-		if( !f.exists()) {
+		if (!f.exists()) {
 			f.mkdirs();
 		}
 
-		Globals.SAS_OUTPUT_FILE_PATH = Globals.OUTPUT_PATH  + "/" + configuration.outputSASFileName;
+		Globals.SAS_OUTPUT_FILE_PATH = Globals.OUTPUT_PATH + "/" + configuration.outputSASFileName;
 
-		Globals.PROCESSED_SAS_OUTPUT_FILE_PATH = Globals.OUTPUT_PATH  + "/" + configuration.outputSASFileName.split("\\.")[0];
+		Globals.PROCESSED_SAS_OUTPUT_FILE_PATH = Globals.OUTPUT_PATH + "/"
+				+ configuration.outputSASFileName.split("\\.")[0];
 
 		Globals.PYTHON_SCRIPTS_FOLDER = configuration.pythonScriptsPath;
 
@@ -328,58 +332,62 @@ public class OurPlanner implements Creator  {
 		availableLeaders = new ArrayList<>(agentList);
 		long passedTimeMS = 0;
 
-		long agentTimeoutInMS = timeoutInMS/agentList.size();
+		long agentTimeoutInMS = timeoutInMS / agentList.size();
 
 		List<String> leaderAgentPlan = null;
 
 		boolean isLearning = false;
 		boolean isTimeout = false;
 
-		if(numOftracesToUse>=0)
+		if (numOftracesToUse >= 0)
 			isLearning = learnSafeAndUnSafeModelsFromTraces();
 
 		LogLearningTimes();
 
-		if(Globals.IGNORE_OFFLINE_LEARNING_TIMEOUT)
+		if (Globals.IGNORE_OFFLINE_LEARNING_TIMEOUT)
 			timeoutInMS += TestDataAccumulator.getAccumulator().totalLearningTimeMs;
 
 		LOGGER.info("Garbage collection!");
 		System.gc();
 
-		while(leaderAgentPlan == null) {
+		while (leaderAgentPlan == null) {
 
 			passedTimeMS = System.currentTimeMillis() - startTimeMs;
 			/*
-			if(!Globals.IGNORE_OFFLINE_LEARNING_TIMEOUT)
-				passedTimeMS = TestDataAccumulator.getAccumulator().getTotalTimeMSWithoutOfflienLearning();
-			else
-				passedTimeMS = TestDataAccumulator.getAccumulator().getTotalTimeMS();
+			 * if(!Globals.IGNORE_OFFLINE_LEARNING_TIMEOUT) passedTimeMS =
+			 * TestDataAccumulator.getAccumulator().getTotalTimeMSWithoutOfflienLearning();
+			 * else passedTimeMS = TestDataAccumulator.getAccumulator().getTotalTimeMS();
 			 */
 
-			if(passedTimeMS > timeoutInMS){
+			if (passedTimeMS > timeoutInMS) {
 
-				isTimeout= true;
+				isTimeout = true;
 				LOGGER.fatal("TIMEOUT!");
 				break;
 			}
 
 			/*
-			double getCommittedVirtualMemorySize = (double)OSstatistics.getCommittedVirtualMemorySize()/1073741824;
-			double getFreePhysicalMemorySize = (double)OSstatistics.getFreePhysicalMemorySize()/1073741824;
-			double getTotalPhysicalMemorySize = (double)OSstatistics.getTotalPhysicalMemorySize()/1073741824;
-
-			double usedMemoryRatio = (double)(getTotalPhysicalMemorySize-getFreePhysicalMemorySize)/(double)getTotalPhysicalMemorySize;
+			 * double getCommittedVirtualMemorySize =
+			 * (double)OSstatistics.getCommittedVirtualMemorySize()/1073741824; double
+			 * getFreePhysicalMemorySize =
+			 * (double)OSstatistics.getFreePhysicalMemorySize()/1073741824; double
+			 * getTotalPhysicalMemorySize =
+			 * (double)OSstatistics.getTotalPhysicalMemorySize()/1073741824;
+			 * 
+			 * double usedMemoryRatio =
+			 * (double)(getTotalPhysicalMemorySize-getFreePhysicalMemorySize)/(double)
+			 * getTotalPhysicalMemorySize;
 			 */
 			double usedMemoryRatio = OSStatistics.GetMemoryUsage();
 
-			if(usedMemoryRatio > Globals.MEMORY_OVER_USAGE_RATIO) {
+			if (usedMemoryRatio > Globals.MEMORY_OVER_USAGE_RATIO) {
 
-				isTimeout= true;
+				isTimeout = true;
 				LOGGER.fatal("MEMORY OVER USAGE!");
 				break;
 			}
 
-			if(availableLeaders.isEmpty()){
+			if (availableLeaders.isEmpty()) {
 
 				LOGGER.fatal("No more available leaders. No solution!");
 				break;
@@ -393,8 +401,9 @@ public class OurPlanner implements Creator  {
 
 			long agentLearningTime = 0;
 
-			if(Globals.IGNORE_OFFLINE_LEARNING_TIMEOUT)
-				agentLearningTime = TestDataAccumulator.getAccumulator().agentOfflineLearningTimeMs.get(currentLeaderAgent);
+			if (Globals.IGNORE_OFFLINE_LEARNING_TIMEOUT)
+				agentLearningTime = TestDataAccumulator.getAccumulator().agentOfflineLearningTimeMs
+				.get(currentLeaderAgent);
 
 			long planningTimeoutMS = agentTimeoutInMS;// + agentLearningTime;
 
@@ -410,8 +419,8 @@ public class OurPlanner implements Creator  {
 			TestDataAccumulator.getAccumulator().totalPlaningTimeMs += planningTimeTotal;
 			TestDataAccumulator.getAccumulator().agentPlanningTimeMs.put(currentLeaderAgent, planningTimeTotal);
 
-			if(leaderAgentPlan == null)
-				continue;	
+			if (leaderAgentPlan == null)
+				continue;
 
 			long verifingTimeoutMS = agentTimeoutInMS - planningTimeTotal + agentLearningTime;
 
@@ -427,19 +436,18 @@ public class OurPlanner implements Creator  {
 			LOGGER.info("Garbage collection!");
 			System.gc();
 
-			if(isVerified) {
+			if (isVerified) {
 
 				TestDataAccumulator.getAccumulator().finishStatus = "SOLVED";
 				TestDataAccumulator.getAccumulator().solvingAgent = currentLeaderAgent;
-				TestDataAccumulator.getAccumulator().planLength= leaderAgentPlan.size();
+				TestDataAccumulator.getAccumulator().planLength = leaderAgentPlan.size();
 
 				return true;
-			}
-			else
-				leaderAgentPlan=null;
+			} else
+				leaderAgentPlan = null;
 		}
 
-		if(isTimeout || num_agents_timeout==agentList.size())
+		if (isTimeout || num_agents_timeout == agentList.size())
 			TestDataAccumulator.getAccumulator().finishStatus = "TIMEOUT";
 		else
 			TestDataAccumulator.getAccumulator().finishStatus = "NOT SOLVED";
@@ -458,9 +466,9 @@ public class OurPlanner implements Creator  {
 
 		boolean isTimeout = false;
 
-		double timeLimitForAgent = ((double)timeoutInMS)/agentList.size();
+		double timeLimitForAgent = ((double) timeoutInMS) / agentList.size();
 
-		if(numOftracesToUse>=0)
+		if (numOftracesToUse >= 0)
 			learnSafeAndUnSafeModelsFromTraces();
 
 		LOGGER.info("Garbage collection!");
@@ -468,21 +476,19 @@ public class OurPlanner implements Creator  {
 
 		LogLearningTimes();
 
-		if(Globals.IGNORE_OFFLINE_LEARNING_TIMEOUT)
+		if (Globals.IGNORE_OFFLINE_LEARNING_TIMEOUT)
 			timeoutInMS += TestDataAccumulator.getAccumulator().totalLearningTimeMs;
 
-		while(!availableLeaders.isEmpty()) {
+		while (!availableLeaders.isEmpty()) {
 
 			passedTimeMS = System.currentTimeMillis() - startTimeMs;
 			/*
-			if(!Globals.IGNORE_OFFLINE_LEARNING_TIMEOUT)
-				passedTimeMS = TestDataAccumulator.getAccumulator().getTotalTimeMSWithoutOfflienLearning();
-			else
-				passedTimeMS = TestDataAccumulator.getAccumulator().getTotalTimeMS();
+			 * if(!Globals.IGNORE_OFFLINE_LEARNING_TIMEOUT) passedTimeMS =
+			 * TestDataAccumulator.getAccumulator().getTotalTimeMSWithoutOfflienLearning();
+			 * else passedTimeMS = TestDataAccumulator.getAccumulator().getTotalTimeMS();
 			 */
-			if(passedTimeMS > timeoutInMS)
-			{
-				isTimeout=true;
+			if (passedTimeMS > timeoutInMS) {
+				isTimeout = true;
 				LOGGER.fatal("TIMEOUT!");
 				break;
 			}
@@ -493,32 +499,33 @@ public class OurPlanner implements Creator  {
 
 			long agentLearningTime = 0;
 
-			if(Globals.IGNORE_OFFLINE_LEARNING_TIMEOUT)
-				agentLearningTime = TestDataAccumulator.getAccumulator().agentOfflineLearningTimeMs.get(currentLeaderAgent);
+			if (Globals.IGNORE_OFFLINE_LEARNING_TIMEOUT)
+				agentLearningTime = TestDataAccumulator.getAccumulator().agentOfflineLearningTimeMs
+				.get(currentLeaderAgent);
 
 			double timeoutMS = timeLimitForAgent + agentLearningTime;
 
 			PlannerAndModelLearner plannerAndLearner = new PlannerAndModelLearner(currentLeaderAgent, agentList,
-					domainFileName, problemFileName, learner, learner.getGoalFacts(),
-					System.currentTimeMillis(), timeoutMS, planningTimeoutInMS);
+					domainFileName, problemFileName, learner, learner.getGoalFacts(), System.currentTimeMillis(),
+					timeoutMS, planningTimeoutInMS);
 
-
-			if(iterationMethod==IterationMethod.Monte_Carlo_Reliability_Heuristic) {
+			if (iterationMethod == IterationMethod.Monte_Carlo_Reliability_Heuristic) {
 
 				TestDataAccumulator.getAccumulator().method = "Monte_Carlo_Reliability_Heuristic C value = " + cValue;
-				leaderAgentPlan = plannerAndLearner.planAndLearnMonteCarlo(IterationMethod.Reliability_Heuristic, cValue);
-			}
-			else if(iterationMethod==IterationMethod.Monte_Carlo_Goal_Proximity_Heuristic) {
+				leaderAgentPlan = plannerAndLearner.planAndLearnMonteCarlo(IterationMethod.Reliability_Heuristic,
+						cValue);
+			} else if (iterationMethod == IterationMethod.Monte_Carlo_Goal_Proximity_Heuristic) {
 
-				TestDataAccumulator.getAccumulator().method = "Monte_Carlo_Goal_Proximity_Heuristic C value = " + cValue;
-				leaderAgentPlan = plannerAndLearner.planAndLearnMonteCarlo(IterationMethod.Goal_Proximity_Heuristic, cValue);
-			}
-			else if(iterationMethod==IterationMethod.Monte_Carlo_Plan_Length_Heuristic) {
+				TestDataAccumulator.getAccumulator().method = "Monte_Carlo_Goal_Proximity_Heuristic C value = "
+						+ cValue;
+				leaderAgentPlan = plannerAndLearner.planAndLearnMonteCarlo(IterationMethod.Goal_Proximity_Heuristic,
+						cValue);
+			} else if (iterationMethod == IterationMethod.Monte_Carlo_Plan_Length_Heuristic) {
 
 				TestDataAccumulator.getAccumulator().method = "Monte_Carlo_Plan_Length_Heuristic C value = " + cValue;
-				leaderAgentPlan = plannerAndLearner.planAndLearnMonteCarlo(IterationMethod.Plan_Length_Heuristic, cValue);
-			}
-			else {
+				leaderAgentPlan = plannerAndLearner.planAndLearnMonteCarlo(IterationMethod.Plan_Length_Heuristic,
+						cValue);
+			} else {
 				leaderAgentPlan = plannerAndLearner.planAndLearn(iterationMethod);
 			}
 
@@ -526,15 +533,17 @@ public class OurPlanner implements Creator  {
 			TestDataAccumulator.getAccumulator().numOfAgentsTimeout += plannerAndLearner.num_agents_timeout;
 			TestDataAccumulator.getAccumulator().numOfAgentsNotSolved += plannerAndLearner.num_agents_not_solved;
 
-			TestDataAccumulator.getAccumulator().agentNumOfIterations.put(currentLeaderAgent, plannerAndLearner.numOfIterations);
-			TestDataAccumulator.getAccumulator().agentAddedTrainingSize.put(currentLeaderAgent, plannerAndLearner.addedTrainingSize);
+			TestDataAccumulator.getAccumulator().agentNumOfIterations.put(currentLeaderAgent,
+					plannerAndLearner.numOfIterations);
+			TestDataAccumulator.getAccumulator().agentAddedTrainingSize.put(currentLeaderAgent,
+					plannerAndLearner.addedTrainingSize);
 
 			LogLearningTimes();
-			
+
 			LOGGER.info("Garbage collection!");
 			System.gc();
 
-			if(leaderAgentPlan != null) {
+			if (leaderAgentPlan != null) {
 
 				TestDataAccumulator.getAccumulator().finishStatus = "SOLVED";
 				TestDataAccumulator.getAccumulator().solvingAgent = currentLeaderAgent;
@@ -543,15 +552,15 @@ public class OurPlanner implements Creator  {
 				return true;
 			}
 
-			//			if(plannerAndLearner.isTimeout)
-			//			{
-			//				isTimeout=true;
-			//				LOGGER.fatal("TIMEOUT!");
-			//				break;
-			//			}
+			// if(plannerAndLearner.isTimeout)
+			// {
+			// isTimeout=true;
+			// LOGGER.fatal("TIMEOUT!");
+			// break;
+			// }
 		}
 
-		if(isTimeout)
+		if (isTimeout)
 			TestDataAccumulator.getAccumulator().finishStatus = "TIMEOUT";
 		else
 			TestDataAccumulator.getAccumulator().finishStatus = "NOT SOLVED";
@@ -559,18 +568,122 @@ public class OurPlanner implements Creator  {
 		return false;
 	}
 
+	private boolean runPlanningAlgorithmWithLikelyModelUpdating() {
+
+		LOGGER.info("Running planning algorithm with likely model updating");
+
+		availableLeaders = new ArrayList<>(agentList);
+
+		List<String> leaderAgentPlan = null;
+		long passedTimeMS = 0;
+
+		boolean isTimeout = false;
+
+		double timeLimitForAgent = ((double) timeoutInMS) / agentList.size();
+
+		DeleteEffectGenerator DEGenerator = new DeleteEffectGenerator (groundedFile, domainFileName, problemFileName);
+
+		Set<String> actionNames = DEGenerator.generateAllActionLabels();
+		Set<String> factNames = DEGenerator.generateAllFacts();
+
+		Map<String, Set<String>> variableToValuesMapping = getVariableToValuesMapping(false);
+
+		if (!PlannerAndLikelyModelLearner.setupLikelyModelGenerator(tracesFile, agentList, actionNames, variableToValuesMapping))			
+			return false;
+
+		availableLeaders = new ArrayList<>(agentList);
+
+		while (!availableLeaders.isEmpty()) {
+
+			passedTimeMS = System.currentTimeMillis() - startTimeMs;
+			/*
+			 * if(!Globals.IGNORE_OFFLINE_LEARNING_TIMEOUT) passedTimeMS =
+			 * TestDataAccumulator.getAccumulator().getTotalTimeMSWithoutOfflienLearning();
+			 * else passedTimeMS = TestDataAccumulator.getAccumulator().getTotalTimeMS();
+			 */
+			if (passedTimeMS > timeoutInMS) {
+				isTimeout = true;
+				LOGGER.fatal("TIMEOUT!");
+				break;
+			}
+
+			if (!PlannerAndLikelyModelLearner.clearLikelyModelGeneratorFiles())
+				return false;
+
+			currentLeaderAgent = pickLeader();
+
+			long learningStartTime = System.currentTimeMillis();
+
+			if (!PlannerAndLikelyModelLearner.preprocessData(configFilePath))
+				return false;
+
+			long totalLeariningTime = System.currentTimeMillis() - learningStartTime;
+
+			LOGGER.info("Garbage collection!");
+			System.gc();
+
+			LikelyModelStatus status = PlannerAndLikelyModelLearner.readLikelyModelStatus(agentList);
+			TestDataAccumulator.getAccumulator().agentAllActionsPresent = status.getAgentActionsPresesnt();
+
+			TestDataAccumulator.getAccumulator().agentOfflineLearningTimeMs.put(currentLeaderAgent,totalLeariningTime);
+
+			double timeoutMS = timeLimitForAgent + totalLeariningTime;
+
+			PlannerAndLikelyModelLearner plannerAndLikelyModelLearner =
+					new PlannerAndLikelyModelLearner(groundedFile, localViewFile, domainFileName, problemFileName,configFilePath,
+							currentLeaderAgent,agentList, System.currentTimeMillis(),timeoutMS, planningTimeoutInMS);
+
+			leaderAgentPlan = plannerAndLikelyModelLearner.plan();
+
+			LOGGER.info("Garbage collection!");
+			System.gc();
+
+			TestDataAccumulator.getAccumulator().agentLearningTimeMs.put(currentLeaderAgent,
+					totalLeariningTime+plannerAndLikelyModelLearner.agentLearningTime);
+
+			TestDataAccumulator.getAccumulator().numOfAgentsSolved += plannerAndLikelyModelLearner.num_agents_solved;
+			TestDataAccumulator.getAccumulator().numOfAgentsTimeout += plannerAndLikelyModelLearner.num_agents_timeout;
+			TestDataAccumulator.getAccumulator().numOfAgentsNotSolved += plannerAndLikelyModelLearner.num_agents_not_solved;
+
+			TestDataAccumulator.getAccumulator().agentNumOfIterations.put(currentLeaderAgent,
+					plannerAndLikelyModelLearner.num_of_iterations);
+			TestDataAccumulator.getAccumulator().agentAddedTrainingSize.put(currentLeaderAgent,
+					plannerAndLikelyModelLearner.num_of_added_traces);
+
+			if (leaderAgentPlan != null) {
+
+				TestDataAccumulator.getAccumulator().finishStatus = "SOLVED";
+				TestDataAccumulator.getAccumulator().solvingAgent = currentLeaderAgent;
+				TestDataAccumulator.getAccumulator().planLength = leaderAgentPlan.size();
+
+				return true;
+			}
+		}
+
+		if (isTimeout)
+			TestDataAccumulator.getAccumulator().finishStatus = "TIMEOUT";
+		else
+			TestDataAccumulator.getAccumulator().finishStatus = "NOT SOLVED";
+
+		return false;
+	}
+
+
 	private void LogLearningTimes() {
 		for (String agentName : agentList) {
 
 			long agentLearningTime = 0;
 
-			for (String otherAgentName : agentList) 
-				if(!otherAgentName.equals(agentName))
+			for (String otherAgentName : agentList)
+				if (!otherAgentName.equals(agentName))
 					agentLearningTime += learner.agentLearningTimes.get(otherAgentName);
 
-			//TestDataAccumulator.getAccumulator().agentLearningTimeMs.put(agentName, agentLearningTime);
-			TestDataAccumulator.getAccumulator().agentLearningTimeMs.put(agentName, learner.agentLearningTimes.get(agentName));
-			TestDataAccumulator.getAccumulator().agentOfflineLearningTimeMs.put(agentName, learner.agentLearningTimes.get(agentName));
+			// TestDataAccumulator.getAccumulator().agentLearningTimeMs.put(agentName,
+			// agentLearningTime);
+			TestDataAccumulator.getAccumulator().agentLearningTimeMs.put(agentName,
+					learner.agentLearningTimes.get(agentName));
+			TestDataAccumulator.getAccumulator().agentOfflineLearningTimeMs.put(agentName,
+					learner.agentLearningTimes.get(agentName));
 		}
 	}
 
@@ -578,13 +691,13 @@ public class OurPlanner implements Creator  {
 
 		LOGGER.info("Running learning algorithm");
 
-		learner = new TraceLearner(agentList,tracesFile, groundedFile, localViewFile, 
-				domainFileName, problemFileName, numOftracesToUse, tracesLearinigInterval, 
-				startTimeMs, timeoutInMS , Globals.IGNORE_OFFLINE_LEARNING_TIMEOUT);	
+		learner = new TraceLearner(agentList, tracesFile, groundedFile, localViewFile, domainFileName, problemFileName,
+				numOftracesToUse, tracesLearinigInterval, startTimeMs, timeoutInMS,
+				Globals.IGNORE_OFFLINE_LEARNING_TIMEOUT);
 
 		boolean isLearned = learner.learnSafeAndUnSafeModels();
 
-		if(!FileDeleter.deleteTempFiles()) {
+		if (!FileDeleter.deleteTempFiles()) {
 			LOGGER.info("Deleting Temporary files failure");
 			return false;
 		}
@@ -634,7 +747,6 @@ public class OurPlanner implements Creator  {
 		return true;
 	}
 
-
 	private boolean verifyPlan(List<String> plan, boolean isLearning, VerificationModel model, long timeoutMS) {
 
 		LOGGER.info("Verifing plan");
@@ -658,34 +770,30 @@ public class OurPlanner implements Creator  {
 				useGrounded = true;
 				break;
 			}
-		}else {
+		} else {
 			problemFilesPath = Globals.INPUT_LOCAL_VIEW_PATH;
 		}
 
-		PlanVerifier planVerifier = new PlanVerifier(agentList,domainFileName,problemFileName,
-				timeoutMS, problemFilesPath, useGrounded);
+		PlanVerifier planVerifier = new PlanVerifier(agentList, domainFileName, problemFileName, timeoutMS,
+				problemFilesPath, useGrounded);
 
-		VerificationResult res = planVerifier.verifyPlan(plan,0);
+		VerificationResult res = planVerifier.verifyPlan(plan, 0);
 
-		if(!FileDeleter.deleteTempFiles()) {
+		if (!FileDeleter.deleteTempFiles()) {
 			LOGGER.info("Deleting Temporary files failure");
-			return false;	
+			return false;
 		}
 
-		if(res!=null)
-		{
-			if(res.isVerified) {
+		if (res != null) {
+			if (res.isVerified) {
 				num_agents_solved++;
 				return true;
-			}
-			else if(res.isTimeout) {
+			} else if (res.isTimeout) {
 				num_agents_timeout++;
 				return false;
-			}
-			else 
+			} else
 				return false;
-		}
-		else
+		} else
 			return false;
 	}
 
@@ -699,47 +807,44 @@ public class OurPlanner implements Creator  {
 
 			switch (model) {
 			case UnSafeModel:
-				agentDomainPath = Globals.OUTPUT_UNSAFE_MODEL_PATH  + "/" + agentName + "/" + domainFileName;
+				agentDomainPath = Globals.OUTPUT_UNSAFE_MODEL_PATH + "/" + agentName + "/" + domainFileName;
 				break;
 			case SafeModel:
-				agentDomainPath = Globals.OUTPUT_SAFE_MODEL_PATH  + "/" + agentName + "/" + domainFileName;
+				agentDomainPath = Globals.OUTPUT_SAFE_MODEL_PATH + "/" + agentName + "/" + domainFileName;
 				break;
 			case GroundedModel:
 			default:
 				agentDomainPath = Globals.INPUT_GROUNDED_PATH + "/" + domainFileName;
 				break;
 			}
-		}
-		else 
+		} else
 			agentDomainPath = Globals.INPUT_LOCAL_VIEW_PATH + "/" + agentName + "/" + domainFileName;
 
 		String agentProblemPath = Globals.INPUT_LOCAL_VIEW_PATH + "/" + agentName + "/" + problemFileName;
 		String agentADDLPath = Globals.OUTPUT_TEMP_PATH + "/" + problemFileName.split("\\.")[0] + ".addl";
 		String heuristic = "saFF-glcl";
 		int recursionLevel = -1;
-		double timeLimitMin = ((double)timeoutMS/60000);
+		double timeLimitMin = ((double) timeoutMS / 60000);
 
-		MADLAPlanner planner = new MADLAPlanner(agentDomainPath, agentProblemPath, agentADDLPath,
-				heuristic, recursionLevel, timeLimitMin, agentList, agentName);
+		MADLAPlanner planner = new MADLAPlanner(agentDomainPath, agentProblemPath, agentADDLPath, heuristic,
+				recursionLevel, timeLimitMin, agentList, agentName);
 
 		List<String> result = null;
 
-		/*try {
-			result = planner.plan();
-		} catch (OutOfMemoryError E) {
-			num_agents_not_solved++;
-			return null;
-		}*/
+		/*
+		 * try { result = planner.plan(); } catch (OutOfMemoryError E) {
+		 * num_agents_not_solved++; return null; }
+		 */
 
 		result = planner.plan();
 
-		if(planner.isTimeout)
+		if (planner.isTimeout)
 			num_agents_timeout++;
 
-		if(planner.isNotSolved)
+		if (planner.isNotSolved)
 			num_agents_not_solved++;
 
-		if(!FileDeleter.deleteTempFiles()) {
+		if (!FileDeleter.deleteTempFiles()) {
 			LOGGER.info("Deleting Temporary files failure");
 			return null;
 		}
@@ -757,7 +862,7 @@ public class OurPlanner implements Creator  {
 
 		availableLeaders.remove(leaderAgentIndex);
 
-		LOGGER.info("Leader agent: "+ leaderAgent);
+		LOGGER.info("Leader agent: " + leaderAgent);
 
 		return leaderAgent;
 	}
@@ -770,8 +875,8 @@ public class OurPlanner implements Creator  {
 
 		try {
 
-			String domainName = domainFileName.substring(0,domainFileName.lastIndexOf(".") );
-			String problemName = problemFileName.substring(0,problemFileName.lastIndexOf(".") );
+			String domainName = domainFileName.substring(0, domainFileName.lastIndexOf("."));
+			String problemName = problemFileName.substring(0, problemFileName.lastIndexOf("."));
 
 			String scriptPath = Globals.PYTHON_SCRIPTS_FOLDER + "/" + AGENT_PARSER_SCRIPT;
 
@@ -779,22 +884,20 @@ public class OurPlanner implements Creator  {
 
 			LOGGER.info("Running: " + cmd);
 
-			//			pr = Runtime.getRuntime().exec(cmd);
-			//			pr.waitFor();
+			// pr = Runtime.getRuntime().exec(cmd);
+			// pr.waitFor();
 
 			ec = new ExecCommand(cmd);
-		}
-		catch (Exception e) {
-			LOGGER.info(e,e);
+		} catch (Exception e) {
+			LOGGER.info(e, e);
 			return false;
 		}
 
-
-		//		} 
-		//		catch (Exception e) {
-		//			LOGGER.fatal(e, e);
-		//			return false;
-		//		}
+		// }
+		// catch (Exception e) {
+		// LOGGER.fatal(e, e);
+		// return false;
+		// }
 
 		return agentsReaderValid(ec);
 	}
@@ -803,7 +906,7 @@ public class OurPlanner implements Creator  {
 
 		LOGGER.info("Agents reading check");
 
-		if(ec == null) {
+		if (ec == null) {
 			LOGGER.fatal("agent-parser.py script failure");
 			return false;
 		}
@@ -813,7 +916,7 @@ public class OurPlanner implements Creator  {
 		String[] split = ec.getOutput().split("\n");
 
 		for (int i = 0; i < split.length; i++) {
-			output.add(split[i]);                                                                                       
+			output.add(split[i]);
 		}
 
 		agentList = new ArrayList<>(output);
@@ -832,11 +935,11 @@ public class OurPlanner implements Creator  {
 		String status = "";
 		boolean valid = true;
 
-		if ((valid = ArgsLenghtValid(args)) == false) 
-			status = "Usage: <grounded folder> <localview folder> <traces folder> <domain name> <problem name> <addl name>";	
+		if ((valid = ArgsLenghtValid(args)) == false)
+			status = "Usage: <grounded folder> <localview folder> <traces folder> <domain name> <problem name> <addl name>";
 
-		if ((valid = ArgsParsingValid(args)) == false) 
-			status = "Bad path to one or more provided files";	
+		if ((valid = ArgsParsingValid(args)) == false)
+			status = "Bad path to one or more provided files";
 
 		if (!valid) {
 			LOGGER.fatal("provided args: " + Arrays.toString(args));
@@ -861,11 +964,30 @@ public class OurPlanner implements Creator  {
 		configurationFilePath = args[1];
 		File configurationFile = new File(configurationFilePath);
 
-		if( !configurationFile.exists()) {
+		if (!configurationFile.exists()) {
 			LOGGER.fatal(".json configuration file not exists");
 			return false;
 		}
 
 		return true;
 	}
+
+	private Map<String, Set<String>> getVariableToValuesMapping(boolean format) {
+
+		LOGGER.info("Getting mapping");
+
+		String problemFilesPath = Globals.INPUT_GROUNDED_PATH;
+
+		VariableValueExtractor extractor = new VariableValueExtractor(domainFileName,problemFileName,problemFilesPath);	
+
+		Map<String, Set<String>> res = extractor.getMapping(format);
+
+		if(!FileDeleter.deleteTempFiles()) {
+			LOGGER.info("Deleting Temporary files failure");
+			return null;	
+		}
+
+		return res;
+	}
+
 }

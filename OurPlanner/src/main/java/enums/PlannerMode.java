@@ -9,5 +9,6 @@ package enums;
  */
 public enum PlannerMode {
 	Planning,
-	PlanningAndLearning
+	PlanningAndLearning,
+	PlanningAndLearningLikely
 }

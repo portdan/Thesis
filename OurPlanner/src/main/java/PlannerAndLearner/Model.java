@@ -84,6 +84,40 @@ public class Model {
 		return res;
 	}
 
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((actions == null) ? 0 : actions.hashCode());
+		result = prime * result + (firstAction ? 1231 : 1237);
+		result = prime * result + ((startOfModel == null) ? 0 : startOfModel.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Model other = (Model) obj;
+		if (actions == null) {
+			if (other.actions != null)
+				return false;
+		} else if (!actions.equals(other.actions))
+			return false;
+		if (firstAction != other.firstAction)
+			return false;
+		if (startOfModel == null) {
+			if (other.startOfModel != null)
+				return false;
+		} else if (!startOfModel.equals(other.startOfModel))
+			return false;
+		return true;
+	}
+
 	private int extractAction(List<String> content, int actionStartLineNumber) {
 
 		String line = "";

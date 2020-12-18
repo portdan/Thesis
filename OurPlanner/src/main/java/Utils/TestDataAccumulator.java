@@ -34,6 +34,7 @@ public class TestDataAccumulator {
 	public Map<String, Long> agentVerifingTimeMs = new HashMap<String, Long>();
 	public Map<String, Integer> agentAddedTrainingSize = new HashMap<String, Integer>();
 	public Map<String, Integer> agentNumOfIterations = new HashMap<String, Integer>();
+	public Map<String, Boolean> agentAllActionsPresent = new HashMap<String, Boolean>();
 
 	public long totalTimeMs = 0;
 	public long totalLearningTimeMs = 0;
@@ -152,9 +153,12 @@ public class TestDataAccumulator {
 			sb.append(agentName + " Verifing Time").append(sep);
 			sb.append(agentName + " Added Training Size").append(sep);
 			sb.append(agentName + " Number of Iterations").append(sep);
+			sb.append(agentName + " All Actions Present").append(sep);
 		}
 
 		sb.append("Solving Agent").append(sep);
+		sb.append("Solving Agent Number of Iterations").append(sep);
+		sb.append("Solving Agent All Actions Present").append(sep);
 		sb.append("Plan Length").append(sep);
 
 		return sb.toString();
@@ -201,9 +205,12 @@ public class TestDataAccumulator {
 			sb.append(agentVerifingTimeMs.get(agentName)).append(sep);
 			sb.append(agentAddedTrainingSize.get(agentName)).append(sep);
 			sb.append(agentNumOfIterations.get(agentName)).append(sep);
+			sb.append(agentAllActionsPresent.get(agentName)).append(sep);
 		}
 
 		sb.append(solvingAgent).append(sep);
+		sb.append(agentNumOfIterations.get(solvingAgent)).append(sep);
+		sb.append(agentAllActionsPresent.get(solvingAgent)).append(sep);
 		sb.append(planLength).append(sep);
 
 		return sb.toString();

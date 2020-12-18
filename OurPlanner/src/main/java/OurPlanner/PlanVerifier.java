@@ -454,7 +454,7 @@ public class PlanVerifier {
 
 		if(agentProblem == null) {
 			LOGGER.info("Plan cannot be verified!");
-			return new VerificationResult(-1, false);
+			return new VerificationResult(actionIndex-1, false);
 		}
 
 		passedTimeMS = System.currentTimeMillis() - startTimeMs;
@@ -462,7 +462,7 @@ public class PlanVerifier {
 		if(passedTimeMS > timeoutInMS)
 		{
 			LOGGER.fatal("TIMEOUT!");
-			return new VerificationResult(-1, false, true);
+			return new VerificationResult(actionIndex-1, false, true);
 		}
 
 		Action action = getActionFromPlan(agentProblem, actionStr);

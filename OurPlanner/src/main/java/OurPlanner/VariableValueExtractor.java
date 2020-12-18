@@ -38,18 +38,14 @@ public class VariableValueExtractor {
 	private String problemFileName = "";
 	private String problemFilesPath = "";
 
-	private String agentName = "";
-
 	private boolean sasSolvable = false;
 
-	public VariableValueExtractor(String agentName, String domainFileName,
-			String problemFileName, String problemFilesPath) {
+	public VariableValueExtractor(String domainFileName,String problemFileName, String problemFilesPath) {
 
 		LOGGER.setLevel(Level.INFO);
 
 		LOGGER.info("VariableValueExtractor constructor");
 
-		this.agentName = agentName;
 		this.domainFileName = domainFileName;
 		this.problemFileName = problemFileName;
 		this.problemFilesPath = problemFilesPath;
@@ -73,7 +69,6 @@ public class VariableValueExtractor {
 
 		LOGGER.info("Logging input");
 
-		LOGGER.info("agentName: " + agentName);
 		LOGGER.info("domainFileName: " + domainFileName);
 		LOGGER.info("problemFileName: " + problemFileName);
 		LOGGER.info("problemFilesPath: " + problemFilesPath);
@@ -149,10 +144,10 @@ public class VariableValueExtractor {
 		return true;
 	}
 
-	private StateActionStateSASPreprocessor generatePreprocessor(String agentName, String domainPath,
+	private StateActionStateSASPreprocessor generatePreprocessor(String domainPath,
 			String problemPath, String agentADDLPath) {
 
-		LOGGER.info("Generating problem for agent: " + agentName);
+		LOGGER.info("Generating SAS Preprocessor");
 
 		File agentFile = new File(agentADDLPath);
 		if (!agentFile.exists()) {
@@ -307,7 +302,7 @@ public class VariableValueExtractor {
 		return true;
 	}
 
-	public Map<String,Set<String>> getMapping() {
+	public Map<String,Set<String>> getMapping(boolean format) {
 
 		LOGGER.info("Getting mapping");
 
@@ -315,8 +310,7 @@ public class VariableValueExtractor {
 		String problemPath = TEMP_DIR_PATH + "/" + problemFileName;
 		String agentADDLPath = TEMP_DIR_PATH + "/" + problemFileName.split("\\.")[0] + ".addl";	
 
-		StateActionStateSASPreprocessor preprocessor = generatePreprocessor(agentName,
-				domainPath, problemPath, agentADDLPath);
+		StateActionStateSASPreprocessor preprocessor = generatePreprocessor(domainPath, problemPath, agentADDLPath);
 
 		if(preprocessor == null) {
 			LOGGER.info("Mapping cannot be generated!");
@@ -331,7 +325,10 @@ public class VariableValueExtractor {
 			String key = entry.getKey();
 			Set<String> value = entry.getValue();
 
-			res.put(key, new HashSet<String>(formatFacts(value)));
+			if(format)
+				value = formatFacts(value);
+
+			res.put(key, new HashSet<String>(value));
 		}
 
 		return res;

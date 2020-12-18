@@ -1026,9 +1026,9 @@ public class PlannerAndModelLearner {
 
 		String problemFilesPath = Globals.INPUT_GROUNDED_PATH;
 
-		VariableValueExtractor extractor = new VariableValueExtractor(agentName,domainFileName,problemFileName,problemFilesPath);	
+		VariableValueExtractor extractor = new VariableValueExtractor(domainFileName,problemFileName,problemFilesPath);	
 
-		Map<String, Set<String>> res = extractor.getMapping();
+		Map<String, Set<String>> res = extractor.getMapping(true);
 
 		if(!FileDeleter.deleteTempFiles()) {
 			LOGGER.info("Deleting Temporary files failure");

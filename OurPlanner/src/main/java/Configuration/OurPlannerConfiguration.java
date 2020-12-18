@@ -27,6 +27,8 @@ public class OurPlannerConfiguration {
 	public String outputUnSafeModelLearningDirName;
 	public PlanningModel planningModel;
 	public String problemFileName;
+	public String likelyModelGeneratorPath;
+	public String configFilePath;
 	public String pythonScriptsPath;
 	public String testOutputCSVFilePath;
 	public int tracesLearinigInterval;

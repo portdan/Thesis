@@ -16,74 +16,39 @@ public class FileDeleter {
 
 		LOGGER.info("Deleting temporary files");
 
-		File temp = new File(Globals.OUTPUT_TEMP_PATH);		
-		if(temp.exists()) {
-			LOGGER.info("Deleting 'temp' folder");
+		deleteFile(Globals.PROCESSED_SAS_OUTPUT_FILE_PATH);
 
-			try {
-				FileUtils.deleteDirectory(temp);
-			} catch (IOException e) {
-				LOGGER.fatal(e, e);
-				return false;
-			}
-		}
+		deleteFile(Globals.SAS_OUTPUT_FILE_PATH);
 
-		File output = new File(Globals.PROCESSED_SAS_OUTPUT_FILE_PATH);		
-		if(output.exists()) {
-			LOGGER.info("Deleting " + Globals.PROCESSED_SAS_OUTPUT_FILE_PATH + " file");
-			output.delete();
-		}
-
-		File outputSAS = new File(Globals.SAS_OUTPUT_FILE_PATH);		
-		if(outputSAS.exists()) {
-			LOGGER.info("Deleting "+ Globals.SAS_OUTPUT_FILE_PATH +" file");
-			outputSAS.delete();
-		}
-
-		return true;
+		return cleanDirectory(Globals.OUTPUT_TEMP_PATH, true);
 	}
 
 	public static boolean deleteLearnedFiles() {
 
 		LOGGER.info("Deleting learned files");
 
-		File temp = new File(Globals.OUTPUT_SAFE_MODEL_PATH);		
-		if(temp.exists()) {
-			LOGGER.info("Deleting 'safe model' folder");
+		return cleanDirectory(Globals.OUTPUT_SAFE_MODEL_PATH, true) && cleanDirectory(Globals.OUTPUT_UNSAFE_MODEL_PATH, true);
 
-			try {
-				FileUtils.deleteDirectory(temp);
-			} catch (IOException e) {
-				LOGGER.fatal(e, e);
-				return false;
-			}
-		}
-
-		temp = new File(Globals.OUTPUT_UNSAFE_MODEL_PATH);		
-		if(temp.exists()) {
-			LOGGER.info("Deleting 'unsafe model' folder");
-
-			try {
-				FileUtils.deleteDirectory(temp);
-			} catch (IOException e) {
-				LOGGER.fatal(e, e);
-				return false;
-			}
-		}
-
-		return true;
 	}
 
 	public static boolean deleteOutputFiles() {
 
 		LOGGER.info("Deleting output files");
 
-		File temp = new File(Globals.OUTPUT_PATH);		
-		if(temp.exists()) {
-			LOGGER.info("Deleting 'output' folder");
+		return cleanDirectory(Globals.OUTPUT_PATH, true);
+	}
 
+	public static boolean cleanDirectory(String folderPath, boolean delete) {
+
+		LOGGER.info("Clearing files in folder " + folderPath);
+
+		File file = new File(folderPath);		
+		if(file.exists()) {
 			try {
-				FileUtils.deleteDirectory(temp);
+				if(delete)
+					FileUtils.deleteDirectory(file);
+				else
+					FileUtils.cleanDirectory(file);
 			} catch (IOException e) {
 				LOGGER.fatal(e, e);
 				return false;
@@ -93,21 +58,23 @@ public class FileDeleter {
 		return true;
 	}
 
-
 	public static void deleteSASfiles() {
 
 		LOGGER.info("Deleting sas files");
 
-		File output = new File(Globals.PROCESSED_SAS_OUTPUT_FILE_PATH);		
-		if(output.exists()) {
-			LOGGER.info("Deleting " + Globals.PROCESSED_SAS_OUTPUT_FILE_PATH + " file");
-			output.delete();
-		}
+		deleteFile(Globals.PROCESSED_SAS_OUTPUT_FILE_PATH);
 
-		File outputSAS = new File(Globals.SAS_OUTPUT_FILE_PATH);		
-		if(outputSAS.exists()) {
-			LOGGER.info("Deleting "+ Globals.SAS_OUTPUT_FILE_PATH +" file");
-			outputSAS.delete();
+		deleteFile(Globals.SAS_OUTPUT_FILE_PATH);
+	}
+
+	public static void deleteFile(String filePath) {
+
+		LOGGER.info("Deleting file: " + filePath);
+
+		File output = new File(filePath);		
+		if(output.exists()) {
+			LOGGER.info("Deleting file: " + filePath);
+			output.delete();
 		}
 	}
 }
